@@ -40,7 +40,9 @@ vector<vector<int>> colorz; //main color list containing the colors correspondin
 vector<Item> items; //holds all the items on map
 SDL_Texture** item_tiles_p; //primo item tiles
 SDL_Texture** item_tiles_s; //seco item tiles
-//SDL_Color* world_colors; //array of sdl_colors
+SDL_Texture** item_tiles_t; //terto item tiles
+vector<SDL_Color> world_colors; //array of sdl_colors
+vector<vector<Item>> map_items; //a list of list of items on a tile. Index corresponds to [y*map_width + x]
 
 //SDL Stuff
 SDL_Window* gWindow = NULL;//The window we'll be rendering to
@@ -49,7 +51,6 @@ SDL_Renderer* gRenderer = NULL;//The window renderer
 //TTF STUFF
 TTF_Font * font1; //menu font
 SDL_Color font1_clr = {255,255,255}; //color of font
-SDL_Rect inv_font_rect = { SCREEN_HEIGHT - 50, 0, SCREEN_HEIGHT, 200 };
 int texW = 0;//constants used in displaying fonts
 int texH = 0;//constants used in displaying fonts
 
@@ -221,9 +222,9 @@ bool isNodeIn(vector<int> e, vector<vector<int>> v){
 //#MAP LEGEND:
 // 0-99 - WEEDZ -  RANDOMLY GENERATED WEEDZ
 // 100-199 - STONEZ - RANDOMLY GENERTATED STONEZ
-// 200 - FLOOR - EMPTY/COMMA
+// 200 - FLOOR - EMPTY
 // 201 - WALL - STRIPES
-// 202 - WALL - ADOBE
+// 202 - FLOOR - COMMA
 //
 // 299 - EMPTY
 // 300 - ITEM (ANY ITEM, WHATSOEVER)
@@ -232,6 +233,8 @@ bool isNodeIn(vector<int> e, vector<vector<int>> v){
 //Generates a map, based on window dimensions
 //We generate tiles in tmap (what's on floor)
 //And we also generate Items (specific objects)
+//CONSIDER DEPRECATING THIS PAIR!!!!!!!!!()genMap and drawVectorMap!!!!!!!! MAP CAN BE DRAWN WITH ITEM CLASS INSTEAD>>>>>>>>
+//JUST CREATE A SEPARATE ARRAY FOR BUILDING?ENVIRONMENT ITEMS
 vector<vector<int> > genMap(){
     
     vector<vector<int> > tmap; //the map we will return
@@ -271,8 +274,9 @@ vector<vector<int> > genMap(){
     //Fill out entire map with tilez
     for (int i = 0; i<map_height;i++){
         for (int j = 0;j < map_width;j++){
-            if(rand()%2 == 1){
-                tmap[i][j] = rand()%203;
+            if(rand()%20 == 1){
+                //tmap[i][j] = rand()%203;
+                tmap[i][j] = 202;
                 
                 //Also create an item at that point
 //                Item temp = Item::Item(j,i, tmap[i][j], {static_cast<Uint8>(colorz[120][0]),static_cast<Uint8>(colorz[120][1]),static_cast<Uint8>(colorz[120][2])}, {0xff,0xff,0xff,0xff} );
@@ -283,9 +287,16 @@ vector<vector<int> > genMap(){
             }
             
             //ARTIFICIAL FEATURE
-            if(i>20){
-                tmap[i][j] = 299;
-            }
+            //|||||||||||||||||||||
+            //|||||||||||||||||||||
+            //|||||||||||||||||||||
+            //|||||||||||||||||||||
+            //|||||||||||||||||||||
+            //|||||||||||||||||||||
+            //VVVVVVVVVVVVVVVVVVVVV
+//            if(i>2){
+//                tmap[i][j] = 299;
+//            }
             
         }
     }
@@ -300,6 +311,7 @@ void loadTiles(){
     
     item_tiles_p = new SDL_Texture* [303];
     item_tiles_s = new SDL_Texture* [303];
+    item_tiles_t = new SDL_Texture* [303];
     //world_colors = new SDL_Color [200];
     SDL_Color temp_col;
     
@@ -315,8 +327,9 @@ void loadTiles(){
         //AS WE INTEGRATE THESE "MATERIALS" INTO ITEMS, WE ALSO UPDATE THOSE LISTS
         item_tiles_p[i] = loadTexture("Civ2/Civ2/weedz/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
-//        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b)};
-//        world_colors[i] = temp_col;
+        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b)};
+        //world_colors[i] = temp_col;
+        world_colors.push_back(temp_col);
     }
     for(int i = 100 ; i < 200; i++){
         tiles[i] = loadTexture("Civ2/Civ2/stonez/"+std::to_string(i)+".png");
@@ -332,6 +345,7 @@ void loadTiles(){
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
 //        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b)};
 //        world_colors[i] = temp_col;
+        world_colors.push_back(temp_col);
         
     }
     tiles[200] = loadTexture("Civ2/Civ2/tiles/map8.png");
@@ -342,6 +356,7 @@ void loadTiles(){
     
     //initialize item tiles.
     //TODO: WEE NEED TO INTEGRATE THE WEEDZ AND STONES INTO THIS CLASS AS WELL!!!!!
+    //ULTIMATELY ONLY EVERYTHING BELOW HERE WILL REMAIN
     //initialize Item tile's (class static variables)
     //Item::Item initializer constructor takes in two arrays of tiles (SDL_Texture's)
     //initialize temporary array for textures
@@ -353,6 +368,12 @@ void loadTiles(){
     item_tiles_s[300] = loadTexture("Civ2/Civ2/tiles/canSeco.png");
     item_tiles_p[301] = loadTexture("Civ2/Civ2/tiles/adobePrim.png");
     item_tiles_s[301] = loadTexture("Civ2/Civ2/tiles/adobeSeco.png");
+    item_tiles_p[302] = loadTexture("Civ2/Civ2/tiles/saxPrim.png");
+    item_tiles_s[302] = loadTexture("Civ2/Civ2/tiles/saxSeco.png");
+    
+    item_tiles_p[303] = loadTexture("Civ2/Civ2/tiles/celloPrim.png");
+    item_tiles_s[303] = loadTexture("Civ2/Civ2/tiles/celloSeco.png");
+    item_tiles_t[303] = loadTexture("Civ2/Civ2/tiles/celloTert.png");
     
     //Item::tilesPrim = new SDL_Texture * [1];
     //Item::tilesPrim[0] = loadTexture("Civ2/Civ2/tiles/canPrim.png");
@@ -392,16 +413,8 @@ void drawVectorMap(vector<vector<int> > map){
 
 //
 //HOW ADOBE WORKS:
-//On map, adobe has a certain value, indicating there is an adobe wall there
-//However, map DOES NOT contain the COLOR data.
-//All adobe information (color, and position) is contained in Adobe struct
-//All the walls on the map are contained in a single global Adobe array, adobes.
-//
-//
-//FORGET ABOVE
 //TRYING TO DO THIS WITH *ITEM* CLASS
 vector<Item> adobe_items;
-
 
 //DRAW ADOBE WALLS
 //Go through the list of Adobes and draw all
@@ -410,6 +423,13 @@ void drawAdobe(){
     //Using a class
     for(int b = 0 ; b<adobe_items.size(); b++){
         adobe_items[b].draw(gRenderer, item_tiles_p, item_tiles_s);
+        
+        //experimental, change colors each time
+        //SDL_Color p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};;
+        SDL_Color p1 = {255, static_cast<Uint8>(rand()%125),static_cast<Uint8>(rand()%125)};
+
+        SDL_Color s1;
+        adobe_items[b].primColor = p1;
     }
     
     return;
@@ -418,21 +438,91 @@ void drawAdobe(){
 //DRAW SOME ADOBE IN HERE
 void genAdobe(){
     
+    //colors used throughout
+    SDL_Color p1;
+    SDL_Color s1;
+    
     //We're also going to want to gen some more elaborate constructs
     //TODO: Simple COrridor Maze???
     //Make new Adobe using Item class
-    for(int p = 0 ; p < 299; p++){
-        printf("%d\n",adobe_items.size());
-        SDL_Color p1 = {0,0,0};
-        SDL_Color s1 = {255,255,255};
-        Item temp_item = Item(30+(p%6),12+p%4,301, p1, s1);
-        //Item temp_item = Item(30+p%6,12,301);
-        adobe_items.push_back(temp_item);
-        //Item temp_adobe = *new Item(26,26,120,{static_cast<Uint8>(colorz[120][0]),static_cast<Uint8>(colorz[120][1]),static_cast<Uint8>(colorz[120][2])},{0xff,0xff,0xff,0x00});
-        //adobes[p] = Item::Item(50, 23, 301,p1 , s1  );
-        //adobe_items.push_back(*temp_adobe);
+//    for(int p = 0 ; p < 299; p++){
+//        p1 = {0,0,0};
+//        s1 = {255,255,255};
+//        Item temp_item = Item(30+(p%6),12+p%4,301, p1, s1);
+//        //Item temp_item = Item(30+p%6,12,301);
+//        adobe_items.push_back(temp_item);
+//        //Item temp_adobe = *new Item(26,26,120,{static_cast<Uint8>(colorz[120][0]),static_cast<Uint8>(colorz[120][1]),static_cast<Uint8>(colorz[120][2])},{0xff,0xff,0xff,0x00});
+//        //adobes[p] = Item::Item(50, 23, 301,p1 , s1  );
+//        //adobe_items.push_back(*temp_adobe);
+//    }
+    
+    vector<vector<short>> gmap = gen_maze_corridor();
+    int con_x = 10;//the starting point of construction
+    int con_y = 10;//the starting point of construction
+    //redefine colors
+    p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
+    s1 = {0,0,0};
+    //now read in the map and create an adobe for each piece
+    for(int i = 0 ; i < gmap.size(); i++){
+        if(i + con_y>=map_width-1){continue;} //check if i is out of bounds
+        for(int j = 0 ; j < gmap[i].size(); j++){
+            if(j + con_x >= map_height){continue;} //check if j is out of bounds
+            if(gmap[i][j] == 1){
+                //then we need an adobe wall tile there.
+                Item con_item = Item(con_x + i, con_y+ j , 301, p1, s1);
+                adobe_items.push_back(con_item);
+                
+                //////////////////////////
+                //ATTENTION ATTENTION ATTENTION
+                //In order to flip maze about origin, swap i and j in Item constructor AND swap map_height and map_width in bounds checks ONLY
+                ////////////////////////
+            }
+        }
     }
     
+}
+
+//generates the initial items on the map
+void init_items(){
+    map_items.resize(map_width*map_height);
+    
+    //we're going to create 300 random items (basic first kind)
+    //we have to generate items, and also add them to the correct element in the array
+    int tempx; //temporary x
+    int tempy; //temporary y
+    int temp_tile; //temporarily stores random tile index
+    
+    //Create some random items!
+    for(int i = 0; i < 4500; i++){
+        tempx = rand()%(map_width);
+        tempy = rand()%(map_height);
+        temp_tile = rand()%199;
+        //Item temp_item = Item(tempx, tempy, temp_tile, world_colors[temp_tile],{255,255,255,0} ); //temporary item
+        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(colorz[temp_tile][0]), static_cast<Uint8>(colorz[temp_tile][1]), static_cast<Uint8>(colorz[temp_tile][2]),255},{255,255,255,0} ); //temporary item
+        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+        //printf("cc %d %d cc", tempx, tempy);
+        //printf("cc %d %d cc", map_items[(tempy-1)*map_width+(tempx)].back().x, temp_item.x);
+        
+    }
+    
+//    for(int b = 0 ; b<4500; b++){
+//        tempx = rand()%(map_width);
+//        tempy = rand()%(map_height);
+//        temp_tile = 302; //+ (rand()%2);
+//        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
+//        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+//    }
+    
+    
+}
+//Draws all the items
+void draw_items(){
+    //You know what to do
+    for(int i = 0; i < map_items.size(); i++){
+        for(int j = 0 ; j < map_items[i].size(); j++){
+            map_items[i][j].draw(gRenderer, item_tiles_p, item_tiles_s);
+        }
+    }
     
 }
 
@@ -705,12 +795,9 @@ void showInventory(Sprite* sprite, SDL_Event * e){
         SDL_FreeSurface(surface);
         
     }
-    
-    
-
-
-    
 }
+
+
 
 int main( int argc, char* args[] ){
     
@@ -732,6 +819,8 @@ int main( int argc, char* args[] ){
     cre1->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
     Sprite* cre2 = new Sprite(10,11);
     cre2->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
+    Sprite* cre3 = new Sprite(10,10);
+    cre3->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
     Sprite* shroom1 = new Sprite(3,3);
     shroom1->loadFromFile("Civ2/Civ2/tiles/shroomPrim.png","Civ2/Civ2/tiles/shroomSeco.png", 16, 16);
     Sprite* lov1 = new Sprite(5,5);
@@ -742,9 +831,10 @@ int main( int argc, char* args[] ){
     Item* item2 = new Item(26,26,120,{static_cast<Uint8>(colorz[120][0]),static_cast<Uint8>(colorz[120][1]),static_cast<Uint8>(colorz[120][2])},{0xff,0xff,0xff,0x00});
 
     //TEST SHIT
-    genAdobe();
-    gen_maze();
-    
+    //genAdobe();
+    //vector<vector<short>> maze = gen_maze_corridor();
+    //printMaze(maze);
+    init_items();
     
     vector<vector<int>> test = findPathToCoord(map, 8, 3, 1, 0);
 
@@ -811,7 +901,7 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_d:
-                        if(cre1->x > map_width-1){ //bounds check
+                        if(cre1->x >= map_width-1){ //bounds check
                             break;
                         }
                         if(shiftDown){ //get info of above tile
@@ -869,14 +959,16 @@ int main( int argc, char* args[] ){
         //Update Positions...
         //lov1->randomMove();
         //lov1->randomDance();
-        //cre1->randomDance();
+        //cre3->randomDance();
         //cre2->randomDance();
         
         drawVectorMap(map);
-        drawAdobe();
+        //drawAdobe();
+        draw_items();
         //Draw all the sprites
         cre1->draw();
         cre2->draw();
+        cre3->draw();
         shroom1->draw();
         lov1->draw();
         //Draw all the items
@@ -886,7 +978,8 @@ int main( int argc, char* args[] ){
         
         //Draw Display windows
         if(inventoryDisplayOn){
-            showInventory(cre1, &e);
+            //showInventory(cre1, &e);
+            displayItemList(map_items[21], gRenderer, SCREEN_HEIGHT);
         }
         
         SDL_RenderPresent( gRenderer ); //Update screen

@@ -34,4 +34,7 @@ public:
     
 };
 
+//display list of items
+void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN_HEIGHT);
+
 #endif //item_hpp

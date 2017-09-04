@@ -17,4 +17,5 @@
 
 using namespace std;
 
-vector<vector<int>> gen_maze(); //generates a random corridor maze
+vector<vector<short>> gen_maze_corridor(); //generates a random corridor maze
+void printMaze(vector<vector<short>> maze); //prints out a maze to console, simple utility
