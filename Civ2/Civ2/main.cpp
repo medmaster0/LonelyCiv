@@ -35,6 +35,7 @@ SDL_Texture** tiles; //contains map tiles
 int map_width;
 int map_height;
 vector<vector<int>> colorz; //main color list containing the colors corresponding to the tilez
+int blockable[2] = {301,304};
 
 //ItemTile Stuff
 vector<Item> items; //holds all the items on map
@@ -54,9 +55,10 @@ SDL_Color font1_clr = {255,255,255}; //color of font
 int texW = 0;//constants used in displaying fonts
 int texH = 0;//constants used in displaying fonts
 
-//Interface Windows flags
+//Interface Windows flags and vars
 //These are for control of what "windows" are displayed
 bool inventoryDisplayOn = false;
+int item_display_index = 0; //counter used with cursors for inventory pos
 
 /////////////////////////////////////////////////////////
 ////FUNCTIONS BEGIN////////////////////////////////////////
@@ -326,6 +328,7 @@ void loadTiles(){
         
         //AS WE INTEGRATE THESE "MATERIALS" INTO ITEMS, WE ALSO UPDATE THOSE LISTS
         item_tiles_p[i] = loadTexture("Civ2/Civ2/weedz/"+std::to_string(i)+".png");
+        item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b)};
         //world_colors[i] = temp_col;
@@ -343,6 +346,7 @@ void loadTiles(){
         //AS WE INTEGRATE THESE "MATERIALS" INTO ITEMS, WE ALSO UPDATE THOSE LISTS
         item_tiles_p[i] = loadTexture("Civ2/Civ2/stonez/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+        item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
 //        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b)};
 //        world_colors[i] = temp_col;
         world_colors.push_back(temp_col);
@@ -366,14 +370,24 @@ void loadTiles(){
 
     item_tiles_p[300] = loadTexture("Civ2/Civ2/tiles/canPrim.png");
     item_tiles_s[300] = loadTexture("Civ2/Civ2/tiles/canSeco.png");
+    item_tiles_t[300] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
     item_tiles_p[301] = loadTexture("Civ2/Civ2/tiles/adobePrim.png");
     item_tiles_s[301] = loadTexture("Civ2/Civ2/tiles/adobeSeco.png");
+    item_tiles_t[301] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+
     item_tiles_p[302] = loadTexture("Civ2/Civ2/tiles/saxPrim.png");
     item_tiles_s[302] = loadTexture("Civ2/Civ2/tiles/saxSeco.png");
+    item_tiles_t[303] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+
     
     item_tiles_p[303] = loadTexture("Civ2/Civ2/tiles/celloPrim.png");
     item_tiles_s[303] = loadTexture("Civ2/Civ2/tiles/celloSeco.png");
     item_tiles_t[303] = loadTexture("Civ2/Civ2/tiles/celloTert.png");
+    
+    item_tiles_p[304] = loadTexture("Civ2/Civ2/tiles/brickPrim.png");
+    item_tiles_s[304] = loadTexture("Civ2/Civ2/tiles/brickSeco.png");
+    item_tiles_t[304] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     //Item::tilesPrim = new SDL_Texture * [1];
     //Item::tilesPrim[0] = loadTexture("Civ2/Civ2/tiles/canPrim.png");
@@ -485,6 +499,9 @@ void genAdobe(){
 //generates the initial items on the map
 void init_items(){
     map_items.resize(map_width*map_height);
+    //colors used throughout
+    SDL_Color p1;
+    SDL_Color s1;
     
     //we're going to create 300 random items (basic first kind)
     //we have to generate items, and also add them to the correct element in the array
@@ -492,26 +509,65 @@ void init_items(){
     int tempy; //temporary y
     int temp_tile; //temporarily stores random tile index
     
-    //Create some random items!
-    for(int i = 0; i < 4500; i++){
-        tempx = rand()%(map_width);
-        tempy = rand()%(map_height);
-        temp_tile = rand()%199;
-        //Item temp_item = Item(tempx, tempy, temp_tile, world_colors[temp_tile],{255,255,255,0} ); //temporary item
-        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(colorz[temp_tile][0]), static_cast<Uint8>(colorz[temp_tile][1]), static_cast<Uint8>(colorz[temp_tile][2]),255},{255,255,255,0} ); //temporary item
-        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
-        //printf("cc %d %d cc", tempx, tempy);
-        //printf("cc %d %d cc", map_items[(tempy-1)*map_width+(tempx)].back().x, temp_item.x);
-        
-    }
-    
-//    for(int b = 0 ; b<4500; b++){
+//    //Create some random items!
+//    for(int i = 0; i < 4500; i++){
 //        tempx = rand()%(map_width);
 //        tempy = rand()%(map_height);
-//        temp_tile = 302; //+ (rand()%2);
-//        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
+//        temp_tile = rand()%199;
+//        //Item temp_item = Item(tempx, tempy, temp_tile, world_colors[temp_tile],{255,255,255,0} ); //temporary item
+//        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(colorz[temp_tile][0]), static_cast<Uint8>(colorz[temp_tile][1]), static_cast<Uint8>(colorz[temp_tile][2]),255},{255,255,255,0} ); //temporary item
 //        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+//        //printf("cc %d %d cc", tempx, tempy);
+//        //printf("cc %d %d cc", map_items[(tempy-1)*map_width+(tempx)].back().x, temp_item.x);
+//        
 //    }
+    
+    for(int b = 0 ; b<450; b++){
+        tempx = rand()%(map_width);
+        tempy = rand()%(map_height);
+        if(rand()%2 == 1){
+            temp_tile = 304; //+ (rand()%2);
+        }else{
+            temp_tile=304;
+        }
+        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
+        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+    }
+    
+    //Make a brick maze
+    vector<vector<short>> gmap = gen_maze_corridor();
+    int con_x = 10;//the starting point of construction
+    int con_y = 10;//the starting point of construction
+    //redefine colors
+    p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
+    s1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
+    //BASIC RECIPE FOR MAKING A MAZE OUT OF PHYSICAL ITEMS
+    for(int i = 0 ; i < gmap.size(); i++){
+        tempy = i+con_y;
+        if(tempy>=map_height-1){continue;} //check if i is out of bounds
+        for(int j = 0 ; j < gmap[i].size(); j++){
+            tempx = j + con_x;
+            if(tempx >= map_width){continue;} //check if j is out of bounds
+            if(gmap[i][j] == 1){
+                //then we need an adobe wall tile there.
+                Item con_item = Item(con_x + i, con_y+ j , 304, p1, s1);
+                map_items[(tempy)*map_width+(tempx)].push_back(con_item);
+            }
+        }
+    }
+    
+    //for testing inventory, specific tile...
+    for(int b = 0 ; b<450; b++){
+        tempx = 14;
+        tempy = 14;
+        if(rand()%2 == 1){
+            temp_tile = 302; //+ (rand()%2);
+        }else{
+            temp_tile=304;
+        }
+        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
+        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+    }
     
     
 }
@@ -520,7 +576,7 @@ void draw_items(){
     //You know what to do
     for(int i = 0; i < map_items.size(); i++){
         for(int j = 0 ; j < map_items[i].size(); j++){
-            map_items[i][j].draw(gRenderer, item_tiles_p, item_tiles_s);
+            map_items[i][j].draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
         }
     }
     
@@ -532,22 +588,22 @@ void draw_items(){
 
 //a function that picks up an item from the map, and put's it in the specified Sprite's inventory
 void pickUpItem(Sprite* sprite, int xpos, int ypos){
-    Material item_temp; // a temporary item for adding to inventory
-    int index; //a temporary index
-    vector<int> clr; //a temporary holder for colors used multiple times below
-    
-    index = map[ypos][xpos]; //get the tile number at the position
-    //check to make sure item is pick-upable
-    if(index > 199){
-        return;
-    }
-    
-    clr = colorz[index]; //get the color of the tile the cre is at
-    item_temp = {clr, index};
-    sprite->inventory.push_back(item_temp);
-    
-    //Also delete item from map
-    map[ypos][xpos] = 200; //blank tile
+//    Item item_temp; // a temporary item for adding to inventory
+//    int index; //a temporary index
+//    vector<int> clr; //a temporary holder for colors used multiple times below
+//    
+//    index = map[ypos][xpos]; //get the tile number at the position
+//    //check to make sure item is pick-upable
+//    if(index > 199){
+//        return;
+//    }
+//    
+//    clr = colorz[index]; //get the color of the tile the cre is at
+//    item_temp = {clr, index};
+//    sprite->inventory.push_back(item_temp);
+//    
+//    //Also delete item from map
+//    map[ypos][xpos] = 200; //blank tile
 }
 
 //////////////////////
@@ -716,86 +772,86 @@ vector<vector<int>> findPathToCoord(vector<vector<int>>, int x1, int y1, int x2,
 //DISPLAY WINDOWS?RECTANGLES WITH INFO
 //WE REALLY SHOULD CREATE A SOLID CLASS FOR ALL OF THESE...
 //A function to display a little box showing what's in inventory
-int counterInventory = 0; //counter used with cursors for inventory pos
-SDL_Surface * surface; //used in drawing
-SDL_Texture * texture; //
-void showInventory(Sprite* sprite, SDL_Event * e){
-    
-    std::string words = "      inventory\n"; //char buffer that is displayed
-    
-    //Black out Box {x, y, w, h}
-    SDL_Rect r={0,SCREEN_HEIGHT,150,-150};
-
-    SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255 ); //color of box
-    SDL_RenderFillRect( gRenderer, &r ); //copy box to renderer
-    
-    surface = TTF_RenderText_Blended_Wrapped(font1, words.c_str(), font1_clr, 125);
-    texture = SDL_CreateTextureFromSurface(gRenderer, surface);
-    
-    //Create text rect (text box)
-    SDL_QueryTexture(texture, NULL, NULL, &texW, &texH); //This get's the dimensions of the font/text
-    SDL_Rect dstrect = { 0, SCREEN_HEIGHT+r.h, texW, texH }; //so we can make the proper rect to display it
-    SDL_RenderCopy(gRenderer, texture, NULL, &dstrect); //write
-    
-    //Free Memory!!!
-    SDL_DestroyTexture(texture);
-    SDL_FreeSurface(surface);
-    
-    ////////////FINISH PUTTING THE TITLE: inventory
-    
-    //Now we need to print out the items (in COLOR text!!!!)
-    std::string item_name;
-    int item_index; //keeps track of what item in inventory we are actually printing - depends on two factors, down below
-    SDL_Color item_color; //The color of the item
-    
-//    if(sprite->inventory.size()!=0){counterInventory = counterInventory % sprite->inventory.size();} //this allows it to scroll back on itself//
-    if(counterInventory<0){counterInventory = sprite->inventory.size()-1;}
-    if(counterInventory>sprite->inventory.size()-1){   counterInventory = 0;}
-    
-    //We'll also reuse some of the previously used objects
-    for(int u = 0; u<7; u++){ //cycle through however many elements you wanna fit on screen
-        item_index = u+counterInventory; //Allow the user to control the scroll by referencing global counterInventory
-        if(u+counterInventory >= sprite->inventory.size()) {//check if sprite's inventory index is out of bounds
-            break;
-        }
-        
-        //Need to:
-        //Determine item type
-        //  Make string for item_type
-        //Determine color of item
-        //  Make color of item
-        //make surface with string, color, and pre-created font
-        //make texture from surface
-        //Query texture for dimensions
-        //create rectangle at correct position and with determined dimensions
-        //copy onto renderer
-        
-        //Determine item type
-        if(sprite->inventory[item_index].tile<100){ //Then it's a weed
-            item_name = "weed";
-        }else if(sprite->inventory[item_index].tile<200){ //Then it's a stone
-            item_name = "stone";
-        }
-        if(item_index == 0){item_name.append(" FIRST");} //Specify if first in list
-        else if(item_index+1 == sprite->inventory.size()){ item_name.append(" LAST"); }
-        if(u == 0){item_name.append(" <-");} //print out a cursor
-        //Determine Color
-        item_color = {static_cast<Uint8>(sprite->inventory[item_index].color[0]), static_cast<Uint8>(sprite->inventory[item_index].color[1]), static_cast<Uint8>(sprite->inventory[item_index].color[2]) }; //lots of conversion from int vector to SDL COLOR...
-        //Make surface and texture
-        surface = TTF_RenderText_Blended_Wrapped(font1, item_name.c_str(), item_color, 125);
-        texture = SDL_CreateTextureFromSurface(gRenderer, surface);
-        //Make the destination rectangle
-        SDL_QueryTexture(texture, NULL, NULL, &texW, &texH); //This get's the dimensions of the font/text
-        dstrect = { 0, SCREEN_HEIGHT+r.h + 15+(u*15), texW, texH }; //so we can make the proper rect to display it
-        //Render to screen
-        SDL_RenderCopy(gRenderer, texture, NULL, &dstrect); //write
-
-        //Free Memory!!!
-        SDL_DestroyTexture(texture);
-        SDL_FreeSurface(surface);
-        
-    }
-}
+//int counterInventory = 0; //counter used with cursors for inventory pos
+//SDL_Surface * surface; //used in drawing
+//SDL_Texture * texture; //
+//void showInventory(Sprite* sprite, SDL_Event * e){
+//    
+//    std::string words = "      inventory\n"; //char buffer that is displayed
+//    
+//    //Black out Box {x, y, w, h}
+//    SDL_Rect r={0,SCREEN_HEIGHT,150,-150};
+//
+//    SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255 ); //color of box
+//    SDL_RenderFillRect( gRenderer, &r ); //copy box to renderer
+//    
+//    surface = TTF_RenderText_Blended_Wrapped(font1, words.c_str(), font1_clr, 125);
+//    texture = SDL_CreateTextureFromSurface(gRenderer, surface);
+//    
+//    //Create text rect (text box)
+//    SDL_QueryTexture(texture, NULL, NULL, &texW, &texH); //This get's the dimensions of the font/text
+//    SDL_Rect dstrect = { 0, SCREEN_HEIGHT+r.h, texW, texH }; //so we can make the proper rect to display it
+//    SDL_RenderCopy(gRenderer, texture, NULL, &dstrect); //write
+//    
+//    //Free Memory!!!
+//    SDL_DestroyTexture(texture);
+//    SDL_FreeSurface(surface);
+//    
+//    ////////////FINISH PUTTING THE TITLE: inventory
+//    
+//    //Now we need to print out the items (in COLOR text!!!!)
+//    std::string item_name;
+//    int item_index; //keeps track of what item in inventory we are actually printing - depends on two factors, down below
+//    SDL_Color item_color; //The color of the item
+//    
+////    if(sprite->inventory.size()!=0){counterInventory = counterInventory % sprite->inventory.size();} //this allows it to scroll back on itself//
+//    if(counterInventory<0){counterInventory = sprite->inventory.size()-1;}
+//    if(counterInventory>sprite->inventory.size()-1){   counterInventory = 0;}
+//    
+//    //We'll also reuse some of the previously used objects
+//    for(int u = 0; u<7; u++){ //cycle through however many elements you wanna fit on screen
+//        item_index = u+counterInventory; //Allow the user to control the scroll by referencing global counterInventory
+//        if(u+counterInventory >= sprite->inventory.size()) {//check if sprite's inventory index is out of bounds
+//            break;
+//        }
+//        
+//        //Need to:
+//        //Determine item type
+//        //  Make string for item_type
+//        //Determine color of item
+//        //  Make color of item
+//        //make surface with string, color, and pre-created font
+//        //make texture from surface
+//        //Query texture for dimensions
+//        //create rectangle at correct position and with determined dimensions
+//        //copy onto renderer
+//        
+//        //Determine item type
+//        if(sprite->inventory[item_index].tile<100){ //Then it's a weed
+//            item_name = "weed";
+//        }else if(sprite->inventory[item_index].tile<200){ //Then it's a stone
+//            item_name = "stone";
+//        }
+//        if(item_index == 0){item_name.append(" FIRST");} //Specify if first in list
+//        else if(item_index+1 == sprite->inventory.size()){ item_name.append(" LAST"); }
+//        if(u == 0){item_name.append(" <-");} //print out a cursor
+//        //Determine Color
+//        item_color = {static_cast<Uint8>(sprite->inventory[item_index].color[0]), static_cast<Uint8>(sprite->inventory[item_index].color[1]), static_cast<Uint8>(sprite->inventory[item_index].color[2]) }; //lots of conversion from int vector to SDL COLOR...
+//        //Make surface and texture
+//        surface = TTF_RenderText_Blended_Wrapped(font1, item_name.c_str(), item_color, 125);
+//        texture = SDL_CreateTextureFromSurface(gRenderer, surface);
+//        //Make the destination rectangle
+//        SDL_QueryTexture(texture, NULL, NULL, &texW, &texH); //This get's the dimensions of the font/text
+//        dstrect = { 0, SCREEN_HEIGHT+r.h + 15+(u*15), texW, texH }; //so we can make the proper rect to display it
+//        //Render to screen
+//        SDL_RenderCopy(gRenderer, texture, NULL, &dstrect); //write
+//
+//        //Free Memory!!!
+//        SDL_DestroyTexture(texture);
+//        SDL_FreeSurface(surface);
+//        
+//    }
+//}
 
 
 
@@ -844,7 +900,7 @@ int main( int argc, char* args[] ){
     bool shiftDown = false; //a flag holding state of shift key
     vector<int> clr; //a temporary holder for colors used multiple times below
     
-    //MAIN GMAE LOOP
+    //MAIN GAME LOOP
     while(!quit){
         //Handle events on queue
         while( SDL_PollEvent( &e ) != 0 )
@@ -860,7 +916,6 @@ int main( int argc, char* args[] ){
                 switch( e.key.keysym.sym )
                 {
                     case SDLK_q:
-                        //r += 32;
                         break;
                         
                     case SDLK_w:
@@ -875,7 +930,6 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_e:
-                        //b += 32;
                         break;
                         
                     case SDLK_a:
@@ -901,9 +955,21 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_d:
-                        if(cre1->x >= map_width-1){ //bounds check
+                        //bool willMove = true; //if the cre will move this turn
+                        //bounds check
+                        if(cre1->x >= map_width-1){
+                            //willMove = false;
                             break;
                         }
+                        //Check if tile is blocked
+                        for(int i = 0; i < map_items[(cre1->y*map_width)+cre1->x+1].size(); i++){
+                            if(map_items[(cre1->y*map_width)+cre1->x+1][i].type == 304){
+                                printf("%d", map_items[(cre1->y*map_width)+cre1->x+1][i].type);
+                                //willMove = false;
+                                break;
+                            }
+                        }
+        
                         if(shiftDown){ //get info of above tile
                             pickUpItem(cre1, (cre1->x)+1, (cre1->y)); //pick up item right
                             break;
@@ -944,10 +1010,10 @@ int main( int argc, char* args[] ){
                 if( e.type == SDL_KEYDOWN ){
                     switch( e.key.keysym.sym ){
                         case SDLK_EQUALS:
-                            counterInventory++;
+                            item_display_index++;
                             break;
                         case SDLK_MINUS:
-                            counterInventory--;
+                            item_display_index--;
                             break;
                     }
                 }
@@ -979,7 +1045,7 @@ int main( int argc, char* args[] ){
         //Draw Display windows
         if(inventoryDisplayOn){
             //showInventory(cre1, &e);
-            displayItemList(map_items[21], gRenderer, SCREEN_HEIGHT);
+            displayItemList(map_items[14*map_width+14], gRenderer, SCREEN_HEIGHT);
         }
         
         SDL_RenderPresent( gRenderer ); //Update screen

@@ -30,8 +30,6 @@ vector<vector<short>> gen_maze_corridor(){
     vector<short> walls1;
     vector<short> walls2;
     
-    printf("translating all fuckin day ");
-    
     //Create alternating periods of walls and no walls.
     for(int i = 0; i<rows; i++){ //for every row
         //Decide whether to fill in cols with 1 or 0

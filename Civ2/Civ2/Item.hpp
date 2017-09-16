@@ -10,13 +10,15 @@
 #define item_hpp
 
 #include <SDL2/SDL.h>
+#include <vector>
 
-//#include "Item.hpp"
-#include "creature.hpp"
+#include "Item.hpp"
 
 using namespace std;
 
 //SDL_Texture* loadTexture( string path, SDL_Renderer* gRenderer );
+extern SDL_Renderer* gRenderer;//The window renderer
+
 
 class Item{
 public:
@@ -28,9 +30,8 @@ public:
     int x,y,z;
     int type; //specifies item type
     void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s); //draws the item
+    void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s,SDL_Texture** item_tiles_t); //overload
     
-    static SDL_Texture** tilesPrim;
-    static SDL_Texture** tilesSeco;
     
 };
 

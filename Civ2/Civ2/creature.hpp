@@ -14,6 +14,9 @@
 
 #include "creature.hpp"
 
+//#ifndef item_hpp
+#include "Item.hpp"
+//#endif
 
 #include <vector>
 using namespace std;
@@ -28,10 +31,10 @@ SDL_Texture* loadTexture( std::string path );
 vector<vector<int>> findPathToCoord(vector<vector<int>>, int x1, int y1, int x2, int y2);
 
 //Material DATA - (other function handles drawing)
-struct Material {
-    vector<int> color; //int vecotr of r,g,b
-    int tile; //The tile index - what kind of item the element is
-};
+//struct Material {
+//    vector<int> color; //int vecotr of r,g,b
+//    int tile; //The tile index - what kind of item the element is
+//};
 
 class Sprite{
 public:
@@ -42,11 +45,12 @@ public:
     void moveDown();
     void moveUp();
     void moveRight();
+    //void moveRightmoveRight(int* blocked, vector<vector<Item>> map_items); //checks if the next tile is blocked
     void moveLeft();
     void randomMove();
     void randomDance();
     int x,y,z; //Position of sprite (MAP COORDS!)
-    vector<Material> inventory; //list of items the sprite is carrying
+    vector<Item> inventory; //list of items the sprite is carrying
     void moveTo(int x1, int y1);
 private:
     SDL_Texture* primTexture;//primary texture of the sprite

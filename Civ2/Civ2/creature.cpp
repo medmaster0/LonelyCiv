@@ -8,6 +8,7 @@
 
 #include "creature.hpp"
 #include "dancez.hpp"
+#include "Item.hpp"
 #include <vector>
 #include <iostream>
 
@@ -103,6 +104,11 @@ void Sprite::moveRight(){
     x=x+1;;
     return;
 }
+////Move Right (1 step) CHECKS BLOCKED
+//void Sprite::moveRight(int* blocked, vector<vector<Item>> map_items){
+//    x=x+1;;
+//    return;
+//}
 //Move Left (1 step)
 void Sprite::moveLeft(){
     x=x-1;;

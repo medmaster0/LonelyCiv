@@ -19,6 +19,7 @@
 		0CA100A61F3A8476004836E0 /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CA100A51F3A8476004836E0 /* SDL2_ttf.framework */; };
 		0CE22F051EFF778800FC41F4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CE22F041EFF778800FC41F4 /* main.cpp */; };
 		0CE22F0F1EFF783200FC41F4 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CE22F0E1EFF783200FC41F4 /* SDL2.framework */; };
+		0CF1F4DA1F6CDA400056FBB1 /* tent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CF1F4D91F6CDA400056FBB1 /* tent.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -48,6 +49,8 @@
 		0CE22F041EFF778800FC41F4 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0CE22F0C1EFF780000FC41F4 /* Frameworks */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Frameworks; path = ../../../../../Library/Frameworks; sourceTree = "<group>"; };
 		0CE22F0E1EFF783200FC41F4 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
+		0CF1F4D81F6CD9C10056FBB1 /* tent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = tent.hpp; path = Civ2/tent.hpp; sourceTree = "<group>"; };
+		0CF1F4D91F6CDA400056FBB1 /* tent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tent.cpp; path = Civ2/tent.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +73,8 @@
 				0C542A4D1F562ADC00CC1D8C /* Item.hpp */,
 				0C542A4B1F562ACA00CC1D8C /* Item.cpp */,
 				0C157BDE1F59B187005FAAF0 /* med_algo.cpp */,
+				0CF1F4D81F6CD9C10056FBB1 /* tent.hpp */,
+				0CF1F4D91F6CDA400056FBB1 /* tent.cpp */,
 				0C157BDF1F59B187005FAAF0 /* med_algo.hpp */,
 				0C0F9A521F45437C0049AD91 /* dancez.cpp */,
 				0C0F9A561F4658860049AD91 /* creature.cpp */,
@@ -182,6 +187,7 @@
 			files = (
 				0C542A4C1F562ACA00CC1D8C /* Item.cpp in Sources */,
 				0C157BE01F59B187005FAAF0 /* med_algo.cpp in Sources */,
+				0CF1F4DA1F6CDA400056FBB1 /* tent.cpp in Sources */,
 				0C0F9A541F45437C0049AD91 /* dancez.cpp in Sources */,
 				0CE22F051EFF778800FC41F4 /* main.cpp in Sources */,
 				0C0F9A581F4658860049AD91 /* creature.cpp in Sources */,

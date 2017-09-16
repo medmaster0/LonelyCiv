@@ -25,6 +25,7 @@ using namespace std;
 // 301 - ADOBE
 // 302 - SAX
 // 303 - CELLO
+// 304 - BRICK
 
 //static variable constructor
 //This overloaded constructor sets the static class variables
@@ -80,12 +81,31 @@ void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture*
         SDL_SetTextureColorMod( item_tiles_s[type], secoColor.r, secoColor.g, secoColor.b); //modulate color, update to match the new one
         SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
     }
+    
+}
+
+//Overloaded draw method
+void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s,SDL_Texture** item_tiles_t){
+    //Set rendering space and render to screen
+    SDL_Rect renderQuad = { x*16, y*16, 16, 16 };
+    SDL_Rect* clip = NULL;
+    SDL_SetTextureColorMod( item_tiles_p[type], primColor.r, primColor.g, primColor.b); //modulate color, update to match the new one
+    SDL_RenderCopy( gRenderer, item_tiles_p[type], clip, &renderQuad );//Render to screen
+    if(item_tiles_s[type] != (SDL_Texture*) 0x9999 ){
+        SDL_SetTextureColorMod( item_tiles_s[type], secoColor.r, secoColor.g, secoColor.b); //modulate color, update to match the new one
+        SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
+    }
+    //Draw the tert pic... shouldnt change color
+    if(item_tiles_t[type] != (SDL_Texture*) 0x9999 ){
+        SDL_RenderCopy( gRenderer, item_tiles_t[type], clip, &renderQuad );//Render to screen
+    }
+
 }
 
 
 //Create a display window that prints out a list of items...
 //globals, will later be tweaked by main game loop... dunno if that's a good idea but fuck
-int item_display_index; //keeps track of inventory segment to draw.
+extern int item_display_index; //keeps track of inventory segment to draw.
 SDL_Surface * item_display_surface; //used in drawing
 SDL_Texture * item_display_texture; //
 //TTF_Font * item_font; //item font
@@ -93,10 +113,12 @@ extern TTF_Font * font1; //item font
 SDL_Color item_font_clr = {255,255,255}; //color of font
 int item_texW = 0;//constants used in displaying fonts
 int item_texH = 0;//constants used in displaying fonts
-
+//interface
+extern int counterInventory;
 void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN_HEIGHT){
     
-    string item_text = "      inventory\n"; //char buffer that is displayed
+    string item_text = "inv: "; //char buffer that is displayed
+    item_text = item_text + std::to_string(item_list.size()) + " items\n";
     //Black out Box {x, y, w, h}
     SDL_Rect r={0,SCREEN_HEIGHT,150,-150};
     SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255 ); //color of box
@@ -152,8 +174,14 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
             item_name = "    can";
         }else if(item_list[item_index].type==301){ //Then it's a stone
             item_name = "    adobe";
+        }else if(item_list[item_index].type==302){ //Then it's a stone
+            item_name = "    sax";
+        }else if(item_list[item_index].type==303){ //Then it's a stone
+            item_name = "    cello";
+        }else if(item_list[item_index].type==304){ //Then it's a stone
+            item_name = "    brick";
         }
-        
+    
         //Determine Color
         item_color1 = item_list[item_index].primColor;
         item_color2 = item_list[item_index].secoColor;
@@ -184,114 +212,6 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
         SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE); //turn alpha back off
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//////////////////////////////
-////DISPLAY WINDOWS?RECTANGLES WITH INFO
-////WE REALLY SHOULD CREATE A SOLID CLASS FOR ALL OF THESE...
-////A function to display a little box showing what's in inventory
-//int counterInventory = 0; //counter used with cursors for inventory pos
-//SDL_Surface * surface; //used in drawing
-//SDL_Texture * texture; //
-//void showInventory(Sprite* sprite, SDL_Event * e){
-//    
-//    std::string words = "      inventory\n"; //char buffer that is displayed
-//    
-//    //Black out Box {x, y, w, h}
-//    SDL_Rect r={0,SCREEN_HEIGHT,150,-150};
-//    
-//    SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255 ); //color of box
-//    SDL_RenderFillRect( gRenderer, &r ); //copy box to renderer
-//    
-//    surface = TTF_RenderText_Blended_Wrapped(font1, words.c_str(), font1_clr, 125);
-//    texture = SDL_CreateTextureFromSurface(gRenderer, surface);
-//    
-//    //Create text rect (text box)
-//    SDL_QueryTexture(texture, NULL, NULL, &texW, &texH); //This get's the dimensions of the font/text
-//    SDL_Rect dstrect = { 0, SCREEN_HEIGHT+r.h, texW, texH }; //so we can make the proper rect to display it
-//    SDL_RenderCopy(gRenderer, texture, NULL, &dstrect); //write
-//    
-//    //Free Memory!!!
-//    SDL_DestroyTexture(texture);
-//    SDL_FreeSurface(surface);
-//    
-//    ////////////FINISH PUTTING THE TITLE: inventory
-//    
-//    //Now we need to print out the items (in COLOR text!!!!)
-//    std::string item_name;
-//    int item_index; //keeps track of what item in inventory we are actually printing - depends on two factors, down below
-//    SDL_Color item_color; //The color of the item
-//    
-//    //    if(sprite->inventory.size()!=0){counterInventory = counterInventory % sprite->inventory.size();} //this allows it to scroll back on itself//
-//    if(counterInventory<0){counterInventory = sprite->inventory.size()-1;}
-//    if(counterInventory>sprite->inventory.size()-1){   counterInventory = 0;}
-//    
-//    //We'll also reuse some of the previously used objects
-//    for(int u = 0; u<7; u++){ //cycle through however many elements you wanna fit on screen
-//        item_index = u+counterInventory; //Allow the user to control the scroll by referencing global counterInventory
-//        if(u+counterInventory >= sprite->inventory.size()) {//check if sprite's inventory index is out of bounds
-//            break;
-//        }
-//        
-//        //Need to:
-//        //Determine item type
-//        //  Make string for item_type
-//        //Determine color of item
-//        //  Make color of item
-//        //make surface with string, color, and pre-created font
-//        //make texture from surface
-//        //Query texture for dimensions
-//        //create rectangle at correct position and with determined dimensions
-//        //copy onto renderer
-//        
-//        //Determine item type
-//        if(sprite->inventory[item_index].tile<100){ //Then it's a weed
-//            item_name = "weed";
-//        }else if(sprite->inventory[item_index].tile<200){ //Then it's a stone
-//            item_name = "stone";
-//        }
-//        if(item_index == 0){item_name.append(" FIRST");} //Specify if first in list
-//        else if(item_index+1 == sprite->inventory.size()){ item_name.append(" LAST"); }
-//        if(u == 0){item_name.append(" <-");} //print out a cursor
-//        //Determine Color
-//        item_color = {static_cast<Uint8>(sprite->inventory[item_index].color[0]), static_cast<Uint8>(sprite->inventory[item_index].color[1]), static_cast<Uint8>(sprite->inventory[item_index].color[2]) }; //lots of conversion from int vector to SDL COLOR...
-//        //Make surface and texture
-//        surface = TTF_RenderText_Blended_Wrapped(font1, item_name.c_str(), item_color, 125);
-//        texture = SDL_CreateTextureFromSurface(gRenderer, surface);
-//        //Make the destination rectangle
-//        SDL_QueryTexture(texture, NULL, NULL, &texW, &texH); //This get's the dimensions of the font/text
-//        dstrect = { 0, SCREEN_HEIGHT+r.h + 15+(u*15), texW, texH }; //so we can make the proper rect to display it
-//        //Render to screen
-//        SDL_RenderCopy(gRenderer, texture, NULL, &dstrect); //write
-//        
-//        //Free Memory!!!
-//        SDL_DestroyTexture(texture);
-//        SDL_FreeSurface(surface);
-//        
-//    }
-//}
-
-
-
 
 
 
