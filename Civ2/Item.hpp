@@ -10,24 +10,32 @@
 #define item_hpp
 
 #include <SDL2/SDL.h>
+#include <vector>
 
-//#include "Item.hpp"
-#include "creature.hpp"
+#include "Item.hpp"
+
+using namespace std;
+
+//SDL_Texture* loadTexture( string path, SDL_Renderer* gRenderer );
+extern SDL_Renderer* gRenderer;//The window renderer
 
 
 class Item{
 public:
-    Item(int xpos, int ypos);
-    static SDL_Texture** tilesPrim; //contains item tiles, the first version
-    static SDL_Texture** tilesSeco; //contains item tiles, the secondary version
+    Item(SDL_Texture** tiles1, SDL_Texture** tiles2);
+    Item(int xpos, int ypos, int tile_type, SDL_Color primo, SDL_Color seco);
+    Item(int xpos, int ypos, int tile_type);
     SDL_Color primColor; //the pirimary color of item
     SDL_Color secoColor; //the secondary color of the item
     int x,y,z;
     int type; //specifies item type
-    void draw(); //draws the item
-    
+    void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s); //draws the item
+    void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s,SDL_Texture** item_tiles_t); //overload
     
     
 };
+
+//display list of items
+void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN_HEIGHT);
 
 #endif //item_hpp
