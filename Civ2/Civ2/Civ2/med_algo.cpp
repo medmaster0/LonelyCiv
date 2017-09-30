@@ -1,0 +1,445 @@
+//
+//  med_algo.cpp
+//  Civ2
+//
+//  Created by Medz on 9/1/17.
+//  Copyright © 2017 Medz. All rights reserved.
+//
+
+#include "med_algo.hpp"
+#include <vector>
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+
+using namespace std;
+
+//generates a random corridor maze
+//A corridor maze is moitititi inspired set of corridors
+//There are two intermediate walls in open runs
+// 1 - BRICK
+// 0 - EMPTY SPACE
+vector<vector<short>> gen_maze_corridor(){
+
+    vector<vector<short>> tmaze; //temporarily create the maze
+    vector<short> trow; //tmemporarily create a row for the maze
+    int rows = 80; //how long the meze is
+    int cols = 20; //how wide the maze is
+    
+    //these lists keep track where the mid walls are for each open row
+    vector<short> walls1;
+    vector<short> walls2;
+    
+    //Create alternating periods of walls and no walls.
+    for(int i = 0; i<rows; i++){ //for every row
+        //Decide whether to fill in cols with 1 or 0
+        if(i%2 == 0){ //on even
+            //fill in with 0s
+            trow.clear(); //clear first
+            for(int j = 0 ; j<cols; j++){
+                trow.push_back(0);
+            }
+            //but also add the boundaries on sides
+            trow[0] = 1;
+            trow[cols - 1] = 1;
+            tmaze.push_back(trow);
+        }else{ //on odd
+            //fill in with 1s
+            trow.clear(); //clear first
+            for(int k = 0 ; k<cols; k++){
+                trow.push_back(1);
+            }
+            tmaze.push_back(trow);
+        }
+        
+    }
+    
+    //Now we add the walls in the middle of the corridor
+    short wall_pos; //temporarily holds the wall's position
+    for(int i = 0; i<rows; i++){ //for every row
+        //only do the evens
+        if(i%2 !=0){
+            walls1.push_back(0);//just as a place holder
+            walls2.push_back(0);//just as a place holder
+            continue;
+        }
+        
+        wall_pos = rand()%(short)floor((0.75*cols)) + 1; //because of this, 0.25*cols need to be greater than 3!!!!!!
+        tmaze[i][wall_pos] = 1;
+        walls1.push_back(wall_pos);
+        //Do it again for the second wall
+        wall_pos = rand()%(cols-walls1[i]-2) + walls1[i] + 1;
+        tmaze[i][wall_pos] = 1;
+        walls2.push_back(wall_pos);
+
+    }
+    
+    //With walls generated, we can determine where to place doors
+    //Place Doors, based on walls lists
+    vector<short> adj_walls; //a temp list to keep track of where adjacent walls are
+    for(int i = 0; i<rows-2; i++){ //for every row , BUT DON"T DO IT FOR LAST ROW THAT IS INCOMPLETE
+        //only do the odds
+        if(i%2 ==0){
+            continue;
+        }
+        
+        //Now for every solid row, we look at the adjacnet open rows and determine where walls are
+        adj_walls.clear();
+        if(i-1>=0){
+            adj_walls.push_back(walls1[i-1]);
+            adj_walls.push_back(walls2[i-1]);
+        }
+        if (i+1<rows){
+            adj_walls.push_back(walls1[i+1]);
+            adj_walls.push_back(walls2[i+1]);
+        }
+
+        //make sure the nodes are in order
+        sort(adj_walls.begin(), adj_walls.end());
+        
+    
+        //between each adjacent wall, we need a doorway
+        //pick a random spot between them (if there's enough room)
+        //TODO::::::: currently hardcode each combination, could probably be more general
+        short d; //a temporary values between the two "adjacent walls"
+        //FIRST
+        if(adj_walls[0]-0>1){
+            d = rand()%(adj_walls[0]-1)+0+1;
+            tmaze[i][d] = 3;
+        }
+        //SECOND
+        if(adj_walls[1]-adj_walls[0]>1){
+            d = rand()%(adj_walls[1]-adj_walls[0]-1)+adj_walls[0]+1;
+            tmaze[i][d] = 3;
+        }
+        //THIRD, one row will only have two
+        if(adj_walls[2]-adj_walls[1]>1){
+            d = rand()%(adj_walls[2]-adj_walls[1]-1)+adj_walls[1]+1;
+            tmaze[i][d] = 3;
+        }
+        //FOURTH, one row will only have two
+        if(adj_walls[3]-adj_walls[2]>1){
+            d = rand()%(adj_walls[3]-adj_walls[2]-1)+adj_walls[2]+1;
+            tmaze[i][d] = 3;
+        }
+        //FIFTH,
+        if(cols-1-adj_walls[3]>1){
+            d = rand()%(cols-1-adj_walls[3]-1)+adj_walls[3]+1;
+            tmaze[i][d] = 3;
+        }
+        
+        
+        
+        //printf("sizeof: %d  ", adj_walls.size());
+        
+        
+//            //print out shit
+//            for(int i = 0 ; i<adj_walls.size(); i++){
+//                    printf("%d", adj_walls[i]);
+//        
+//                printf("\n");
+//            }
+        
+    }
+    
+    
+    return tmaze;
+
+    
+}
+
+//prints out a maze to console, simple utility
+void printMaze(vector<vector<short>> maze){
+    
+    for(int i = 0 ; i<maze.size(); i++){
+        for(int j = 0 ; j < maze[i].size(); j++){
+            printf("%d", maze[i][j]);
+            
+        }
+        printf("\n");
+    }
+    
+    
+    
+}
+
+
+
+
+/////////////////////////////////////////////////////////////////////
+//FUCK I GOTTTA DO EVERYTHING
+
+//need struct for linked list node, list_node
+struct list_node{
+    list_node *next; //next in list, in whatever linked list it's in
+    list_node *prev; //previous in list, whatver linked list it's in
+    list_node *parent; //the parent (in regards to A* algo)
+    int x,y;
+    int f,g,h;
+    list_node(){
+        next = 0;
+        prev = 0;
+        parent = 0;
+        x,y,f,g,h = 0;
+    }
+    list_node(list_node* i_next, list_node* i_prev, list_node* i_parent, int i_x, int i_y, int i_f, int i_g , int i_h){
+        next = i_next;
+        prev = i_prev;
+        parent = i_parent;
+        x = i_x;
+        y = i_y;
+        f = i_f;
+        g = i_g;
+        h = i_h;
+    }
+};
+
+//generic struct for linked lists
+struct list{
+    list_node* first;
+    list_node* last;
+};
+
+//An even better A*, gash damn!
+//Returns a list (vector) of steps from x1,y2 to x2,y2
+//Steps are in form of (x,y)
+vector<vector<int>> A_star(bool block_map[],int map_width, int x1, int y1, int x2, int y2){
+    
+    list open_set = {nullptr,nullptr}; //the start of the open_set
+    list closed_set = {nullptr,nullptr};; //the start of the closed_set
+    
+    //create first node
+    list_node* temp = new list_node;
+    *temp = {nullptr, nullptr, nullptr, x1, y1, 0, 0, 0};
+    
+    //add it to open_set
+    open_set.first = temp;
+    open_set.last = temp;
+    
+    bool search_main = true; //flag to indicate searching - turns off when target is reached
+    //while open_set isn't empty, keep picking off the node with the smallest f
+    while( (open_set.first!=nullptr)  && (search_main)){
+        
+        //find node in open_set with least f, make it q
+        ///////////////////////////////////
+        bool search_f = true;
+        list_node* lowest_f = nullptr; //points to the node with lowest f
+        int least_f = 999999; //start with high (lol) number
+        list_node* current = open_set.first; //points to the current node, we're searching
+        while(search_f){
+            
+            if(current == nullptr){
+                break;
+            }
+            
+            if(current->f<=least_f){ //if, it'shas a lesser f, point to it... THIS ALSO ENSURES THE LAST ONE POPPED ON GETS PICKED
+                lowest_f = current;
+                least_f = lowest_f->f;
+            }
+            if(current==open_set.last){ //if cuurently pointing to last nodee, then stop search
+                search_f = false;
+            }else{
+                current = current->next;
+            }
+        }
+        //when done with search, lowest_f should point to node with lowest f
+        
+        //Find lowest_f node in open_set and call it q
+        ////////////////////////////
+        list_node* q = lowest_f; //q has the lowest f
+        
+        //POPping off q from OPEN_SET
+        ////////////////////////
+        if(q->prev!=nullptr){ //if lowest_f is not FIRST in list
+            (q->prev)->next = q->next; //update the previous node in list
+        }else{ //if lowest_f is first in list
+            open_set.first = q->next; //update the open_set struct
+        }
+        if(q->next!=nullptr){ //if lowest_f is not LAST in list
+            (q->next)->prev = q->prev; //update the next node in list
+        }else{ //if lowest_f is last in list
+            open_set.last = q->prev; //update the open_set struct
+        }
+        //open_set (and it's elements) are correct and up to date
+        
+        list_node* neighbors[4]; //The FOUR neighbors
+        neighbors[0] = new list_node;
+        *neighbors[0] = {nullptr, nullptr, q, (q->x)-1 , q->y , 9999, 9999, 9999};
+        neighbors[1] = new list_node;
+        *neighbors[1] = {nullptr, nullptr, q, (q->x)+1 , q->y , 9999, 9999, 9999};
+        neighbors[2] = new list_node;
+        *neighbors[2] = {nullptr, nullptr, q, q->x , (q->y)-1 , 9999, 9999, 9999};
+        neighbors[3] = new list_node;
+        *neighbors[3] = {nullptr, nullptr, q, q->x , (q->y)+1 , 9999, 9999, 9999};
+     
+        //ADD q to CLOSED_SET
+        q->next = nullptr; //indicate q is at end of list
+        q->prev = closed_set.last; //update q who it's behind
+        if(closed_set.last!=nullptr){closed_set.last->next = q;} //the (former) last item in list now points to neighbor
+        closed_set.last= q; //the closed_set is updated
+        if(closed_set.first==nullptr){closed_set.first= q;}; //if this is the first item in open_set
+        
+        //For each neighbor/successor
+        for(int i = 0; i<4; i++){
+            
+            //if neighbor is TARGET, then we can stop
+            if((neighbors[i]->x==x2)&&(neighbors[i]->y==y2)){
+
+                //ADD neighbor to CLOSED_SET
+                neighbors[i]->next = nullptr; //indicate neighbor is at end of list
+                neighbors[i]->prev = closed_set.last; //update neighbor who it's behind
+                if(closed_set.last!=nullptr){closed_set.last->next = neighbors[i];} //the (former) last item in list now points to neighbor
+                closed_set.last = neighbors[i]; //the closed_set is updated
+                if(closed_set.first==nullptr){closed_set.first= neighbors[i];}; //if this is the first item in open_set
+                
+                //we also need to delete the rest of the neighbors that we've created but haven't had a chance to process
+                int j = i + 1;
+                while(j<4){
+                    delete neighbors[j];
+                    j = j + 1;
+                }
+                
+                search_main = false;
+                break;
+            }
+            
+            //if neighbor tile is blocked then we can stop
+            if(block_map[(neighbors[i]->y*map_width)+neighbors[i]->x]==true){
+                delete neighbors[i]; //delete what we've created!!!
+                continue; //move on to next neighbor
+            }
+            
+            //Calculate The 3 Values: f, g, h
+            neighbors[i]->g = q->g + 1;
+            neighbors[i]->h = abs(y2-(neighbors[i]->y)) + abs(x2-(neighbors[i]->x));
+            neighbors[i]->f = neighbors[i]->g + neighbors[i]->h;
+            
+            //Cycle Through OPEN_SET and check if the neighbor is already in there (with lower f or does it matter here?)
+            bool search_o = true; //search flag
+            bool in_open =  false; //flag indicating if neighbor is in OPNE_SET
+            current = open_set.first; //start at beginning
+            while(search_o){
+                
+                //Check if at end of list
+                if(current==nullptr){
+                    search_o = false;
+                    break;
+                }
+                
+                //Check x,y values in node
+                if( (current->x==neighbors[i]->x) && (current->y==neighbors[i]->y)){
+                    in_open = true;
+                }
+              
+                //Move on to search next node in list
+                current = current->next;
+                
+            }
+            if(in_open){
+                delete neighbors[i]; //delete what we've created!!!
+                continue; //skip this neighbor
+            }
+            
+            //Cycle Through CLOSED_SET and check if the neighbor is already in there (with lower f or does it matter here?)
+            bool search_c = true; //search flag
+            bool in_closed =  false; //flag indicating if neighbor is in CLOSED_SET
+            current = closed_set.first; //start at beginning
+            while(search_c){
+                
+                //Check if at end of list
+                if(current==nullptr){
+                    search_c = false;
+                    break;
+                }
+                
+                //Check x,y values in node
+                if( (current->x==neighbors[i]->x) && (current->y==neighbors[i]->y)){
+                    in_closed = true;
+                }
+                
+                //Move on to search next node in list
+                current = current->next;
+                
+            }
+            if(in_closed){
+                delete neighbors[i]; //delete what we've created!!!
+                continue; //skip this neighbor
+            }
+            
+            //If we've made it to this point, it isn't in CLOSED or OPEN SET
+            //ADD neighbor to OPEN_SET
+            neighbors[i]->next = nullptr; //indicate neighbor is at end of list
+            neighbors[i]->prev = open_set.last; //update neighbor who it's behind
+            if(open_set.last!=nullptr){open_set.last->next = neighbors[i];} //the (former) last item in list now points to neighbor
+            open_set.last = neighbors[i]; //the open_set is updated
+            if(open_set.first==nullptr){open_set.first= neighbors[i];}; //if this is the first item in open_set
+
+            
+        }//Done cycling through neighbors
+        
+        
+    }//end open_list empty
+    
+    
+    //CCONSTRUCT VECTOR TO RETURN BY TRAVERSING THE CLOSED LIST
+    vector<vector<int>> search_q; //the main "list", could really be turned into what ever datat type you wantx
+    vector<int> coord; //a temp coord to add to the search_q.
+    list_node* travel = closed_set.last; //temp pointer for traversing the lists
+    while(true){
+        coord = {travel->x,travel->y};
+        search_q.push_back(coord);
+        travel = travel->parent; //move on to the parent
+        if(travel == nullptr){ //if at end of list
+            break; //bust outta the while loop
+        }
+    }
+    
+    
+    //DELETIION
+    //Print out the closed and open_sets
+    //...the closed set
+    bool printing = true;
+    list_node* current = closed_set.first;
+    while(printing){
+        if(current==nullptr){
+            printing = false;
+            break;
+        }
+        list_node* temp = current; //Fo deletion
+        current = current->next;
+        delete temp; //Also fo deletion
+        
+    }
+    //...the open set
+    printing = true;
+    current = open_set.first;
+    while(printing){
+        if(current==nullptr){
+            printing = false;
+            break;
+        }
+        list_node* temp = current; //fo deletion
+        current = current->next;
+        delete temp; //also fo deletion
+        
+    }
+    
+    printf("\nTarget aqcuired\n");
+    return search_q;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
