@@ -26,6 +26,8 @@ using namespace std;
 // 302 - SAX
 // 303 - CELLO
 // 304 - BRICK
+// 305 - HAT
+// 306 - BOW
 
 //static variable constructor
 //This overloaded constructor sets the static class variables
@@ -88,7 +90,7 @@ void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture*
 void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s,SDL_Texture** item_tiles_t){
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { x*16, y*16, 16, 16 };
-    SDL_Rect* clip = NULL;
+    SDL_Rect* clip = nullptr;
     SDL_SetTextureColorMod( item_tiles_p[type], primColor.r, primColor.g, primColor.b); //modulate color, update to match the new one
     SDL_RenderCopy( gRenderer, item_tiles_p[type], clip, &renderQuad );//Render to screen
     if(item_tiles_s[type] != (SDL_Texture*) 0x9999 ){
@@ -97,7 +99,13 @@ void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture*
     }
     //Draw the tert pic... shouldnt change color
     if(item_tiles_t[type] != (SDL_Texture*) 0x9999 ){
+        printf("\nITEMDrawDebug:%d",&renderQuad);
         SDL_RenderCopy( gRenderer, item_tiles_t[type], clip, &renderQuad );//Render to screen
+        //DEBUGGING ABOVE LINE!!!:
+        //item_tiles_t[type] is NOT the EXC_BAD_ACCESS...
+        //gRenderer is NOT the mutha fuckin EXC_BAD_ACCESS
+        //renderQuad ain't the EXC_BAD_ACCESS...
+        //Must be something Else
     }
 
 }
@@ -180,6 +188,10 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
             item_name = "    cello";
         }else if(item_list[item_index].type==304){ //Then it's a stone
             item_name = "    brick";
+        }else if(item_list[item_index].type==305){ //Then it's a stone
+            item_name = "    hat";
+        }else if(item_list[item_index].type==306){ //Then it's a stone
+            item_name = "    bow";
         }
     
         //Determine Color

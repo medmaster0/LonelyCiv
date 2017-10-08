@@ -11,6 +11,7 @@
 #include "Item.hpp"
 #include <vector>
 #include <iostream>
+#include "med_algo.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -104,11 +105,6 @@ void Sprite::moveRight(){
     x=x+1;;
     return;
 }
-////Move Right (1 step) CHECKS BLOCKED
-//void Sprite::moveRight(int* blocked, vector<vector<Item>> map_items){
-//    x=x+1;;
-//    return;
-//}
 //Move Left (1 step)
 void Sprite::moveLeft(){
     x=x-1;;
@@ -166,6 +162,35 @@ void Sprite::randomDance(){
     
 }
 
+//Draw the sprite's inventory
+void Sprite::drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s){
+    for(int i = 0; i < inventory.size(); i++){
+        inventory[i].x = x;
+        inventory[i].y = y;
+        inventory[i].draw(gRenderer, item_tiles_p, item_tiles_s);
+    }
+}
 
 //END OF SPRITE CLASS
 ///////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
