@@ -86,6 +86,7 @@ void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture*
     
 }
 
+
 //Overloaded draw method
 void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s,SDL_Texture** item_tiles_t){
     //Set rendering space and render to screen
@@ -99,7 +100,6 @@ void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture*
     }
     //Draw the tert pic... shouldnt change color
     if(item_tiles_t[type] != (SDL_Texture*) 0x9999 ){
-        printf("\nITEMDrawDebug:%d",&renderQuad);
         SDL_RenderCopy( gRenderer, item_tiles_t[type], clip, &renderQuad );//Render to screen
         //DEBUGGING ABOVE LINE!!!:
         //item_tiles_t[type] is NOT the EXC_BAD_ACCESS...

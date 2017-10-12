@@ -323,9 +323,9 @@ vector<vector<int> > genMap(){
 void loadTiles(){
     tiles = new SDL_Texture *[303];
     
-    item_tiles_p = new SDL_Texture* [306];
-    item_tiles_s = new SDL_Texture* [306];
-    item_tiles_t = new SDL_Texture* [306];
+    item_tiles_p = new SDL_Texture* [307];
+    item_tiles_s = new SDL_Texture* [307];
+    item_tiles_t = new SDL_Texture* [307];
     tent_tiles_p = new SDL_Texture* [100];
     tent_tiles_s = new SDL_Texture* [100];
     workshop_tiles_p = new SDL_Texture* [100];
@@ -395,7 +395,7 @@ void loadTiles(){
 
     item_tiles_p[302] = loadTexture("Civ2/Civ2/tiles/saxPrim.png");
     item_tiles_s[302] = loadTexture("Civ2/Civ2/tiles/saxSeco.png");
-    item_tiles_t[303] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[302] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
 
     
     item_tiles_p[303] = loadTexture("Civ2/Civ2/tiles/celloPrim.png");
@@ -421,6 +421,9 @@ void loadTiles(){
     //WORKSHOP TILES
     workshop_tiles_p[0] = loadTexture("Civ2/Civ2/doodadz/spinwhelPrim.png");
     workshop_tiles_s[0] = loadTexture("Civ2/Civ2/doodadz/spinwhelSeco.png");
+
+    workshop_tiles_p[1] = loadTexture("Civ2/Civ2/doodadz/screwpressPrim.png");
+    workshop_tiles_s[1] = loadTexture("Civ2/Civ2/doodadz/screwpressSeco.png");
 }
 
 //Generate tilez
@@ -430,6 +433,7 @@ void generateTilez(){
     system("python Civ2/Civ2/weedz/WEEDZ.py");
     system("python Civ2/Civ2/stonez/STONEZ.py");
     system("python Civ2/Civ2/doodadz/spinwhel2.py");
+    system("python Civ2/Civ2/doodadz/screwpress.py");
 
 }
 
@@ -497,31 +501,38 @@ void init_items(){
         map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
     }
     
-    block_map = new bool[map_width*map_height]; //initialize a dynamically sized blocked map
+    block_map = new bool[map_width*map_height](); //initialize a dynamically sized blocked map
     //Make a brick maze
-    vector<vector<short>> gmap = gen_maze_corridor();
-    int con_x = 10;//the starting point of construction
+    vector<vector<short>> gmap = gen_maze_corridor(30,70);
+    printMaze(gmap);
+    int con_x = 20;//the starting point of construction
     int con_y = 10;//the starting point of construction
-    //redefine colors
+    //redefine color
     p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
     s1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
     //BASIC RECIPE FOR MAKING A MAZE OUT OF PHYSICAL ITEMS
-    for(int i = 0 ; i < gmap.size(); i++){
-        tempy = i+con_y;
-        if(tempy>=map_height-1){continue;} //check if i is out of bounds
-        for(int j = 0 ; j < gmap[i].size(); j++){
-            tempx = j + con_x;
-            if(tempx >= map_width){continue;} //check if j is out of bounds
-            if(gmap[i][j] == 1){
-                //then we need an adobe wall tile there.
-                Item con_item = Item(con_x + i, con_y+ j , 304, p1, s1);
-                map_items[(tempy)*map_width+(tempx)].push_back(con_item);
-                block_map[(tempx)*map_width+(tempy)]=true; //initialize block_map
-            }else{
-                block_map[(tempx)*map_width+(tempy)]=false; //initiailize block_map
+    //(Switch i and j for rotation)
+    for(int j = 0 ; j < gmap.size(); j++){ //the ROWS of
+        for(int i = 0; i<gmap[j].size();i++){ //the COLS of
+//    for(int i = 0 ; i < gmap.size(); i++){ //the ROWS of
+//        for(int j = 0; j<gmap[i].size();j++){ //the COLS of
+    
+            tempx = i + con_x;
+            if(tempx >= map_width){continue;}
+            tempy = j + con_y;
+            if( tempy >= map_height){continue;}
+            //Now check if the space is empty or wall
+            if(gmap[j][i] == 1){
+                printf("(%d,%d)",tempx, tempy);
+                //then we need a wall here
+                Item con_item = Item(tempx, tempy, 304, p1, s1);
+                map_items[(tempy*map_width)+tempx].push_back(con_item);
+                block_map[(tempy*map_width)+tempx] = true;
             }
+            
         }
     }
+    
     
     //for testing inventory, specific tile...
     for(int b = 0 ; b<450; b++){
@@ -547,6 +558,11 @@ void init_items(){
     tempx = 25;
     tempy = 8;
     Workshop temp_workshop = Workshop(tempx, tempy, 0);
+    map_workshops[(tempy)*map_width+(tempx)].push_back(temp_workshop);
+    
+    tempx = 27;
+    tempy = 8;
+    temp_workshop = Workshop(tempx, tempy, 1);
     map_workshops[(tempy)*map_width+(tempx)].push_back(temp_workshop);
     
     
@@ -996,6 +1012,10 @@ int main( int argc, char* args[] ){
                         if(cre1->y<1){ //bounds check
                             break;
                         }
+                        //blocked check
+                        if(block_map[(cre1->y-1)*map_width+cre1->x]==true){
+                            break;
+                        }
                         if(shiftDown){ //pick up above tile
                             pickUpItem(cre1, cre1->x, (cre1->y)-1); //pick up item above
                             break;
@@ -1003,11 +1023,16 @@ int main( int argc, char* args[] ){
                         cre1->moveUp();
                         break;
                         
-                    case SDLK_e:
+                    case SDLK_b: //FOR DEBUGGING!!!!
+                        for(int i = 0; i < map_width*map_height; i++) cout << block_map[i];
                         break;
                         
                     case SDLK_a:
                         if(cre1->x<1){ //bounds check
+                            break;
+                        }
+                        //blocked check
+                        if(block_map[(cre1->y)*map_width+cre1->x-1]==true){
                             break;
                         }
                         if(shiftDown){ //get info of left tile
@@ -1019,6 +1044,10 @@ int main( int argc, char* args[] ){
                         
                     case SDLK_s:
                         if(cre1->y>map_height-2){ //bounds check
+                            break;
+                        }
+                        //blocked check
+                        if(block_map[(cre1->y+1)*map_width+cre1->x]==true){
                             break;
                         }
                         if(shiftDown){ //get info of above tile
@@ -1035,7 +1064,10 @@ int main( int argc, char* args[] ){
                             //willMove = false;
                             break;
                         }
-
+                        //blocked check
+                        if(block_map[(cre1->y)*map_width+cre1->x+1]==true){
+                            break;
+                        }
         
                         if(shiftDown){ //get info of above tile
                             pickUpItem(cre1, (cre1->x)+1, (cre1->y)); //pick up item right
@@ -1095,7 +1127,6 @@ int main( int argc, char* args[] ){
         //cre2->randomDance();
         
         drawVectorMap(map);
-        draw_items();
         //Draw all the sprites
         cre1->draw();
         cre1->drawInventory(gRenderer, item_tiles_p, item_tiles_s);
@@ -1105,6 +1136,8 @@ int main( int argc, char* args[] ){
         shroom1->draw();
         lov1->draw();
         //Draw all the items
+        draw_items();
+        //DEBUG: Test generic wonky ass items not in list (BAD)
         can1->draw(gRenderer, item_tiles_p, item_tiles_s);
         item1->draw(gRenderer, item_tiles_p, item_tiles_s);
         item2->draw(gRenderer, item_tiles_p, item_tiles_s);

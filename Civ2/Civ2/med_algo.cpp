@@ -21,12 +21,14 @@ using namespace std;
 //There are two intermediate walls in open runs
 // 1 - BRICK
 // 0 - EMPTY SPACE
-vector<vector<short>> gen_maze_corridor(){
+// Inputs: Specify how many rows, cols
+// Output: maze[rows][cols]
+vector<vector<short>> gen_maze_corridor(int rows_in, int cols_in){
 
     vector<vector<short>> tmaze; //temporarily create the maze
     vector<short> trow; //tmemporarily create a row for the maze
-    int rows = 50; //how long the meze is
-    int cols = 25; //how wide the maze is
+    int rows = rows_in; //how long the meze is
+    int cols = cols_in; //how wide the maze is
     
     //these lists keep track where the mid walls are for each open row
     vector<short> walls1;
@@ -274,8 +276,13 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
         //For each neighbor/successor
         for(int i = 0; i<4; i++){
             
+            //if neighbor is out of bounds then we can throw it away
+            if( (neighbors[i]->y < 0) || (neighbors[i]->x < 0) || (neighbors[i]->x >= map_width) || (neighbors[i]->y >= map_height)    ){
+                delete neighbors[i]; //delete what we've created!!!
+                continue; //move on to next neighbor
+            }
+            
             //if neighbor tile is blocked then we can stop
-            //printf("%d",block_map[((neighbors[i]->y)*map_width)+neighbors[i]->x]);
             if(block_map[((neighbors[i]->y)*map_width)+neighbors[i]->x]==true){
                 delete neighbors[i]; //delete what we've created!!!
                 continue; //move on to next neighbor
@@ -300,12 +307,6 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
                 
                 search_main = false;
                 break;
-            }
-            
-            //if neighbor is out of bounds then we can throw it away
-            if( (neighbors[i]->y < 0) || (neighbors[i]->x < 0) || (neighbors[i]->x >= map_width) || (neighbors[i]->y >= map_height)    ){
-                delete neighbors[i]; //delete what we've created!!!
-                continue; //move on to next neighbor
             }
             
             //Calculate The 3 Values: f, g, h
