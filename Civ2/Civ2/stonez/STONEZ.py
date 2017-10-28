@@ -38,10 +38,15 @@ def generateStone():
 		#Generate new radius, partly based on current radius
 		#maybe a little bigga, maybe a little smalla
 		radius = radius + random.randint(-2,+1)
-		if radius < 0:
-		 	radius = 0
-		if radius == 7:
-		 	radius = 6
+		# if radius < 0:
+		#  	radius = 0
+		# if radius == 7:
+		#  	radius = 6
+		#New radius to leave room for outline
+		if radius < 1:
+		 	radius = 1
+		if radius == 6:
+		 	radius = 5
 
 	return stone
 

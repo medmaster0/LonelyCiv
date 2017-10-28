@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Civ2/med_algo.cpp"
-            timestampString = "529209418.962042"
+            timestampString = "530841008.991845"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
+            startingLineNumber = "170"
+            endingLineNumber = "170"
             landmarkName = "list_node"
             landmarkType = "14">
          </BreakpointContent>

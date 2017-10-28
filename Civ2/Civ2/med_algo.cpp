@@ -11,6 +11,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string>
+
+#include <iostream>
 
 #include <SDL2/SDL.h>
 
@@ -507,9 +510,228 @@ vector<int> color_fight(SDL_Color col1, SDL_Color col2){
     
 }
 
+//HISTORY
+
+//generates a randmo name
+//For now, 3 - syllables
+string genName(){
+    
+    char consonants[] = "bcdfghjklmnpqrstvwxyz";
+    char vowels[] = "aeiou";
+    
+    char c; //temp char for string building
+    string name1; //the name we constructing
+    
+    //Add first letter, consonant
+    c = consonants[rand()%21];
+    name1 += toupper(c); //capitalize first letter
+    //Add second letter, vowel
+    c = vowels[rand()%5];
+    name1 += c;
+    //Add third letter, consonant
+    c = consonants[rand()%21];
+    name1 += c;
+    name1 += c; //fourth is same
+    //Add fifth letter, vowel
+    c = vowels[rand()%5];
+    name1 += c;
 
 
 
+    return name1;
+    
+    
+}
+
+
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//OLD OUTDATED CODE BELOW - PROBABLY STILL WORKS!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+////Utility to check if an element is in list
+//bool isIntIn(int e, vector<int> v){
+//    if(std::find(v.begin(), v.end(), e) != v.end()) {
+//        return true;
+//    } else {
+//        return false;
+//    }
+//}
+//
+//bool isNodeIn(vector<int> e, vector<vector<int>> v){
+//    
+//    vector<int> temp; //used to hold the nodes...
+//    for(int i = 0; i<v.size(); i++){ //cycle through all elements of v
+//        if(e[0] == v[i][0] && e[1] == v[i][1]){
+//            return true;//means we found a match!
+//        }
+//    }
+//    return false; //means we cycled list and couldn't find match
+//}
+
+
+////The searching Algorithm - One coord to another, considering blocked paths
+////Flood Search
+////Input - map, coord1, coord2
+////Output - a list of coords to fllow to get to target - BACKWARD - so POP element from list to find first step
+//vector<vector<int>> findPathToCoord(vector<vector<int>>, int x1, int y1, int x2, int y2){
+//    vector<vector<int>> search_q; //the main "list"
+//    vector<int> blocked = {201}; //list containing tile "types" that are blocked
+//    int k = 0; //the main counter used to keep track of where we are in the list
+//    vector<int> node; //This is a single node in the list representing <xpos, ypos, steps_from_dest>. Always changing
+//    vector<int> temp; //Temp node used to push new nodes onto queues AND LATER in filtering out irrelevant steps
+//    
+//    node = {x1, y1, 0}; //initialization
+//    search_q.push_back(node); //add first element to list
+//    bool findingTarget = true; //a flag signalling if we're still searching for target (and populating search_q)
+//    while(findingTarget){
+//        try{
+//            node = search_q[k]; //go to the next node in the queue
+//        }catch(...){
+//            return {{}}; //return an empty list signalling we tried all reachable points but couldn't find target
+//        }
+//        
+//        //            printf("one%d",node[0]-1);
+//        //            printf("two%d",x2);
+//        //            printf("three%d",node[1]);
+//        //            printf("four%d",y2);
+//        
+//        //Find all adjacent nodes.
+//        //Check if adjacent node is in fact target coord.
+//        //If not, Add it to search_q if is is eligible space (not blocked).
+//        //LEFT
+//        try{ //we use try-catch so we don't have to worry about bounds errors...
+//            if(node[0]-1 == x2 && node[1] == y2){ //means we found target!
+//                temp = {node[0]-1, node[1], node[2]+1};
+//                search_q.push_back(temp);
+//                findingTarget = false;
+//                break;
+//            }
+//            
+//            if(!(node[0]-1<=0)){
+//                if(!isIntIn(map[node[1]][node[0]-1], blocked)){//if index is *not* in blocked list
+//                    //we also gotta make sure node isn't in queue with lower distance already...
+//                    //cycle through the list and check for every lower distance...
+//                    if(!isNodeIn({node[0]-1,node[1],0}, search_q)){
+//                        temp = {node[0]-1, node[1], node[2]+1};
+//                        search_q.push_back(temp);
+//                    }
+//                }
+//            }
+//            
+//        }catch(...){
+//            k = k; //do nothing pretty much
+//        }
+//        
+//        //RIGHT
+//        try{ //we use try-catch so we don't have to worry about bounds errors...
+//            if(node[0]+1 == x2 && node[1] == y2){ //means we found target!
+//                temp = {node[0]+1, node[1], node[2]+1};
+//                search_q.push_back(temp);
+//                findingTarget = false;
+//                break;
+//            }
+//            if(!isIntIn(map[node[1]][node[0]+1], blocked)){//if index is *not* in blocked list
+//                //we also gotta make sure node isn't in queue with lower distance already...
+//                //cycle through the list and check for every lower distance...
+//                if(!isNodeIn({node[0]+1,node[1]}, search_q)){
+//                    temp = {node[0]+1, node[1], node[2]+1};
+//                    search_q.push_back(temp);
+//                }
+//                
+//            }
+//        }catch(...){
+//            k = k; //do nothing pretty much
+//        }
+//        
+//        //UP
+//        try{ //we use try-catch so we don't have to worry about bounds errors...
+//            if(node[0] == x2 && node[1]-1 == y2){ //means we found target!
+//                temp = {node[0], node[1]-1, node[2]+1};
+//                search_q.push_back(temp);
+//                findingTarget = false;
+//                break;
+//            }
+//            if(node[1]-1 >= 0){
+//                if(!isIntIn(map[node[1]-1][node[0]], blocked)){//if index is *not* in blocked list
+//                    //we also gotta make sure node isn't in queue with lower distance already...
+//                    //cycle through the list and check for every lower distance...
+//                    if(!isNodeIn({node[0],node[1]-1}, search_q)){
+//                        temp = {node[0], node[1]-1, node[2]+1};
+//                        search_q.push_back(temp);
+//                    }
+//                    
+//                }
+//            }
+//            
+//        }catch(...){
+//            k = k; //do nothing pretty much
+//        }
+//        
+//        //DOWN
+//        try{ //we use try-catch so we don't have to worry about bounds errors...
+//            if(node[0] == x2 && node[1]+1 == y2){ //means we found target!
+//                temp = {node[0], node[1]+1, node[2]+1};
+//                search_q.push_back(temp);
+//                findingTarget = false;
+//                break;
+//            }
+//            if(!(node[1]+1 > map_height-1)){ //bounds checking
+//                if(!isIntIn(map[node[1]+1][node[0]], blocked)){//if index is *not* in blocked list
+//                    //we also gotta make sure node isn't in queue with lower distance already...
+//                    //cycle through the list and check for every lower distance...
+//                    if(!isNodeIn({node[0],node[1]+1}, search_q)){
+//                        temp = {node[0], node[1]+1, node[2]+1};
+//                        search_q.push_back(temp);
+//                    }
+//                }
+//            }
+//        }catch(...){
+//            k = k; //do nothing pretty much
+//        }
+//        
+//        
+//        k++; //increase the index
+//        
+//    }//broke out of while loop means we found target
+//    
+//    
+//    //Now we need to go down the list (popping) and only keep nodes that apply to the CORRECT PATH
+//    //We create a list goind BACKWARD from target to current
+//    vector<vector<int>> path2target;//the list of nodes leading from target
+//    temp = search_q.back(); //get last element from list
+//    search_q.pop_back(); //now remove that element since we won't need it in list
+//    path2target.push_back(temp);//Add first node to path
+//    while(true){
+//        temp = search_q.back();
+//        search_q.pop_back(); //Get last value out of search queue
+//        if(temp[2] == 0){ //means 0 steps left and we found original node (our starting position
+//            break;
+//        }
+//        if(temp[2] == path2target.back()[2]- 1){ //if current node is actually a step closer
+//            //check if it's a step in the right direction (AND ONLY 1 unit away from last step)
+//            if(   ((abs(temp[0]-path2target.back()[0])==1)&&(abs(temp[1]-path2target.back()[1])==0)) || //check if x diff is 1
+//               ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==1)) ){ //check if y diff is 1
+//                path2target.push_back(temp);
+//            }
+//            
+//        }
+//        
+//    }
+//    //return search_q;
+//    return path2target;
+//}
+//
 
 
 

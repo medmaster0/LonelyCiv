@@ -37,15 +37,16 @@ public:
     bool loadFromFile(std::string path1,std::string path2, int w, int h);//Load a texture from file for the sprite
     void draw(); //Draws the sprite to screen using MAP COORDS
     void drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //Draw's the sprite's inventory
+    void drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the items' hat (just moved up 8 px)
     void moveDown();
     void moveUp();
     void moveRight();
     void moveLeft();
-    void randomMove();
     void randomDance();
     vector<vector<int>> path; //a path to whatever target it has
     int x,y,z; //Position of sprite (MAP COORDS!)
     vector<Item> inventory; //list of items the sprite is carrying
+    Hat* hat; //a single item containing the sprites hat
     void moveTo(int x1, int y1);
 private:
     SDL_Texture* primTexture;//primary texture of the sprite

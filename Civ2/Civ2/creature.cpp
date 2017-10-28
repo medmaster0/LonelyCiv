@@ -53,6 +53,7 @@ Sprite::Sprite(int xp, int yp)
     secoTexture = NULL;
     mWidth = 0;
     mHeight = 0;
+    hat = nullptr;
     x = xp;
     y = yp;
     z = 0;
@@ -115,25 +116,6 @@ void Sprite::moveTo(int x1, int y1){
     x = x1;
     y = y1;
 }
-//Random movement
-//Sprite follows a random path
-void Sprite::randomMove(){
-    
-    //get a new random path if need be
-    if(path.empty()){
-        //path = findPathToCoord(map, x, y, (rand()%map_width)-1, (rand()%map_height)-1);
-        //Need to make sure it's small steps for now...
-        path = findPathToCoord(map, x, y, rand()%23, rand()%23);
-    }
-    
-    //Now move to next step in the path (if move Period has been reached
-    vector<int> next = path.back();
-    x = next[0];
-    y = next[1];
-    path.pop_back();
-    SDL_Delay(100);
-    
-}
 
 //Sprite's random path will be dance pattern
 void Sprite::randomDance(){
@@ -171,13 +153,19 @@ void Sprite::drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, 
     }
 }
 
+//Draw the sprite's hat
+void Sprite::drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s ){
+    
+    if(hat != nullptr){
+        hat->y = y; //move the hat to the right place
+        hat->x = x;
+        hat->draw(gRenderer, item_tiles_p, item_tiles_s);
+    }
+    
+}
+
 //END OF SPRITE CLASS
 ///////////////////////////
-
-
-
-
-
 
 
 

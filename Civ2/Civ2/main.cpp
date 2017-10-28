@@ -32,11 +32,10 @@ const int SCREEN_HEIGHT = 480;
 //const int SCREEN_HEIGHT = 32;
 
 //TileMap Stuff
-vector<vector<int> > map;
-SDL_Texture** tiles; //contains map tiles
 int map_width;
 int map_height;
-vector<vector<int>> colorz; //main color list containing the colors corresponding to the tilez
+SDL_Color back_col = {0,0,0}; //The background color
+vector<vector<int>> colorz; //every randomly gen. resource (stone, weed) has it's own unique color
 int blockable[2] = {301,304};
 bool* block_map; //this is the map indicating whether a tile is blocked
 
@@ -75,8 +74,6 @@ int item_display_index = 0; //counter used with cursors for inventory pos
 /////////////////////////////////////////////////////////
 ////FUNCTIONS BEGIN////////////////////////////////////////
 ////////////////////////////////////////////////////////
-///Important Declarations First
-vector<vector<int>> findPathToCoord(vector<vector<int>>, int x1, int y1, int x2, int y2);
 
 //initialize screen
 bool initScreen()
@@ -173,155 +170,8 @@ SDL_Texture* loadTexture( std::string path )
     return newTexture;
 }
 
-//Utility to check if an element is in list
-bool isIntIn(int e, vector<int> v){
-    if(std::find(v.begin(), v.end(), e) != v.end()) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-//Utility to check if a node - list(of ints) - is in a list of lists
-//bool isNodeIn(vector<int> e, vector<vector<int>> v){
-//    if(std::find(v.begin(), v.end(), e) != v.end()) {
-//        return true;
-//    } else {
-//        return false;
-//    }
-//}
-//bool isNodeIn(vector<int> e, vector<vector<int>> v){
-//    bool check = false; //initialize to false
-//    vector<int> temp; //Used to hold the nodes (list of ints)
-//
-//    for(std::vector<vector<int>>::iterator it = v.begin(); it!=v.end(); ++it){
-////        for(std::vector<int>::iterator jt = it->begin(); jt!=it->end(); ++jt ){
-////            std::cout << *jt;
-////        }
-//        printf("%d",it[0][0]);
-//        temp = *it;
-//        if(temp == e){
-//            printf("equal");
-//        }else{
-//            printf("not equal");
-//        }
-//    }
-//    
-//    return check;
-//}
-
-bool isNodeIn(vector<int> e, vector<vector<int>> v){
-    
-    vector<int> temp; //used to hold the nodes...
-    for(int i = 0; i<v.size(); i++){ //cycle through all elements of v
-        if(e[0] == v[i][0] && e[1] == v[i][1]){
-            return true;//means we found a match!
-        }
-    }
-    return false; //means we cycled list and couldn't find match
-}
-
-
-//A WORD ON MAPS..
-//Here is as good a place as any to describe the map data structure
-//map is a 2D array of ints (implemented with vector class)
-//Each int is an id to the corresponding tile *type* (open space, wall, floor, etc...
-//
-//Another (2D) array (currently unimplemented) should hold the actual material *COLOR* of the tile *per floor*
-//Probably should contain int index to another discrete world color palette
-//Each map will have it's own set of world/geoprahical color palette
-//All tiles in the world will be a color from this limited set/palette of colors
-//Until this is implemented, the world is colorless...
-//
-//#MAP LEGEND:
-// 0-99 - WEEDZ -  RANDOMLY GENERATED WEEDZ
-// 100-199 - STONEZ - RANDOMLY GENERTATED STONEZ
-// 200 - FLOOR - EMPTY
-// 201 - WALL - STRIPES
-// 202 - FLOOR - COMMA
-//
-// 299 - EMPTY
-// 300 - ITEM (ANY ITEM, WHATSOEVER)
-//
-//
-//Generates a map, based on window dimensions
-//We generate tiles in tmap (what's on floor)
-//And we also generate Items (specific objects)
-//CONSIDER DEPRECATING THIS PAIR!!!!!!!!!()genMap and drawVectorMap!!!!!!!! MAP CAN BE DRAWN WITH ITEM CLASS INSTEAD>>>>>>>>
-//JUST CREATE A SEPARATE ARRAY FOR BUILDING?ENVIRONMENT ITEMS
-vector<vector<int> > genMap(){
-    
-    vector<vector<int> > tmap; //the map we will return
-    
-    map_width = SCREEN_WIDTH/16;
-    map_height = SCREEN_HEIGHT/16;
-    
-    //initialize map array
-    tmap.resize(map_height);
-    for (int i = 0; i<map_height; i++) {
-        tmap[i].resize(map_width);
-    }
-    
-//    tmap[1][1] = rand() % 10;
-//    tmap[1][3] = rand() % 10;
-//    tmap[1][4] = rand() % 10;
-//    tmap[1][2] = rand() % 10;
-    
-    //ADD grid of squares
-    //...Identify top left corner of square
-    //...Branch out from there
-//    for (int i = 0; i<map_height;i++){
-//        for (int j = 0;j < map_width;j++){
-//            if(i%8 == 0 && j%8 == 0){ //Identify the grid, so to speak
-//                //tmap[i][j] = 1;
-//                //Now fill out the square
-//                for (int z = 0; z<6; z++){
-//                    for (int y = 0; y<6; y++){
-//                        tmap[i+z][j+y]=rand() %102; //random number between 0 and NUMBER OF TILES
-//                        if(z>0&&z<5&&y>0&&y<5)tmap[i+z][j+y]=0;
-//                    }
-//                }
-//            }
-//        }
-//    }
-    
-    //Fill out entire map with tilez
-    for (int i = 0; i<map_height;i++){
-        for (int j = 0;j < map_width;j++){
-            if(rand()%20 == 1){
-                //tmap[i][j] = rand()%203;
-                tmap[i][j] = 202;
-                
-                //Also create an item at that point
-//                Item temp = Item::Item(j,i, tmap[i][j], {static_cast<Uint8>(colorz[120][0]),static_cast<Uint8>(colorz[120][1]),static_cast<Uint8>(colorz[120][2])}, {0xff,0xff,0xff,0xff} );
-            
-                
-            }else{
-                tmap[i][j] = 299;
-            }
-            
-            //ARTIFICIAL FEATURE
-            //|||||||||||||||||||||
-            //|||||||||||||||||||||
-            //|||||||||||||||||||||
-            //|||||||||||||||||||||
-            //|||||||||||||||||||||
-            //|||||||||||||||||||||
-            //VVVVVVVVVVVVVVVVVVVVV
-//            if(i>2){
-//                tmap[i][j] = 299;
-//            }
-            
-        }
-    }
-    
-    
-    return tmap;
-}
-
 //Load in al the tiles used for the map
 void loadTiles(){
-    tiles = new SDL_Texture *[303];
     
     item_tiles_p = new SDL_Texture* [307];
     item_tiles_s = new SDL_Texture* [307];
@@ -335,12 +185,11 @@ void loadTiles(){
     
     //ITEM TILES
     for(int i = 0 ; i < 100; i++){
-        tiles[i] = loadTexture("Civ2/Civ2/weedz/"+std::to_string(i)+".png");
+
         int r,g,b;
         r = rand()%255;
         g = rand()%255;
         b = rand()%255;
-        SDL_SetTextureColorMod( tiles[i], r, g, b); //modulate color, update to match the new one
         colorz.push_back({r,g,b});
         
         //AS WE INTEGRATE THESE "MATERIALS" INTO ITEMS, WE ALSO UPDATE THOSE LISTS
@@ -352,12 +201,10 @@ void loadTiles(){
         world_colors.push_back(temp_col);
     }
     for(int i = 100 ; i < 200; i++){
-        tiles[i] = loadTexture("Civ2/Civ2/stonez/"+std::to_string(i)+".png");
         int r,g,b;
         r = rand()%255;
         g = rand()%255;
         b = rand()%255;
-        SDL_SetTextureColorMod( tiles[i], r, g, b); //modulate color, update to match the new one
         colorz.push_back({r,g,b});
         
         //AS WE INTEGRATE THESE "MATERIALS" INTO ITEMS, WE ALSO UPDATE THOSE LISTS
@@ -369,21 +216,6 @@ void loadTiles(){
         world_colors.push_back(temp_col);
         
     }
-    tiles[200] = loadTexture("Civ2/Civ2/tiles/map8.png");
-    tiles[201] = loadTexture("Civ2/Civ2/tiles/map3.png");
-    tiles[202] = loadTexture("Civ2/Civ2/tiles/map5.png");
-    //Integration means we're also going to change tiles array....
-    tiles[300] = loadTexture("Civ2/Civ2/tiles/map8.png");
-    
-    //initialize item tiles.
-    //TODO: WEE NEED TO INTEGRATE THE WEEDZ AND STONES INTO THIS CLASS AS WELL!!!!!
-    //ULTIMATELY ONLY EVERYTHING BELOW HERE WILL REMAIN
-    //initialize Item tile's (class static variables)
-    //Item::Item initializer constructor takes in two arrays of tiles (SDL_Texture's)
-    //initialize temporary array for textures
-    //SDL_Texture** primTiles = new SDL_Texture* [1];
-    //SDL_Texture** secoTiles = new SDL_Texture* [1];
-    //Actual loading
 
     item_tiles_p[300] = loadTexture("Civ2/Civ2/tiles/canPrim.png");
     item_tiles_s[300] = loadTexture("Civ2/Civ2/tiles/canSeco.png");
@@ -406,12 +238,12 @@ void loadTiles(){
     item_tiles_s[304] = loadTexture("Civ2/Civ2/tiles/brickSeco.png");
     item_tiles_t[304] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
-    item_tiles_p[305] = loadTexture("Civ2/Civ2/tiles/hatPrim.png");
-    item_tiles_s[305] = loadTexture("Civ2/Civ2/tiles/hatSeco.png");
+    item_tiles_p[305] = loadTexture("Civ2/Civ2/tiles/capPrim.png");
+    item_tiles_s[305] = loadTexture("Civ2/Civ2/tiles/capSeco.png");
     item_tiles_t[305] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
-    item_tiles_p[306] = loadTexture("Civ2/Civ2/tiles/bowPrim.png");
-    item_tiles_s[306] = loadTexture("Civ2/Civ2/tiles/bowSeco.png");
+    item_tiles_p[306] = loadTexture("Civ2/Civ2/tiles/bow2Prim.png");
+    item_tiles_s[306] = loadTexture("Civ2/Civ2/tiles/bow2Seco.png");
     item_tiles_t[306] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     //TENT TILES
@@ -431,36 +263,32 @@ void loadTiles(){
 //Then load the generated .png files
 void generateTilez(){
     system("python Civ2/Civ2/weedz/WEEDZ.py");
+    system("python Civ2/Civ2/weedz/outline.py");
     system("python Civ2/Civ2/stonez/STONEZ.py");
+    system("python Civ2/Civ2/stonez/outline.py");
     system("python Civ2/Civ2/doodadz/spinwhel2.py");
     system("python Civ2/Civ2/doodadz/screwpress.py");
+    system("python Civ2/Civ2/doodadz/outline.py");
 
 }
 
 //Print out a tile-based map give a vector 2D array
-void drawVectorMap(vector<vector<int> > map){
+void drawVectorMap(){
     //Clear screen
-    SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
+    SDL_SetRenderDrawColor( gRenderer,back_col.r, back_col.g, back_col.b, back_col.a );
     SDL_RenderClear( gRenderer );
-    SDL_Rect* clip = NULL;
-    
-    for(int i = 0; i<map_height; i++){
-        for(int j = 0; j<map_width; j++){
-            if (map[i][j] == 299){
-                //DO NOTHING
-                j = j;
-            }else{
-                SDL_Rect renderQuad = { j*16, i*16,16, 16 }; //a dummy rectangle for drawing
-                SDL_RenderCopy( gRenderer, tiles[map[i][j]], clip, &renderQuad );//Render to screen
-            }
-        }
-    }
 
 }
 
 //////DEBUG OR SOMEHTING LIKE IT
 //generates the initial items on the map
 void init_items(){
+    
+    //Calculate map (grid) dimensions
+    map_width = SCREEN_WIDTH/16;
+    map_height = SCREEN_HEIGHT/16;
+
+    //Initialize our dimension-indexed arrays based on map dimensions
     map_items.resize(map_width*map_height);
     map_tents.resize(map_width*map_height);
     map_workshops.resize(map_width*map_height);
@@ -490,12 +318,12 @@ void init_items(){
     for(int b = 0 ; b<50; b++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
-//        if(rand()%2 == 1){
-//            temp_tile = 305; //+ (rand()%2);
-//        }else{
-//            temp_tile=306;
-//        }
-        temp_tile = rand()%7 + 300;
+        if(rand()%2 == 1){
+            temp_tile = 305; //+ (rand()%2);
+        }else{
+            temp_tile=306;
+        }
+        //temp_tile = rand()%7 + 300;
         //if(temp_tile == 301 || temp_tile == 304){temp_tile = 305;}
         Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
         map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
@@ -654,6 +482,32 @@ void wander_thread(Sprite* spr1){
     
 }
 
+//a thread for changing the background periodically
+void background_color_thread(){
+    
+    short change = 1; //how much to change each component by
+    while(true){
+        
+        //change is an opportunity for growth
+        back_col.r=back_col.r+change;
+        back_col.g=back_col.g+change;
+        back_col.b=back_col.b+change;
+        
+        //bounds checking
+        if(back_col.r>254){
+            change = -1;
+        }
+        if(back_col.r==0){
+            change = +1;
+        }
+        
+        
+        SDL_Delay(100); //Debug Quick
+        //SDL_Delay(500); Nice looking
+    }
+    
+}
+
 //////////////////////
 //OTHER FUNCTIONS
 
@@ -663,158 +517,6 @@ void close(){
     SDL_DestroyWindow(gWindow);
     SDL_DestroyRenderer(gRenderer);
     
-}
-
-//The searching Algorithm - One coord to another, considering blocked paths
-//Flood Search
-//Input - map, coord1, coord2
-//Output - a list of coords to fllow to get to target - BACKWARD - so POP element from list to find first step
-vector<vector<int>> findPathToCoord(vector<vector<int>>, int x1, int y1, int x2, int y2){
-    vector<vector<int>> search_q; //the main "list"
-    vector<int> blocked = {201}; //list containing tile "types" that are blocked
-    int k = 0; //the main counter used to keep track of where we are in the list
-    vector<int> node; //This is a single node in the list representing <xpos, ypos, steps_from_dest>. Always changing
-    vector<int> temp; //Temp node used to push new nodes onto queues AND LATER in filtering out irrelevant steps
-    
-    node = {x1, y1, 0}; //initialization
-    search_q.push_back(node); //add first element to list
-    bool findingTarget = true; //a flag signalling if we're still searching for target (and populating search_q)
-    while(findingTarget){
-        try{
-            node = search_q[k]; //go to the next node in the queue
-        }catch(...){
-            return {{}}; //return an empty list signalling we tried all reachable points but couldn't find target
-        }
-        
-//            printf("one%d",node[0]-1);
-//            printf("two%d",x2);
-//            printf("three%d",node[1]);
-//            printf("four%d",y2);
-        
-        //Find all adjacent nodes.
-        //Check if adjacent node is in fact target coord.
-        //If not, Add it to search_q if is is eligible space (not blocked).
-        //LEFT
-        try{ //we use try-catch so we don't have to worry about bounds errors...
-            if(node[0]-1 == x2 && node[1] == y2){ //means we found target!
-                temp = {node[0]-1, node[1], node[2]+1};
-                search_q.push_back(temp);
-                findingTarget = false;
-                break;
-            }
-            
-            if(!(node[0]-1<=0)){
-                if(!isIntIn(map[node[1]][node[0]-1], blocked)){//if index is *not* in blocked list
-                    //we also gotta make sure node isn't in queue with lower distance already...
-                    //cycle through the list and check for every lower distance...
-                    if(!isNodeIn({node[0]-1,node[1],0}, search_q)){
-                        temp = {node[0]-1, node[1], node[2]+1};
-                        search_q.push_back(temp);
-                    }
-                }
-            }
-            
-        }catch(...){
-            k = k; //do nothing pretty much
-        }
-        
-        //RIGHT
-        try{ //we use try-catch so we don't have to worry about bounds errors...
-            if(node[0]+1 == x2 && node[1] == y2){ //means we found target!
-                temp = {node[0]+1, node[1], node[2]+1};
-                search_q.push_back(temp);
-                findingTarget = false;
-                break;
-            }
-            if(!isIntIn(map[node[1]][node[0]+1], blocked)){//if index is *not* in blocked list
-                //we also gotta make sure node isn't in queue with lower distance already...
-                //cycle through the list and check for every lower distance...
-                if(!isNodeIn({node[0]+1,node[1]}, search_q)){
-                    temp = {node[0]+1, node[1], node[2]+1};
-                    search_q.push_back(temp);
-                }
-
-            }
-        }catch(...){
-            k = k; //do nothing pretty much
-        }
-        
-        //UP
-        try{ //we use try-catch so we don't have to worry about bounds errors...
-            if(node[0] == x2 && node[1]-1 == y2){ //means we found target!
-                temp = {node[0], node[1]-1, node[2]+1};
-                search_q.push_back(temp);
-                findingTarget = false;
-                break;
-            }
-            if(node[1]-1 >= 0){
-                if(!isIntIn(map[node[1]-1][node[0]], blocked)){//if index is *not* in blocked list
-                    //we also gotta make sure node isn't in queue with lower distance already...
-                    //cycle through the list and check for every lower distance...
-                    if(!isNodeIn({node[0],node[1]-1}, search_q)){
-                        temp = {node[0], node[1]-1, node[2]+1};
-                        search_q.push_back(temp);
-                    }
-                    
-                }
-            }
-            
-        }catch(...){
-            k = k; //do nothing pretty much
-        }
-        
-        //DOWN
-        try{ //we use try-catch so we don't have to worry about bounds errors...
-            if(node[0] == x2 && node[1]+1 == y2){ //means we found target!
-                temp = {node[0], node[1]+1, node[2]+1};
-                search_q.push_back(temp);
-                findingTarget = false;
-                break;
-            }
-            if(!(node[1]+1 > map_height-1)){ //bounds checking
-                if(!isIntIn(map[node[1]+1][node[0]], blocked)){//if index is *not* in blocked list
-                    //we also gotta make sure node isn't in queue with lower distance already...
-                    //cycle through the list and check for every lower distance...
-                    if(!isNodeIn({node[0],node[1]+1}, search_q)){
-                        temp = {node[0], node[1]+1, node[2]+1};
-                        search_q.push_back(temp);
-                    }
-                }
-            }
-        }catch(...){
-            k = k; //do nothing pretty much
-        }
-
-        
-        k++; //increase the index
-    
-    }//broke out of while loop means we found target
-    
-    
-    //Now we need to go down the list (popping) and only keep nodes that apply to the CORRECT PATH
-    //We create a list goind BACKWARD from target to current
-    vector<vector<int>> path2target;//the list of nodes leading from target
-    temp = search_q.back(); //get last element from list
-    search_q.pop_back(); //now remove that element since we won't need it in list
-    path2target.push_back(temp);//Add first node to path
-    while(true){
-        temp = search_q.back();
-        search_q.pop_back(); //Get last value out of search queue
-        if(temp[2] == 0){ //means 0 steps left and we found original node (our starting position
-            break;
-        }
-        if(temp[2] == path2target.back()[2]- 1){ //if current node is actually a step closer
-            //check if it's a step in the right direction (AND ONLY 1 unit away from last step)
-            if(   ((abs(temp[0]-path2target.back()[0])==1)&&(abs(temp[1]-path2target.back()[1])==0)) || //check if x diff is 1
-                  ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==1)) ){ //check if y diff is 1
-                path2target.push_back(temp);
-            }
-        
-        }
-        
-    }
-    //return search_q;
-    return path2target;
 }
 
 //DISPLAY WINDOWS?RECTANGLES WITH INFO
@@ -915,7 +617,6 @@ int main( int argc, char* args[] ){
     bool quit = false;
     SDL_Event e; //event handler
     //...Map
-    map = genMap();
     generateTilez(); //call this before loadTiles()
     loadTiles();
     //...Sprites
@@ -941,8 +642,15 @@ int main( int argc, char* args[] ){
     //vector<vector<short>> maze = gen_maze_corridor();
     //printMaze(maze);
     init_items();
-    Item temp_accessory = Item(0, 0, 305); //a temp Item to be added to cre's inventory
-    cre1->inventory.push_back(temp_accessory);
+    Hat temp_accessory = Hat(0, 0, 305); //a temp Item to be added to cre's inventory
+    Hat temp_accessory2 = Hat(0, 0, 306); //a temp Item to be added to cre's inventory
+    cre1->hat = &temp_accessory; //give him a hat
+    cre3->hat = &temp_accessory2; //give him a hat
+    //test the name gen
+//    while(true){
+//        //printf("%s\n",genName());
+//        cout << genName() << '\n';
+//    }
     
     //vector<vector<int>> test = findPathToCoord(map, 8, 3, 1, 0);
     //TEST A* STAR ALGO
@@ -974,8 +682,12 @@ int main( int argc, char* args[] ){
     
     //
     //DEBUG TEST : SPAWN SOME THREAD DAWGd
+    //This thread wanders the input creature
     std::thread wanderObj(wander_thread, std::ref(cre4));
     wanderObj.detach();
+    //This thread updates the background color
+    std::thread backObj(background_color_thread);
+    backObj.detach();
     
     //wanderObj.join();
     
@@ -1077,7 +789,6 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_SPACE:{
-                        clr = colorz[map[cre1->y][cre1->x]]; //get the color of the tile the cre is at
                         break;
                     }
                         
@@ -1121,17 +832,17 @@ int main( int argc, char* args[] ){
         }//End event while loop
         
         //Update Positions...
-        //lov1->randomMove();
         //lov1->randomDance();
         //cre3->randomDance();
         //cre2->randomDance();
         
-        drawVectorMap(map);
+        drawVectorMap();
         //Draw all the sprites
         cre1->draw();
-        cre1->drawInventory(gRenderer, item_tiles_p, item_tiles_s);
+        cre1->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         cre2->draw();
         cre3->draw();
+        cre3->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         cre4->draw();
         shroom1->draw();
         lov1->draw();

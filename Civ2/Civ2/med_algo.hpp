@@ -26,3 +26,6 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
 //COLOR ALGORITHMS!
 int color_diff(SDL_Color col1, SDL_Color col2); //computes the "difference of colors"
 vector<int> color_fight(SDL_Color col1, SDL_Color col2); //How to compute which color is superior...
+
+//GEN HISTORY ALGORITHMS
+string genName(); //generates a random name
