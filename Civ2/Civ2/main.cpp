@@ -16,10 +16,12 @@
 #include <thread>
 
 #include "dancez.hpp"
+#include "music.hpp"
 #include "creature.hpp"
 #include "Item.hpp"
 #include "tent.hpp"
 #include "med_algo.hpp"
+#include "story.hpp"
 //#include <unistd.h>
 /* time */
 
@@ -82,7 +84,7 @@ bool initScreen()
     bool success = true;
     
     //Initialize SDL
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+    if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 )
     {
         printf( "SDL could not initialize! SDL Error: %s\n", SDL_GetError() );
         success = false;
@@ -332,7 +334,6 @@ void init_items(){
     block_map = new bool[map_width*map_height](); //initialize a dynamically sized blocked map
     //Make a brick maze
     vector<vector<short>> gmap = gen_maze_corridor(30,70);
-    printMaze(gmap);
     int con_x = 20;//the starting point of construction
     int con_y = 10;//the starting point of construction
     //redefine color
@@ -351,7 +352,6 @@ void init_items(){
             if( tempy >= map_height){continue;}
             //Now check if the space is empty or wall
             if(gmap[j][i] == 1){
-                printf("(%d,%d)",tempx, tempy);
                 //then we need a wall here
                 Item con_item = Item(tempx, tempy, 304, p1, s1);
                 map_items[(tempy*map_width)+tempx].push_back(con_item);
@@ -404,6 +404,11 @@ void draw_items(){
         }
     }
     
+    
+}
+//Draws constructions
+void draw_constructions(){
+    
     //Draw all tents
     for(int i = 0; i < map_tents.size(); i++){
         for(int j = 0 ; j < map_tents[i].size(); j++){
@@ -417,7 +422,6 @@ void draw_items(){
             map_workshops[i][j].draw(gRenderer, workshop_tiles_p, workshop_tiles_s);
         }
     }
-    
 }
 
 //////////////////////
@@ -482,31 +486,78 @@ void wander_thread(Sprite* spr1){
     
 }
 
+//void music_thread(int ToneHz){
+//    playToneOnce(ToneHz, 2000);
+//    SDL_Delay(2000);
+//    
+//}
+
 //a thread for changing the background periodically
 void background_color_thread(){
     
     short change = 1; //how much to change each component by
+    //How much we change the colors
+    int r_inc = 1;
+    int g_inc = 1;
+    int b_inc = 1;
+    
+    //THESE COLORS SHOULD RANGE FROM 1 to 254 (NO 0 or 255!!!!)
+    //beginning color
+    int r1 = 1;
+    int g1 = 1;
+    int b1 = 1;
+    //stop color
+//    int r2 = 143;
+//    int g2 = 133;
+//    int b2 = 254;
+    int r2 = (rand()%254) + 1;
+    int g2 = (rand()%254) + 1;
+    int b2 = (rand()%254) + 1;
+    
     while(true){
         
         //change is an opportunity for growth
-        back_col.r=back_col.r+change;
-        back_col.g=back_col.g+change;
-        back_col.b=back_col.b+change;
+//        back_col.r=back_col.r+change;
+//        back_col.g=back_col.g+change;
+//        back_col.b=back_col.b+change;
+//        
+//        //bounds checking
+//        if(back_col.r>254){
+//            change = -1;
+//        }
+//        if(back_col.r==0){
+//            change = +1;
+//        }
+//
+
+
+        //oscilates between the two
+        
+        //change is an opportunity for growth
+        //let's only change one color - nice effect :)
+        back_col.r=back_col.r+r_inc;
+        back_col.g=back_col.g+g_inc;
+        back_col.b=back_col.b+b_inc;
         
         //bounds checking
-        if(back_col.r>254){
-            change = -1;
+        if( (back_col.r>r2) || (back_col.r<r1) ){
+            r_inc = r_inc * -1;
         }
-        if(back_col.r==0){
-            change = +1;
+        if( (back_col.g>g2) || (back_col.g<g1) ){
+            g_inc = g_inc * -1;
+        }
+        if( (back_col.b>b2) || (back_col.b<b1) ){
+            b_inc = b_inc * -1;
         }
         
         
         SDL_Delay(100); //Debug Quick
-        //SDL_Delay(500); Nice looking
+        //SDL_Delay(500); //Nice looking
     }
     
 }
+
+
 
 //////////////////////
 //OTHER FUNCTIONS
@@ -518,92 +569,6 @@ void close(){
     SDL_DestroyRenderer(gRenderer);
     
 }
-
-//DISPLAY WINDOWS?RECTANGLES WITH INFO
-//WE REALLY SHOULD CREATE A SOLID CLASS FOR ALL OF THESE...
-//A function to display a little box showing what's in inventory
-//int counterInventory = 0; //counter used with cursors for inventory pos
-//SDL_Surface * surface; //used in drawing
-//SDL_Texture * texture; //
-//void showInventory(Sprite* sprite, SDL_Event * e){
-//    
-//    std::string words = "      inventory\n"; //char buffer that is displayed
-//    
-//    //Black out Box {x, y, w, h}
-//    SDL_Rect r={0,SCREEN_HEIGHT,150,-150};
-//
-//    SDL_SetRenderDrawColor( gRenderer, 0, 0, 0, 255 ); //color of box
-//    SDL_RenderFillRect( gRenderer, &r ); //copy box to renderer
-//    
-//    surface = TTF_RenderText_Blended_Wrapped(font1, words.c_str(), font1_clr, 125);
-//    texture = SDL_CreateTextureFromSurface(gRenderer, surface);
-//    
-//    //Create text rect (text box)
-//    SDL_QueryTexture(texture, NULL, NULL, &texW, &texH); //This get's the dimensions of the font/text
-//    SDL_Rect dstrect = { 0, SCREEN_HEIGHT+r.h, texW, texH }; //so we can make the proper rect to display it
-//    SDL_RenderCopy(gRenderer, texture, NULL, &dstrect); //write
-//    
-//    //Free Memory!!!
-//    SDL_DestroyTexture(texture);
-//    SDL_FreeSurface(surface);
-//    
-//    ////////////FINISH PUTTING THE TITLE: inventory
-//    
-//    //Now we need to print out the items (in COLOR text!!!!)
-//    std::string item_name;
-//    int item_index; //keeps track of what item in inventory we are actually printing - depends on two factors, down below
-//    SDL_Color item_color; //The color of the item
-//    
-////    if(sprite->inventory.size()!=0){counterInventory = counterInventory % sprite->inventory.size();} //this allows it to scroll back on itself//
-//    if(counterInventory<0){counterInventory = sprite->inventory.size()-1;}
-//    if(counterInventory>sprite->inventory.size()-1){   counterInventory = 0;}
-//    
-//    //We'll also reuse some of the previously used objects
-//    for(int u = 0; u<7; u++){ //cycle through however many elements you wanna fit on screen
-//        item_index = u+counterInventory; //Allow the user to control the scroll by referencing global counterInventory
-//        if(u+counterInventory >= sprite->inventory.size()) {//check if sprite's inventory index is out of bounds
-//            break;
-//        }
-//        
-//        //Need to:
-//        //Determine item type
-//        //  Make string for item_type
-//        //Determine color of item
-//        //  Make color of item
-//        //make surface with string, color, and pre-created font
-//        //make texture from surface
-//        //Query texture for dimensions
-//        //create rectangle at correct position and with determined dimensions
-//        //copy onto renderer
-//        
-//        //Determine item type
-//        if(sprite->inventory[item_index].tile<100){ //Then it's a weed
-//            item_name = "weed";
-//        }else if(sprite->inventory[item_index].tile<200){ //Then it's a stone
-//            item_name = "stone";
-//        }
-//        if(item_index == 0){item_name.append(" FIRST");} //Specify if first in list
-//        else if(item_index+1 == sprite->inventory.size()){ item_name.append(" LAST"); }
-//        if(u == 0){item_name.append(" <-");} //print out a cursor
-//        //Determine Color
-//        item_color = {static_cast<Uint8>(sprite->inventory[item_index].color[0]), static_cast<Uint8>(sprite->inventory[item_index].color[1]), static_cast<Uint8>(sprite->inventory[item_index].color[2]) }; //lots of conversion from int vector to SDL COLOR...
-//        //Make surface and texture
-//        surface = TTF_RenderText_Blended_Wrapped(font1, item_name.c_str(), item_color, 125);
-//        texture = SDL_CreateTextureFromSurface(gRenderer, surface);
-//        //Make the destination rectangle
-//        SDL_QueryTexture(texture, NULL, NULL, &texW, &texH); //This get's the dimensions of the font/text
-//        dstrect = { 0, SCREEN_HEIGHT+r.h + 15+(u*15), texW, texH }; //so we can make the proper rect to display it
-//        //Render to screen
-//        SDL_RenderCopy(gRenderer, texture, NULL, &dstrect); //write
-//
-//        //Free Memory!!!
-//        SDL_DestroyTexture(texture);
-//        SDL_FreeSurface(surface);
-//        
-//    }
-//}
-
-
 
 int main( int argc, char* args[] ){
     
@@ -646,10 +611,76 @@ int main( int argc, char* args[] ){
     Hat temp_accessory2 = Hat(0, 0, 306); //a temp Item to be added to cre's inventory
     cre1->hat = &temp_accessory; //give him a hat
     cre3->hat = &temp_accessory2; //give him a hat
+    
+    //DEBUG AUDIOOOOOOOOOOOOOOOO
+//    // NOTE: Sound test
+    int SamplesPerSecond = 48000;
+//    int ToneHz = 240;
+//    int ToneVolume = 3000;
+//    uint RunningSampleIndex = 0;
+//    int SquareWavePeriod = SamplesPerSecond / ToneHz;
+//    int HalfSquareWavePeriod = SquareWavePeriod / 2;
+    int BytesPerSample = sizeof(int) * 2;
+//    // Open our audio device:
+    initAudio(48000, SamplesPerSecond * BytesPerSample / 60);
+    //playToneCont(440);
+//    playToneOnce(440, 2000);
+//    playToneOnce(880, 2000);
+//    playToneOnce(220, 2000);
+    //while(true){
+//        playTwoChord(200, 300, 2000);
+    
+//    while(true){
+//        playTwoChord(200, 300, 2000);
+//        playToneOnce(200, 2000);
+//    }
+     SDL_PauseAudio(0);
+    //playToneList_Phase({440,880,3*440, 4*440, 5*440, 550, 2*550, 3*550, 4*550, 5*550}, 2000);
+
+    while(true){
+        //cout << giveMonickerPost( genName() ) << '\n';
+        //cout << genPrayer() << '\n';
+        //cout << genLatinSentence() << '\n';
+        cout << genCuss() << '\n';
+    }
+
+    //SDL_Delay(2000);
+    //SDL_PauseAudio(0);
+    
+//    bool SoundIsPlaying = false;
+//    
+//    // Sound output test
+//    while(true){
+//        int TargetQueueBytes = SamplesPerSecond * BytesPerSample;
+//        int BytesToWrite = TargetQueueBytes - SDL_GetQueuedAudioSize(1);
+//        if (BytesToWrite)
+//        {
+//            void *SoundBuffer = malloc(BytesToWrite);
+//            int *SampleOut = (int *)SoundBuffer;
+//            int SampleCount = BytesToWrite/BytesPerSample;
+//            for(int SampleIndex = 0;
+//                SampleIndex < SampleCount;
+//                ++SampleIndex)
+//            {
+//                int SampleValue = ((RunningSampleIndex++ / HalfSquareWavePeriod) % 2) ? ToneVolume : -ToneVolume;
+//                *SampleOut++ = SampleValue;
+//                *SampleOut++ = SampleValue;
+//            }
+//            SDL_QueueAudio(1, SoundBuffer, BytesToWrite);
+//            free(SoundBuffer);
+//        }
+//        
+//        if(!SoundIsPlaying)
+//        {
+//            SDL_PauseAudio(0);
+//            SoundIsPlaying = true;
+//        }
+//    }
+    
     //test the name gen
 //    while(true){
 //        //printf("%s\n",genName());
-//        cout << genName() << '\n';
+//        cout << genPrayer() << '\n';
 //    }
     
     //vector<vector<int>> test = findPathToCoord(map, 8, 3, 1, 0);
@@ -689,6 +720,7 @@ int main( int argc, char* args[] ){
     std::thread backObj(background_color_thread);
     backObj.detach();
     
+    //std::thread audioObj1(music_thread, std::ref(440));
     //wanderObj.join();
     
 //    int diff_test = color_diff({255,255,255}, {0,0,0});
@@ -839,19 +871,23 @@ int main( int argc, char* args[] ){
         drawVectorMap();
         //Draw all the sprites
         cre1->draw();
-        cre1->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         cre2->draw();
         cre3->draw();
-        cre3->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         cre4->draw();
         shroom1->draw();
         lov1->draw();
-        //Draw all the items
+        
         draw_items();
+        draw_constructions();
         //DEBUG: Test generic wonky ass items not in list (BAD)
         can1->draw(gRenderer, item_tiles_p, item_tiles_s);
         item1->draw(gRenderer, item_tiles_p, item_tiles_s);
         item2->draw(gRenderer, item_tiles_p, item_tiles_s);
+        
+        cre1->drawHat(gRenderer, item_tiles_p, item_tiles_s);
+        cre3->drawHat(gRenderer, item_tiles_p, item_tiles_s);
+        
+        
         
         //Draw Display windows
         if(inventoryDisplayOn){

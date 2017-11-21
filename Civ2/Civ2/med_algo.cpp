@@ -510,39 +510,6 @@ vector<int> color_fight(SDL_Color col1, SDL_Color col2){
     
 }
 
-//HISTORY
-
-//generates a randmo name
-//For now, 3 - syllables
-string genName(){
-    
-    char consonants[] = "bcdfghjklmnpqrstvwxyz";
-    char vowels[] = "aeiou";
-    
-    char c; //temp char for string building
-    string name1; //the name we constructing
-    
-    //Add first letter, consonant
-    c = consonants[rand()%21];
-    name1 += toupper(c); //capitalize first letter
-    //Add second letter, vowel
-    c = vowels[rand()%5];
-    name1 += c;
-    //Add third letter, consonant
-    c = consonants[rand()%21];
-    name1 += c;
-    name1 += c; //fourth is same
-    //Add fifth letter, vowel
-    c = vowels[rand()%5];
-    name1 += c;
-
-
-
-    return name1;
-    
-    
-}
-
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
