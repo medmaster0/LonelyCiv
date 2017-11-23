@@ -19,32 +19,6 @@ using namespace std;
 
 //////////////////
 //SPRITE CLASS
-//class Sprite{
-//public:
-//    Sprite(int xp, int yp);//Initializes variables
-//    void free(); //For clearing texture memory
-//    bool loadFromFile(std::string path1,std::string path2, int w, int h);//Load a texture from file for the sprite
-//    void draw(); //Draws the sprite to screen using MAP COORDS
-//    void moveDown();
-//    void moveUp();
-//    void moveRight();
-//    void moveLeft();
-//    void randomMove();
-//    int x,y,z; //Position of sprite (MAP COORDS!)
-//    vector<Item> inventory; //list of items the sprite is carrying
-//    void moveTo(int x1, int y1);
-//private:
-//    SDL_Texture* primTexture;//primary texture of the sprite
-//    SDL_Texture* secoTexture;//secondary texture of the sprite
-//    int mWidth;//Image dimensions - pixels
-//    int mHeight;//Image dimensions - pixels
-//    int r,g,b; //colors of the sprite
-//    vector<vector<int>> path; //a path to whatever target it has
-//    //Some vars for movement timing
-//    long int timer; //will later store a time stamp
-//    int moveSpeedPeriod; //how long (ms) it takes to move 1 step
-//    
-//};
 //Constructor
 Sprite::Sprite(int xp, int yp)
 {

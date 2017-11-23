@@ -11,12 +11,12 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
 /////
-///TODO: "COW LATIN"
-//TODO: LAW'
+//TODO: LAW
 
 /////////////////
 //COW LATIN
@@ -61,6 +61,24 @@ string genLatinSentence(){
     return sentence;
     
 }
+//generates random latin sentence, allows you to specify which punctuation index to use
+string genLatinSentence(int punctuation){
+    
+    int words = (rand()%9) + 1;
+    
+    string sentence = ""; //the sentence we will be returning
+    for(int i = 0; i < words; i++){
+        
+        sentence += " " + genLatinWord();
+        
+        
+    }
+    sentence += punctuation_end[punctuation];
+    sentence[1] = toupper(sentence[1]);
+    
+    return sentence;
+    
+}
 
 vector<string> cuss_symbols = {"!","@","#","$","%","^","&","*","z","x","0"};
 
@@ -74,6 +92,67 @@ string genCuss(){
     }
         
     return cuss;
+    
+}
+
+
+/////////////////
+//LAW CLASS
+//Constructor
+Law::Law(string in_author){
+    //constructor stuff go here
+    
+    author = in_author; //original author of the LAW
+    
+    //create the first article (section 0, article 0)
+    article temp_art = {author, genLatinSentence(0), 0,0, NULL, NULL };
+    
+    vector<article> temp_sect; //a temp section to add to article
+    temp_sect.push_back(temp_art); //add article to section
+    articles.push_back(temp_sect); //add section to law
+    
+}
+//prints out the law
+void Law::printLaw(){
+    
+    //preamble
+    //
+    cout << "This is the Law according to " << author << "\n";
+    cout << "---------------------------------------\n\n"; 
+    
+    //print out articles
+    for(int i = 0 ; i < articles.size(); i++){
+        for(int j = 0 ; j < articles[i].size(); j++){
+            cout << "Section " << i << ", Article " << j << " according to " << articles[i][j].author << ":\n\n\t";
+            cout << articles[i][j].text << "\n\n";
+        }
+    }
+}
+//add random article to law (either in new section or existing)
+void Law::addRandArticle(string author){
+    
+    //decide if we add to existing section or new section
+    if(rand()%3 == 1){
+        //new section
+        vector<article> temp_sect;
+        
+        //new article
+        article temp_art = {author, genLatinSentence(0), static_cast<int>( articles.size() ), 0, NULL, NULL };
+        
+        temp_sect.push_back(temp_art);
+        articles.push_back(temp_sect);
+        
+        
+    }else{
+        //add to existing section
+        int sect_id = rand()%articles.size();
+        
+        //new article
+        article temp_art = {author, genLatinSentence(0), sect_id, static_cast<int>(articles[sect_id].size()) , NULL, NULL};
+        
+        articles[sect_id].push_back(temp_art);
+        
+    }
     
 }
 
@@ -116,7 +195,7 @@ string genName(){
     
 }
 
-vector<string> street_monickers_post = {"Dopest","Dope","Baddest","Bad","Slickest","Slick","Mostest","Rad","Clown","Killa","Slizza","Blizza","Snow","Product","Biggie","Down","Chiller","Bomb","Bombest","Funny","Punk","Chill","Junkhead","Cracker","Lowlife","Thug","Thuggin","Pimpin","Chief","Pill","Rocker","Baller","Insane","Moco","Snoop","JoJo","Fly","Real Deal","Peep","Smalls", "Illest","Dude","Duderino","Baby","Vato","Joker","Homie"};
+vector<string> street_monickers_post = {"Dopest","Dope","Baddest","Bad","Slickest","Slick","Mostest","Rad","Clown","Killa","Slizza","Blizza","Snow","Product","Biggie","Down","Chiller","Bomb","Bombest","Funny","Punk","Chill","Junkhead","Cracker","Lowlife","Thug","Thuggin","Pimpin","Chief","Pill","Rocker","Baller","Insane","Moco","Snoop","JoJo","Fly","Real Deal","Peep","Smalls", "Illest","Dude","Duderino","Baby","Vato","Joker","Homie","Flow"};
 
 vector<string> street_monickers_pre = {"Mista", "Lil", "Supa", "Fitty", "Champ", "Kid", "Wiz"};
 

@@ -317,19 +317,19 @@ void init_items(){
         
     }
     
-    for(int b = 0 ; b<50; b++){
-        tempx = rand()%(map_width);
-        tempy = rand()%(map_height);
-        if(rand()%2 == 1){
-            temp_tile = 305; //+ (rand()%2);
-        }else{
-            temp_tile=306;
-        }
-        //temp_tile = rand()%7 + 300;
-        //if(temp_tile == 301 || temp_tile == 304){temp_tile = 305;}
-        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
-        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
-    }
+//    for(int b = 0 ; b<50; b++){
+//        tempx = rand()%(map_width);
+//        tempy = rand()%(map_height);
+//        if(rand()%2 == 1){
+//            temp_tile = 305; //+ (rand()%2);
+//        }else{
+//            temp_tile=306;
+//        }
+//        //temp_tile = rand()%7 + 300;
+//        //if(temp_tile == 301 || temp_tile == 304){temp_tile = 305;}
+//        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
+//        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+//    }
     
     block_map = new bool[map_width*map_height](); //initialize a dynamically sized blocked map
     //Make a brick maze
@@ -375,23 +375,23 @@ void init_items(){
         map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
     }
     
-    //Make some tents
-    tempx = 23;
-    tempy = 8;
-    //Tent temp_tent = Tent(tempx, tempy, 0);
-    Tent temp_tent = Tent(tempx, tempy, 0, {static_cast<Uint8>(127+rand()%127), static_cast<Uint8>(127+rand()%127), static_cast<Uint8>(127+rand()%127), 255},{static_cast<Uint8>(127+rand()%127), static_cast<Uint8>(127+rand()%127), static_cast<Uint8>(127+rand()%127),255});
-    map_tents[(tempy)*map_width+(tempx)].push_back(temp_tent);
-    
-    //Make some workshops
-    tempx = 25;
-    tempy = 8;
-    Workshop temp_workshop = Workshop(tempx, tempy, 0);
-    map_workshops[(tempy)*map_width+(tempx)].push_back(temp_workshop);
-    
-    tempx = 27;
-    tempy = 8;
-    temp_workshop = Workshop(tempx, tempy, 1);
-    map_workshops[(tempy)*map_width+(tempx)].push_back(temp_workshop);
+//    //Make some tents
+//    tempx = 23;
+//    tempy = 8;
+//    //Tent temp_tent = Tent(tempx, tempy, 0);
+//    Tent temp_tent = Tent(tempx, tempy, 0, {static_cast<Uint8>(127+rand()%127), static_cast<Uint8>(127+rand()%127), static_cast<Uint8>(127+rand()%127), 255},{static_cast<Uint8>(127+rand()%127), static_cast<Uint8>(127+rand()%127), static_cast<Uint8>(127+rand()%127),255});
+//    map_tents[(tempy)*map_width+(tempx)].push_back(temp_tent);
+//    
+//    //Make some workshops
+//    tempx = 25;
+//    tempy = 8;
+//    Workshop temp_workshop = Workshop(tempx, tempy, 0);
+//    map_workshops[(tempy)*map_width+(tempx)].push_back(temp_workshop);
+//    
+//    tempx = 27;
+//    tempy = 8;
+//    temp_workshop = Workshop(tempx, tempy, 1);
+//    map_workshops[(tempy)*map_width+(tempx)].push_back(temp_workshop);
     
     
 }
@@ -637,12 +637,23 @@ int main( int argc, char* args[] ){
      SDL_PauseAudio(0);
     //playToneList_Phase({440,880,3*440, 4*440, 5*440, 550, 2*550, 3*550, 4*550, 5*550}, 2000);
 
-    while(true){
-        //cout << giveMonickerPost( genName() ) << '\n';
-        //cout << genPrayer() << '\n';
-        //cout << genLatinSentence() << '\n';
-        cout << genCuss() << '\n';
+//    while(true){
+//        //cout << giveMonickerPost( genName() ) << '\n';
+//        //cout << genPrayer() << '\n';
+//        //cout << genLatinSentence() << '\n';
+//        cout << genCuss() << '\n';
+//    }
+    Law* law1 = new Law(genName());
+    law1->addRandArticle(genName());
+    law1->addRandArticle(genName());
+    law1->addRandArticle(genName());
+    law1->addRandArticle(genName());
+    law1->addRandArticle(genName());
+    for(int y = 0; y < 77; y++){
+       law1->addRandArticle(genName()); 
     }
+    law1->printLaw();
+    
 
     //SDL_Delay(2000);
     //SDL_PauseAudio(0);
