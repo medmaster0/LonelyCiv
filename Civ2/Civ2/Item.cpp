@@ -21,6 +21,9 @@ using namespace std;
 
 ///////////////
 //ITEM TILE TYPES
+// 0 - 99 - WEEDZ
+// 100 - 199 - STONEZ
+// 200 - 299 - FRUITZ
 // 300 - CAN
 // 301 - ADOBE
 // 302 - SAX

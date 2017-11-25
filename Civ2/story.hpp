@@ -17,7 +17,7 @@ using namespace std;
 
 //GEN HISTORY ALGORITHMS
 string genName(); //generates a random name
-string giveMonickerPost(string name); //Adds a post monicker to a name
+string giveMonicker(string name); //Adds a post monicker to a name
 string genPrayer(); //generates a random prayer to a random saint/demon
 
 string genLatinWord(); //generates a random latin word

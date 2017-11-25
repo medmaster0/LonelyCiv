@@ -16,12 +16,12 @@
 using namespace std;
 
 /////
-//TODO: LAW
+//TODO:
 
 /////////////////
 //COW LATIN
 //the syllables
-vector<string> latin_syls = {"est","ius","onos","el","ia","ium","eri","us","nius","tum","um","en","eno","er","era","a","o","u","y"};
+vector<string> latin_syls = {"est","ius","onos","el","ia","ium","eri","itus","us","nius","tum","um","en","eno","er","era","a","o","u","y"};
 //the consonants
 vector<string> latin_cons = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","pl","th","ca","pa"};
 //the end punctuation
@@ -95,6 +95,8 @@ string genCuss(){
     
 }
 
+vector<string> written_by_syns = {"written by", "according to", "as proclaimed by", "in the words of"}; //synynoms for "written by" - to spruce things ups
+
 
 /////////////////
 //LAW CLASS
@@ -124,12 +126,28 @@ void Law::printLaw(){
     for(int i = 0 ; i < articles.size(); i++){
         for(int j = 0 ; j < articles[i].size(); j++){
             cout << "Section " << i << ", Article " << j << " according to " << articles[i][j].author << ":\n\n\t";
-            cout << articles[i][j].text << "\n\n";
+            cout << articles[i][j].text;
+            //if the article references another
+            if(articles[i][j].ref_section!=NULL){
+                cout << " ( In reference to §" << articles[i][j].ref_section << "." << articles[i][j].ref_article  << " )";
+            }
+            cout << "\n\n";
         }
     }
 }
 //add random article to law (either in new section or existing)
 void Law::addRandArticle(string author){
+ 
+    int temp_ref_sect = NULL;
+    int temp_ref_art = NULL;
+    //decide if we reference previous article
+    if(rand()%6==1){
+        
+        //choose a random existing section and article
+        temp_ref_sect = rand()%articles.size();
+        temp_ref_art = rand()%articles[temp_ref_sect].size();
+        
+    }
     
     //decide if we add to existing section or new section
     if(rand()%3 == 1){
@@ -137,7 +155,7 @@ void Law::addRandArticle(string author){
         vector<article> temp_sect;
         
         //new article
-        article temp_art = {author, genLatinSentence(0), static_cast<int>( articles.size() ), 0, NULL, NULL };
+        article temp_art = {author, genLatinSentence(0), static_cast<int>( articles.size() ), 0, temp_ref_sect, temp_ref_art };
         
         temp_sect.push_back(temp_art);
         articles.push_back(temp_sect);
@@ -148,11 +166,12 @@ void Law::addRandArticle(string author){
         int sect_id = rand()%articles.size();
         
         //new article
-        article temp_art = {author, genLatinSentence(0), sect_id, static_cast<int>(articles[sect_id].size()) , NULL, NULL};
+        article temp_art = {author, genLatinSentence(0), sect_id, static_cast<int>(articles[sect_id].size()) , temp_ref_sect, temp_ref_art};
         
         articles[sect_id].push_back(temp_art);
         
     }
+    
     
 }
 
@@ -201,7 +220,7 @@ vector<string> street_monickers_pre = {"Mista", "Lil", "Supa", "Fitty", "Champ",
 
 //Adds a post monicker to a name
 //Ex. Jugga the Fly
-string giveMonickerPost(string name){
+string giveMonicker(string name){
     
     string full_name = ""; //the string we will return
     
@@ -252,15 +271,7 @@ string genPrayer(){
     
 }
 
-////////////
-//LAWS
-//
-//
-//
 
-//Laws: List of Sections
-//Sections: List of Articles
-//Articles: Contains - Author & Reference to other Articles
 
 
 

@@ -10,6 +10,9 @@
 #include <SDL2_mixer/SDL_mixer.h>
 
 #include <vector>
+#include <math.h>
+
+#define Pi32 3.14159265358979f
 
 using std::vector;
 
@@ -98,8 +101,6 @@ void playToneOnce(int ToneHz, int ms){
     int samples_needed = ( ms / 1000 ) * SamplesPerSecond;
     //int BytesToWrite = BytesPerSample * samples_needed;  //Calculate How Many bytes we need
     int BytesToWrite = samples_needed; //One byte per sample?
-    
-    printf("bytes: fuck : %d",BytesToWrite);
     
     //Allocate Some Memory for these suckers
     void *SoundBuffer = malloc(BytesToWrite);
@@ -195,6 +196,7 @@ void playToneList(vector<int> tones, int ms){
 
 //plays the sum of all input tones
 //Doesn't sound so great
+//adds some random noise
 void playToneList_Noise(vector<int> tones, int ms){
     
     //First we figure how much buffer we need
@@ -263,6 +265,303 @@ void playToneList_Phase(vector<int> tones, int ms){
     }
     SDL_QueueAudio(1, SoundBuffer, 4*BytesToWrite);
     free(SoundBuffer);
+}
+
+//plays the sine wave at frequency, for duration ms
+void playSine(float ToneHz, int ms){
+    //First we figure how much buffer we need
+    // ms * (1 s / 1000 ms) * ( samples / s )
+    int samples_needed = ( ms / 1000 ) * SamplesPerSecond;
+    int BytesToWrite = samples_needed; //One byte per sample?
+    
+    //Allocate Some Memory for these suckers
+    void *SoundBuffer = malloc(BytesToWrite);
+    int *SampleOut = (int *)SoundBuffer;
+    
+    //calculate waveform paramters
+    float WavePeriod = (float)SamplesPerSecond / ToneHz;
+    float HalfWavePeriod = WavePeriod / 2.0; //This is the only value we really need
+    
+    //Go through each sample and determine the value (sine)
+    for(int i = 0 ; i < samples_needed; i++){
+        float t = 2.0f*Pi32*i/WavePeriod;
+        float SineValue = sinf(t);
+        int SampleValue = (int)(SineValue*ToneVolume);
+        *SampleOut++ = SampleValue;
+    }
+    
+    SDL_QueueAudio(1, SoundBuffer, 4*BytesToWrite);
+    free(SoundBuffer);
+    
+}
+
+////Go through each sample and determine if it should be high or low
+//for(int i = 0; i < samples_needed; i++){
+//    //create a sample
+//    int SampleValue  = ( (i/HalfSquareWavePeriod) % 2 ) ? ToneVolume : -ToneVolume;
+//    printf("%d,,",SampleValue );
+//    *SampleOut++ = SampleValue;
+//}
+
+//plays the sine wave at frequency, for duration ms
+void playSquare(float ToneHz, int ms){
+    //First we figure how much buffer we need
+    // ms * (1 s / 1000 ms) * ( samples / s )
+    int samples_needed = ( ms / 1000 ) * SamplesPerSecond;
+    int BytesToWrite = samples_needed; //One byte per sample?
+    
+    //Allocate Some Memory for these suckers
+    void *SoundBuffer = malloc(BytesToWrite);
+    int *SampleOut = (int *)SoundBuffer;
+    
+    //calculate waveform paramters
+    float WavePeriod = (float)SamplesPerSecond / ToneHz;
+    float HalfWavePeriod = WavePeriod / 2.0; //This is the only value we really need
+    
+    //Go through each sample and determine if it should be high or low
+    for(int i = 0; i < samples_needed; i++){
+        //create a sample
+        int SampleValue  = ( (int)(i/HalfWavePeriod) % 2 ) ? ToneVolume : -ToneVolume;
+        *SampleOut++ = SampleValue;
+    }
+
+    
+    SDL_QueueAudio(1, SoundBuffer, 4*BytesToWrite);
+    free(SoundBuffer);
+}
+
+//composition
+//# Notes Coding
+//# 0 C
+//# 1 C#
+//# 2 D
+//# 3 D#
+//# 4 E
+//# 5 F
+//# 6 F#
+//# 7 G
+//# 8 G#
+//# 9 A
+//# 10 A#
+//# 11 B
+//# 12 Hi C
+//# 13 Hi C#
+//# 14 Hi D
+//# 15 Hi D#
+//# 16 Hi E
+//# 17 Hi F
+//# 18 Hi F#
+//# 19 Hi G
+//# 20 Hi G#
+//# 21 Hi A
+//# 22 Hi A#
+//# 23 Hi B
+
+//# 99 Special Symbol - REST
+
+//generates Ionian Scale as list of ints (according to above table)
+vector<int> genIonian(int tonic){
+    vector<int> scale;
+    scale.push_back(tonic + 0);
+    scale.push_back(tonic + 2);
+    scale.push_back(tonic + 4);
+    scale.push_back(tonic + 5);
+    scale.push_back(tonic + 7);
+    scale.push_back(tonic + 9);
+    scale.push_back(tonic + 11);
+
+    return scale; 
+
+}
+
+//generates Dorian Scale as list of ints (according to above table)
+vector<int> genDorian(int tonic){
+    vector<int> scale;
+    scale.push_back(tonic + 0);
+    scale.push_back(tonic + 2);
+    scale.push_back(tonic + 3);
+    scale.push_back(tonic + 5);
+    scale.push_back(tonic + 7);
+    scale.push_back(tonic + 9);
+    scale.push_back(tonic + 10);
+    
+    return scale;
+    
+}
+
+//generates Phrygian Scale as list of ints (according to above table)
+vector<int> genPhrygian(int tonic){
+    vector<int> scale;
+    scale.push_back(tonic + 0);
+    scale.push_back(tonic + 1);
+    scale.push_back(tonic + 3);
+    scale.push_back(tonic + 5);
+    scale.push_back(tonic + 7);
+    scale.push_back(tonic + 8);
+    scale.push_back(tonic + 10);
+    
+    return scale;
+    
+}
+
+//generates Lydian Scale as list of ints (according to above table)
+vector<int> genLydian(int tonic){
+    vector<int> scale;
+    scale.push_back(tonic + 0);
+    scale.push_back(tonic + 2);
+    scale.push_back(tonic + 4);
+    scale.push_back(tonic + 6);
+    scale.push_back(tonic + 7);
+    scale.push_back(tonic + 9);
+    scale.push_back(tonic + 11);
+    
+    return scale;
+    
+}
+
+//generates Mixolydian Scale as list of ints (according to above table)
+vector<int> genMixolydian(int tonic){
+    vector<int> scale;
+    scale.push_back(tonic + 0);
+    scale.push_back(tonic + 2);
+    scale.push_back(tonic + 4);
+    scale.push_back(tonic + 5);
+    scale.push_back(tonic + 7);
+    scale.push_back(tonic + 9);
+    scale.push_back(tonic + 10);
+    
+    return scale;
+    
+}
+
+//generates Aeolian Scale as list of ints (according to above table)
+vector<int> genAeolian(int tonic){
+    vector<int> scale;
+    scale.push_back(tonic + 0);
+    scale.push_back(tonic + 2);
+    scale.push_back(tonic + 3);
+    scale.push_back(tonic + 5);
+    scale.push_back(tonic + 7);
+    scale.push_back(tonic + 8);
+    scale.push_back(tonic + 10);
+    
+    return scale;
+    
+}
+
+//generates Locrian Scale as list of ints (according to above table)
+vector<int> genLocrian(int tonic){
+    vector<int> scale;
+    scale.push_back(tonic + 0);
+    scale.push_back(tonic + 1);
+    scale.push_back(tonic + 3);
+    scale.push_back(tonic + 5);
+    scale.push_back(tonic + 6);
+    scale.push_back(tonic + 8);
+    scale.push_back(tonic + 10);
+    
+    return scale;
+    
+}
+
+//generates a major chord based off the tonic
+vector<int> genMajorChord(int tonic){
+    vector<int> chord;
+    chord.push_back(tonic + 0);
+    chord.push_back(tonic + 4);
+    chord.push_back(tonic + 7);
+    chord.push_back(99); //REST
+    
+    return chord; 
+}
+
+//generates a minor chord based off the tonic
+vector<int> genMinorChord(int tonic){
+    vector<int> chord;
+    chord.push_back(tonic + 0);
+    chord.push_back(tonic + 3);
+    chord.push_back(tonic + 7);
+    chord.push_back(99); //REST
+    
+    return chord;
+}
+
+//prints out a list of integers (scale)
+void printScale(vector<int> scale){
+    
+    for(int i = 0; i < scale.size() ; i++){
+        switch(scale[i]){
+                
+            case 0 : printf("C"); break;
+            case 1 : printf("C#"); break;
+            case 2 : printf("D"); break;
+            case 3 : printf("D#"); break;
+            case 4 : printf("E"); break;
+            case 5 : printf("F"); break;
+            case 6 : printf("F#"); break;
+            case 7 : printf("G"); break;
+            case 8 : printf("G#"); break;
+            case 9 : printf("A"); break;
+            case 10 : printf("A#"); break;
+            case 11 : printf("B"); break;
+            case 12 : printf("Hi C"); break;
+            case 13 : printf("Hi C#"); break;
+            case 14 : printf("Hi D"); break;
+            case 15 : printf("Hi D#"); break;
+            case 16 : printf("Hi E"); break;
+            case 17 : printf("Hi F"); break;
+            case 18 : printf("Hi F#"); break;
+            case 19 : printf("Hi G"); break;
+            case 20 : printf("Hi G#"); break;
+            case 21 : printf("Hi A"); break;
+            case 22 : printf("Hi A#"); break;
+            case 23 : printf("Hi B"); break;
+                
+            case 99 : printf("REST"); break;
+                
+        }
+        
+    }
+    
+}
+
+//plays out the list of integers (scale) with playToneOnce() function
+void playScaleOnce(vector<int> scale){
+    
+    for(int i = 0; i < scale.size() ; i++){
+        switch(scale[i]){
+                
+            case 0 : playSquare(C3, 1000); break;
+            case 1 : playSquare(Db3, 1000); break;
+            case 2 : playSquare(D3, 1000); break;
+            case 3 : playSquare(Eb3, 1000); break;
+            case 4 : playSquare(E3, 1000); break;
+            case 5 : playSquare(F3, 1000); break;
+            case 6 : playSquare(Gb3, 1000); break;
+            case 7 : playSquare(G3, 1000); break;
+            case 8 : playSquare(Ab3, 1000); break;
+            case 9 : playSquare(A3, 1000); break;
+            case 10 : playSquare(Bb3, 1000); break;
+            case 11 : playSquare(B3, 1000); break;
+            case 12 : playSquare(C4, 1000); break;
+            case 13 : playSquare(Db4, 1000); break;
+            case 14 : playSquare(D4, 1000); break;
+            case 15 : playSquare(Eb4, 1000); break;
+            case 16 : playSquare(E4, 1000); break;
+            case 17 : playSquare(F4, 1000); break;
+            case 18 : playSquare(Gb4, 1000); break;
+            case 19 : playSquare(G4, 1000); break;
+            case 20 : playSquare(Ab4, 1000); break;
+            case 21 : playSquare(A4, 1000); break;
+            case 22 : playSquare(Bb4, 1000); break;
+            case 23 : playSquare(B4, 1000); break;
+                
+            case 99 : playSquare(REST, 1000); break;
+                
+        }
+        
+    }
+    
 }
 
 

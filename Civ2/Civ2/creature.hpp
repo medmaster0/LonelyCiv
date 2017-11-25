@@ -19,6 +19,7 @@
 //#endif
 
 #include <vector>
+#include <string>
 using namespace std;
 
 extern vector<vector<int> > map;
@@ -43,6 +44,7 @@ public:
     void moveRight();
     void moveLeft();
     void randomDance();
+    string name; //the name of the creature
     vector<vector<int>> path; //a path to whatever target it has
     int x,y,z; //Position of sprite (MAP COORDS!)
     vector<Item> inventory; //list of items the sprite is carrying

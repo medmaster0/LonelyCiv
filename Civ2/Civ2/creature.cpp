@@ -10,8 +10,10 @@
 #include "dancez.hpp"
 #include "Item.hpp"
 #include <vector>
+#include <string>
 #include <iostream>
 #include "med_algo.hpp"
+#include "story.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -23,6 +25,7 @@ using namespace std;
 Sprite::Sprite(int xp, int yp)
 {
     //Initialize
+    name = genName();
     primTexture = NULL;
     secoTexture = NULL;
     mWidth = 0;

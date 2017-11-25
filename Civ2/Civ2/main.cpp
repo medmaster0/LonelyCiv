@@ -213,8 +213,24 @@ void loadTiles(){
         item_tiles_p[i] = loadTexture("Civ2/Civ2/stonez/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
-//        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b)};
-//        world_colors[i] = temp_col;
+        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b)};
+        //world_colors[i] = temp_col;
+        world_colors.push_back(temp_col);
+        
+    }
+    for(int i = 200 ; i < 300; i++){
+        int r,g,b;
+        r = rand()%255;
+        g = rand()%255;
+        b = rand()%255;
+        colorz.push_back({r,g,b});
+        
+        //AS WE INTEGRATE THESE "MATERIALS" INTO ITEMS, WE ALSO UPDATE THOSE LISTS
+        item_tiles_p[i] = loadTexture("Civ2/Civ2/fruitz/"+std::to_string(i)+".png");
+        item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+        item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b)};
+        //world_colors[i] = temp_col;
         world_colors.push_back(temp_col);
         
     }
@@ -271,6 +287,8 @@ void generateTilez(){
     system("python Civ2/Civ2/doodadz/spinwhel2.py");
     system("python Civ2/Civ2/doodadz/screwpress.py");
     system("python Civ2/Civ2/doodadz/outline.py");
+    system("python Civ2/Civ2/fruitz/fruitz.py");
+    system("python Civ2/Civ2/fruitz/outline.py");
 
 }
 
@@ -304,18 +322,36 @@ void init_items(){
     int tempy; //temporary y
     int temp_tile; //temporarily stores random tile index
     
-    //Create some random items!
+//    //Create some random items!
+//    for(int i = 0; i < 450; i++){
+//        tempx = rand()%(map_width);
+//        tempy = rand()%(map_height);
+//        temp_tile = rand()%199;
+//        //Item temp_item = Item(tempx, tempy, temp_tile, world_colors[temp_tile],{255,255,255,0} ); //temporary item
+//        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(colorz[temp_tile][0]), static_cast<Uint8>(colorz[temp_tile][1]), static_cast<Uint8>(colorz[temp_tile][2]),255},{255,255,255,0} ); //temporary item
+//        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+//        //printf("cc %d %d cc", tempx, tempy);
+//        //printf("cc %d %d cc", map_items[(tempy-1)*map_width+(tempx)].back().x, temp_item.x);
+//        
+//    }
+    
+    //Create some random weedz with fruit!
     for(int i = 0; i < 450; i++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
-        temp_tile = rand()%199;
-        //Item temp_item = Item(tempx, tempy, temp_tile, world_colors[temp_tile],{255,255,255,0} ); //temporary item
+        temp_tile = rand()%99;
+        
+        //Create the weed
         Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(colorz[temp_tile][0]), static_cast<Uint8>(colorz[temp_tile][1]), static_cast<Uint8>(colorz[temp_tile][2]),255},{255,255,255,0} ); //temporary item
         map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
-        //printf("cc %d %d cc", tempx, tempy);
-        //printf("cc %d %d cc", map_items[(tempy-1)*map_width+(tempx)].back().x, temp_item.x);
+        
+        //then the fruits
+        temp_item = Item(tempx, tempy, temp_tile+200, {static_cast<Uint8>(colorz[temp_tile+200][0]), static_cast<Uint8>(colorz[temp_tile+200][1]), static_cast<Uint8>(colorz[temp_tile+200][2]),255},{255,255,255,0} ); //temporary item
+        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+        
         
     }
+    
     
 //    for(int b = 0 ; b<50; b++){
 //        tempx = rand()%(map_width);
@@ -551,8 +587,8 @@ void background_color_thread(){
         }
         
         
-        SDL_Delay(100); //Debug Quick
-        //SDL_Delay(500); //Nice looking
+        //SDL_Delay(100); //Debug Quick
+        SDL_Delay(500); //Nice looking
     }
     
 }
@@ -624,8 +660,12 @@ int main( int argc, char* args[] ){
 //    // Open our audio device:
     initAudio(48000, SamplesPerSecond * BytesPerSample / 60);
     //playToneCont(440);
-//    playToneOnce(440, 2000);
-//    playToneOnce(880, 2000);
+    //playToneOnce(110, 2000);
+    //playSquare(116.6, 2000);
+//    playToneOnce(116, 2000);
+//    playToneOnce(117, 2000);
+    
+    
 //    playToneOnce(220, 2000);
     //while(true){
 //        playTwoChord(200, 300, 2000);
@@ -636,57 +676,32 @@ int main( int argc, char* args[] ){
 //    }
      SDL_PauseAudio(0);
     //playToneList_Phase({440,880,3*440, 4*440, 5*440, 550, 2*550, 3*550, 4*550, 5*550}, 2000);
-
+//    while(true){
+//        printf("\n");
+//        printScale(genIonian(0));
+//        printf("\n");
+//    }
+    
+    for(int i = 0; i < 10 ; i++){
+        playScaleOnce(genMinorChord(0));
+    }
+    
 //    while(true){
 //        //cout << giveMonickerPost( genName() ) << '\n';
 //        //cout << genPrayer() << '\n';
 //        //cout << genLatinSentence() << '\n';
-//        cout << genCuss() << '\n';
+//        //cout << genCuss() << '\n';
+//        Law* law1 = new Law(genName());
+//        for(int y = 0; y < 77; y++){
+//           law1->addRandArticle( giveMonicker( genName() ) );
+//        }
+//        law1->printLaw();
+//        
 //    }
-    Law* law1 = new Law(genName());
-    law1->addRandArticle(genName());
-    law1->addRandArticle(genName());
-    law1->addRandArticle(genName());
-    law1->addRandArticle(genName());
-    law1->addRandArticle(genName());
-    for(int y = 0; y < 77; y++){
-       law1->addRandArticle(genName()); 
-    }
-    law1->printLaw();
-    
+
 
     //SDL_Delay(2000);
     //SDL_PauseAudio(0);
-    
-//    bool SoundIsPlaying = false;
-//    
-//    // Sound output test
-//    while(true){
-//        int TargetQueueBytes = SamplesPerSecond * BytesPerSample;
-//        int BytesToWrite = TargetQueueBytes - SDL_GetQueuedAudioSize(1);
-//        if (BytesToWrite)
-//        {
-//            void *SoundBuffer = malloc(BytesToWrite);
-//            int *SampleOut = (int *)SoundBuffer;
-//            int SampleCount = BytesToWrite/BytesPerSample;
-//            for(int SampleIndex = 0;
-//                SampleIndex < SampleCount;
-//                ++SampleIndex)
-//            {
-//                int SampleValue = ((RunningSampleIndex++ / HalfSquareWavePeriod) % 2) ? ToneVolume : -ToneVolume;
-//                *SampleOut++ = SampleValue;
-//                *SampleOut++ = SampleValue;
-//            }
-//            SDL_QueueAudio(1, SoundBuffer, BytesToWrite);
-//            free(SoundBuffer);
-//        }
-//        
-//        if(!SoundIsPlaying)
-//        {
-//            SDL_PauseAudio(0);
-//            SoundIsPlaying = true;
-//        }
-//    }
     
     //test the name gen
 //    while(true){
