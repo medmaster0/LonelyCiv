@@ -45,11 +45,14 @@ public:
     void moveLeft();
     void randomDance();
     string name; //the name of the creature
-    vector<vector<int>> path; //a path to whatever target it has
     int x,y,z; //Position of sprite (MAP COORDS!)
     vector<Item> inventory; //list of items the sprite is carrying
+    SDL_Color faveColor; //the sprite's favorite color
     Hat* hat; //a single item containing the sprites hat
-    void moveTo(int x1, int y1);
+    void moveTo(int x1, int y1); //moves to a specific (x,y) coord
+    //Targeting stuff, below - hopefully GENERAL PURPOSE
+    vector<vector<int>> path; //a path to whatever target it has
+    int target_index; //the index of the target (index of tile stack OR index of enemy for example
 private:
     SDL_Texture* primTexture;//primary texture of the sprite
     SDL_Texture* secoTexture;//secondary texture of the sprite

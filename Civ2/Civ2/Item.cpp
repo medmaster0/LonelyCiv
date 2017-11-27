@@ -181,6 +181,8 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
             item_name = "    weed";
         }else if(item_list[item_index].type<200){ //Then it's a stone
             item_name = "    stone";
+        }else if(item_list[item_index].type<300){ //Then it's a fruit
+            item_name = "    fruit";
         }else if(item_list[item_index].type==300){ //Then it's a stone
             item_name = "    can";
         }else if(item_list[item_index].type==301){ //Then it's a stone

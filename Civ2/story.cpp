@@ -216,7 +216,7 @@ string genName(){
 
 vector<string> street_monickers_post = {"Dopest","Dope","Baddest","Bad","Slickest","Slick","Mostest","Rad","Clown","Killa","Slizza","Blizza","Snow","Product","Biggie","Down","Chiller","Bomb","Bombest","Funny","Punk","Chill","Junkhead","Cracker","Lowlife","Thug","Thuggin","Pimpin","Chief","Pill","Rocker","Baller","Insane","Moco","Snoop","JoJo","Fly","Real Deal","Peep","Smalls", "Illest","Dude","Duderino","Baby","Vato","Joker","Homie","Flow"};
 
-vector<string> street_monickers_pre = {"Mista", "Lil", "Supa", "Fitty", "Champ", "Kid", "Wiz"};
+vector<string> street_monickers_pre = {"Mista", "Lil", "Supa", "Fitty", "Champ", "Kid", "Wiz", "Babyface"};
 
 //Adds a post monicker to a name
 //Ex. Jugga the Fly

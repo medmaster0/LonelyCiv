@@ -37,6 +37,7 @@ Sprite::Sprite(int xp, int yp)
     r = rand() %255;
     g = rand() %255;
     b = rand() %255;
+    faveColor = {static_cast<Uint8>(rand() %255), static_cast<Uint8>(rand() %255), static_cast<Uint8>(rand() %255)};
     
 }
 //Destructor

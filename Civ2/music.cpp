@@ -11,12 +11,17 @@
 
 #include <vector>
 #include <math.h>
+#include <string>
 
 #define Pi32 3.14159265358979f
 
 using std::vector;
+using std::string;
 
-
+////////////////////
+//TODO: SCAT: doo WOP ba WOP
+// ---------> generate strings
+// ---------> generate audio
 
 // NOTE: Sound test
 int SamplesPerSecond = 48000; //This should be constant
@@ -322,6 +327,7 @@ void playSquare(float ToneHz, int ms){
     for(int i = 0; i < samples_needed; i++){
         //create a sample
         int SampleValue  = ( (int)(i/HalfWavePeriod) % 2 ) ? ToneVolume : -ToneVolume;
+        //printf("%d,%d,%d\n",i,BytesToWrite,BytesPerSample);
         *SampleOut++ = SampleValue;
     }
 
@@ -563,6 +569,13 @@ void playScaleOnce(vector<int> scale){
     }
     
 }
+
+///////////////
+//SCAT
+//doo-WOP boo-WOP
+vector<string> scat_syls = {"oo", "op", "a", "ok"};
+vector<string> scat_consonants = {"d", "w", "b", "r"};
+//maybe??: ukka-ukka, ugga-ugga
 
 
 

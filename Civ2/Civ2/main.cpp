@@ -24,6 +24,7 @@
 #include "story.hpp"
 //#include <unistd.h>
 /* time */
+#include <ctime>
 
 using std::vector;
 
@@ -188,11 +189,15 @@ void loadTiles(){
     //ITEM TILES
     for(int i = 0 ; i < 100; i++){
 
-        int r,g,b;
+        int r,g,b,a;
         r = rand()%255;
         g = rand()%255;
         b = rand()%255;
-        colorz.push_back({r,g,b});
+//        r = 140;
+//        g = 0;
+//        b = 0;
+        a = 255;
+        colorz.push_back({r,g,b,a});
         
         //AS WE INTEGRATE THESE "MATERIALS" INTO ITEMS, WE ALSO UPDATE THOSE LISTS
         item_tiles_p[i] = loadTexture("Civ2/Civ2/weedz/"+std::to_string(i)+".png");
@@ -203,11 +208,12 @@ void loadTiles(){
         world_colors.push_back(temp_col);
     }
     for(int i = 100 ; i < 200; i++){
-        int r,g,b;
+        int r,g,b,a;
         r = rand()%255;
         g = rand()%255;
         b = rand()%255;
-        colorz.push_back({r,g,b});
+        a = 255;
+        colorz.push_back({r,g,b,a});
         
         //AS WE INTEGRATE THESE "MATERIALS" INTO ITEMS, WE ALSO UPDATE THOSE LISTS
         item_tiles_p[i] = loadTexture("Civ2/Civ2/stonez/"+std::to_string(i)+".png");
@@ -219,11 +225,12 @@ void loadTiles(){
         
     }
     for(int i = 200 ; i < 300; i++){
-        int r,g,b;
+        int r,g,b,a;
         r = rand()%255;
         g = rand()%255;
         b = rand()%255;
-        colorz.push_back({r,g,b});
+        a = 255;
+        colorz.push_back({r,g,b,a});
         
         //AS WE INTEGRATE THESE "MATERIALS" INTO ITEMS, WE ALSO UPDATE THOSE LISTS
         item_tiles_p[i] = loadTexture("Civ2/Civ2/fruitz/"+std::to_string(i)+".png");
@@ -339,6 +346,8 @@ void init_items(){
     for(int i = 0; i < 450; i++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
+//        tempx = 3;
+//        tempy = 0;
         temp_tile = rand()%99;
         
         //Create the weed
@@ -399,9 +408,9 @@ void init_items(){
     
     
     //for testing inventory, specific tile...
-    for(int b = 0 ; b<450; b++){
+    for(int b = 0 ; b<1; b++){
         tempx = 14;
-        tempy = 14;
+        tempy = 0;
         if(rand()%2 == 1){
             temp_tile = 305; //+ (rand()%2);
         }else{
@@ -466,23 +475,223 @@ void draw_constructions(){
 
 //a function that picks up an item from the map, and put's it in the specified Sprite's inventory
 void pickUpItem(Sprite* sprite, int xpos, int ypos){
-//    Item item_temp; // a temporary item for adding to inventory
-//    int index; //a temporary index
-//    vector<int> clr; //a temporary holder for colors used multiple times below
-//    
-//    index = map[ypos][xpos]; //get the tile number at the position
-//    //check to make sure item is pick-upable
-//    if(index > 199){
-//        return;
-//    }
-//    
-//    clr = colorz[index]; //get the color of the tile the cre is at
-//    item_temp = {clr, index};
-//    sprite->inventory.push_back(item_temp);
-//    
-//    //Also delete item from map
-//    map[ypos][xpos] = 200; //blank tile
+    
+    int num_items = map_items[(ypos*map_width)+xpos].size(); //the last element in the tile item list
+    
+    if(num_items!=0){
+        
+        Item temp_item = Item(999,999, map_items[(ypos*map_width)+xpos][num_items-1].type, {map_items[(ypos*map_width)+xpos][num_items-1].primColor.r,map_items[(ypos*map_width)+xpos][num_items-1].primColor.g,map_items[(ypos*map_width)+xpos][num_items-1].primColor.b,map_items[(ypos*map_width)+xpos][num_items-1].primColor.a}, {map_items[(ypos*map_width)+xpos][num_items-1].secoColor.r,map_items[(ypos*map_width)+xpos][num_items-1].secoColor.g,map_items[(ypos*map_width)+xpos][num_items-1].secoColor.b,map_items[(ypos*map_width)+xpos][num_items-1].secoColor.a});
+        sprite->inventory.push_back(temp_item);
+        map_items[(ypos*map_width) + xpos].pop_back();
+        
+    }
+    
 }
+//overload - function picks up items, specifies index on tile-item stack (map_items) it wants
+void pickUpItem(Sprite* sprite, int xpos, int ypos, int index){
+    
+    int num_items = map_items[(ypos*map_width)+xpos].size(); //the last element in the tile item list
+    if(index>=num_items){return;} //bounds check
+    
+    Item temp_item = Item(999,999, map_items[(ypos*map_width)+xpos][index].type, map_items[(ypos*map_width)+xpos][index].primColor, map_items[(ypos*map_width)+xpos][index].secoColor);
+    sprite->inventory.push_back(temp_item);
+    map_items[(ypos*map_width) + xpos].erase(map_items[(ypos*map_width) + xpos].begin() + index);
+        
+
+}
+
+//Helper function for below search routine
+//returns true if element node e is in node list v
+bool isNodeIn(vector<int> e, vector<vector<int>> v){
+    
+    vector<int> temp; //used to hold the nodes...
+    for(int i = 0; i<v.size(); i++){ //cycle through all elements of v
+        if(e[0] == v[i][0] && e[1] == v[i][1]){
+            return true;//means we found a match!
+        }
+    }
+    return false; //means we cycled list and couldn't find match
+}
+
+//searches for an item that is similar enough for a given color
+//Flood searches from a given sprite's position for item that fits criteria
+//Searches each tile on map_items - each tile has a stack of items that will be searched
+//input: Sprite who will be searching
+//        diff_threshold - the maximum difference in color acceptable
+//output: steps from sprite to target
+//        returns {{9999,9999}} error code if not found soon enough
+//        steps returned as nodes: <xpos, ypos, steps_from_dest>
+//        function returns a list of those nodes
+//others: also sets target data on Sprite*
+vector<vector<int>> faveColorSearch(Sprite* cre, int diff_threshold){
+    
+    vector<vector<int>> search_q; //the main "list"
+    int k = 0; //the main counter used to keep track of where we are in the list
+    vector<int> node; //The current node on the list we are looking at
+    vector<int> temp; //Temp node used to push new nodes onto queues and later in filtering out irrelevant steps
+    
+    //Add starting node to search queue
+    node = {cre->x, cre->y, 0}; //initialization
+    search_q.push_back(node); //add first element to list
+    bool findingTarget = true; //a flag signalling if we're still searching for target (and populating search_q)
+    while(findingTarget){
+        
+        if(k<search_q.size()){ //bounds chhecking
+            node = search_q[k]; //pull the next node <xpos, ypos, distance_from_start>
+        }else{ //if we've got to the end of list
+            //couldn't find targ
+            cre->path = {{9999,9999}}; //set the path to indicate error code
+            return {{9999,9999}} ; //didn't find / couldn't reach / searching too long
+        }
+        
+        
+        //Look at all nodes adjacent to the current node
+        //LEFT
+        if(node[0]-1 > 0){ //bounds checking
+             if(block_map[((node[1])*map_width)+(node[0]-1)]==false){ //if adjacent is NOT blocked
+                for(int i = 0; i < map_items[((node[1])*map_width)+(node[0]-1)].size() ; i++){ //iterate through all items on the adjacent node
+                    if( color_diff( map_items[((node[1])*map_width)+(node[0]-1)][i].primColor , cre->faveColor) < diff_threshold){
+                        //We found target!
+                        temp = {node[0]-1, node[1], node[2]+1}; //temporary
+                        search_q.push_back(temp); //add to search_q
+                        findingTarget = false;
+                        break;
+                    }
+                }//end for
+             }
+            
+            if(findingTarget==false){break;} //?right???????
+                
+            //Otherwise, add node to search_q (if eligible, ofc)
+            
+            if(block_map[((node[1])*map_width)+(node[0]-1)]==false){ //if adjacent is NOT blocked
+                //we also gotta make sure node isn't in queue with lower distance already...
+                //cycle through the list and check for every lower distance...
+                if(!isNodeIn({node[0]-1,node[1],0}, search_q)){
+                    temp = {node[0]-1, node[1], node[2]+1};
+                    search_q.push_back(temp);
+                }
+            }
+        }
+        //RIGHT
+        if(node[0]+1 < map_width){ //bounds checking
+            if(block_map[((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
+                for(int i = 0; i < map_items[((node[1])*map_width)+(node[0]+1)].size() ; i++){ //iterate through all items on the adjacent node
+                    if( color_diff( map_items[((node[1])*map_width)+(node[0]+1)][i].primColor , cre->faveColor) < diff_threshold){
+                        //We found target!
+                        temp = {node[0]+1, node[1], node[2]+1}; //temporary
+                        search_q.push_back(temp); //add to search_q
+                        findingTarget = false;
+                        break;
+                    }
+                }//end for
+            }
+            
+            if(findingTarget==false){break;} //?right???????
+            
+            //Otherwise, add node to search_q (if eligible, ofc)
+            
+            if(block_map[((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
+                //we also gotta make sure node isn't in queue with lower distance already...
+                //cycle through the list and check for every lower distance...
+                if(!isNodeIn({node[0]+1,node[1],0}, search_q)){
+                    temp = {node[0]+1, node[1], node[2]+1};
+                    search_q.push_back(temp);
+                }
+            }
+        }
+        //UP
+        if(node[1]-1 > 0){ //bounds checking
+            if(block_map[((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+                for(int i = 0; i < map_items[((node[1]-1)*map_width)+(node[0])].size() ; i++){ //iterate through all items on the adjacent node
+                    if( color_diff( map_items[((node[1]-1)*map_width)+(node[0])][i].primColor , cre->faveColor) < diff_threshold){
+                        //We found target!
+                        temp = {node[0], node[1]-1, node[2]+1}; //temporary
+                        search_q.push_back(temp); //add to search_q
+                        findingTarget = false;
+                        break;
+                    }
+                }//end for
+            }
+            
+            if(findingTarget==false){break;} //?right???????
+            
+            //Otherwise, add node to search_q (if eligible, ofc)
+            
+            if(block_map[((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+                //we also gotta make sure node isn't in queue with lower distance already...
+                //cycle through the list and check for every lower distance...
+                if(!isNodeIn({node[0],node[1]-1,0}, search_q)){
+                    temp = {node[0], node[1]-1, node[2]+1};
+                    search_q.push_back(temp);
+                }
+            }
+        }
+        //DOWN
+        if(node[1]+1 < map_height){ //bounds checking
+            if(block_map[((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+                for(int i = 0; i < map_items[((node[1]+1)*map_width)+(node[0])].size() ; i++){ //iterate through all items on the adjacent node
+                    if( color_diff( map_items[((node[1]+1)*map_width)+(node[0])][i].primColor , cre->faveColor) < diff_threshold){
+                        //We found target!
+                        temp = {node[0], node[1]+1, node[2]+1}; //temporary
+                        search_q.push_back(temp); //add to search_q
+                        findingTarget = false;
+                        break;
+                    }
+                }//end for
+            }
+            
+            if(findingTarget==false){break;} //?right???????
+            
+            //Otherwise, add node to search_q (if eligible, ofc)
+            
+            if(block_map[((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+                //we also gotta make sure node isn't in queue with lower distance already...
+                //cycle through the list and check for every lower distance...
+                if(!isNodeIn({node[0],node[1]+1,0}, search_q)){
+                    temp = {node[0], node[1]+1, node[2]+1};
+                    search_q.push_back(temp);
+                }
+            }
+        }
+        k = k+1;
+        if(k > 400){ //if we've been searching too long, give up
+            k = search_q.size(); //just go to end of queue so we can return error code
+        }
+    
+    }//Broke out of while loop means we found target
+    
+    //Now we need to go down the list (popping) and only keep nodes that apply to the CORRECT PATH
+    //We create a list goind BACKWARD from target to current
+    vector<vector<int>> path2target;//the list of nodes leading from target
+    temp = search_q.back(); //get last element from list
+    search_q.pop_back(); //now remove that element since we won't need it in list
+    path2target.push_back(temp);//Add first node to path
+    while(true){
+        temp = search_q.back();
+        search_q.pop_back(); //Get last value out of search queue
+        if(temp[2] == 0){ //means 0 steps left and we found original node (our starting position
+            break;
+        }
+        if(temp[2] == path2target.back()[2]- 1){ //if current node is actually a step closer
+            //check if it's a step in the right direction (AND ONLY 1 unit away from last step)
+            if(   ((abs(temp[0]-path2target.back()[0])==1)&&(abs(temp[1]-path2target.back()[1])==0)) || //check if x diff is 1
+               ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==1)) ){ //check if y diff is 1
+                path2target.push_back(temp);
+            }
+            
+        }
+        
+    }
+    
+    //return search_q;
+    //reverse(path2target.begin(), path2target.end());
+    cre->path = path2target;
+    
+    return path2target; //return the list backwards so you can pop_back to get the next step needed
+    
+}
+
 
 ////////////////////////////
 //THREADS - ACTIONS
@@ -499,8 +708,6 @@ void wander_thread(Sprite* spr1){
         
         if(spr1->path.empty()){ //if path is empty
             spr1->path = A_Star(block_map, map_width, map_height, spr1->x, spr1->y, rand()%map_width, rand()%map_height );
-            //spr1->path = A_Star(block_map, map_width, map_height, spr1->x, spr1->y, 15, 0);
-            //spr1->path = A_Star(block_map, map_width, map_height,  -15, -15 , spr1->x, spr1->y);
         }
         
         //Check if the search failed (error code (9999,9999)
@@ -519,6 +726,62 @@ void wander_thread(Sprite* spr1){
         SDL_Delay(500);
     }
     
+    
+}
+
+//a thread for picking up items of your favorite color
+//Call the faveColorSearch algorithm
+//Travels to proper tile
+//picks up item (if it's still there)
+void gather_thread(Sprite* spr1){
+    
+    int color_thresh = 100; //the maximum difference between item color and fave color,  allowable
+    
+    //spr1->path.clear(); //clear path and start clean
+    
+    while(true){
+        
+        //find a new target path
+        if(spr1->path.empty()){ //if path is empty
+            faveColorSearch(spr1, color_thresh);
+        }
+        
+        //Check if the search failed (error code (9999,9999)
+        if(spr1->path[0][0] == 9999){
+            spr1->path.pop_back();
+            continue; //search failed, try again....
+            //break;
+        }
+        
+
+        
+        vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
+        //Now actually move
+        spr1->x = next_step[0];
+        spr1->y = next_step[1];
+        //pop off the step from path
+        spr1->path.pop_back();
+        
+        //If we've reach target...
+        if(spr1->path.empty()){
+            cout << "target reach";
+            
+            //now look on tile and check if item is still there and pick up
+            for(int i = 0; i < map_items[(spr1->y*map_width)+spr1->x].size(); i++){
+                if(color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor)<color_thresh ){
+                    
+                    pickUpItem(spr1, spr1->x, spr1->y, i); //then pick up the item
+                }
+                
+            }
+            
+            
+            //break;
+        }
+        
+        SDL_Delay(500);
+        
+    }
     
 }
 
@@ -546,9 +809,9 @@ void background_color_thread(){
 //    int r2 = 143;
 //    int g2 = 133;
 //    int b2 = 254;
-    int r2 = (rand()%254) + 1;
-    int g2 = (rand()%254) + 1;
-    int b2 = (rand()%254) + 1;
+    int r2 = (rand()%154) + 1;
+    int g2 = (rand()%154) + 1;
+    int b2 = (rand()%154) + 1;
     
     while(true){
         
@@ -629,14 +892,12 @@ int main( int argc, char* args[] ){
     cre3->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
     Sprite* cre4 = new Sprite(7,10);
     cre4->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
+    Sprite* cre5 = new Sprite(24,24);
+    cre5->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
     Sprite* shroom1 = new Sprite(3,3);
     shroom1->loadFromFile("Civ2/Civ2/tiles/shroomPrim.png","Civ2/Civ2/tiles/shroomSeco.png", 16, 16);
     Sprite* lov1 = new Sprite(5,5);
     lov1->loadFromFile("Civ2/Civ2/tiles/lovPrim.png", "Civ2/Civ2/tiles/lovSeco.png", 16, 16);
-    //...Items
-    Item* can1 = new Item(25,25,300);
-    Item* item1 = new Item(24,24,301);
-    Item* item2 = new Item(26,26,120,{static_cast<Uint8>(colorz[120][0]),static_cast<Uint8>(colorz[120][1]),static_cast<Uint8>(colorz[120][2])},{0xff,0xff,0xff,0x00});
 
     //TEST SHIT
     //genAdobe();
@@ -674,7 +935,18 @@ int main( int argc, char* args[] ){
 //        playTwoChord(200, 300, 2000);
 //        playToneOnce(200, 2000);
 //    }
-     SDL_PauseAudio(0);
+    SDL_PauseAudio(0);
+    
+//    time_t timev = time(nullptr);
+//    cout << asctime(localtime( &timev )) << timev;
+//    vector<vector<int>> test_path = faveColorSearch(cre5);
+//    for(int i = 0; i < test_path.size(); i++){
+//        printf("\n(%d,%d,%d)", test_path[i][0],test_path[i][1]);
+//    }
+//    
+//    timev = time(nullptr);
+//    cout << asctime(localtime( &timev )) << timev;
+    
     //playToneList_Phase({440,880,3*440, 4*440, 5*440, 550, 2*550, 3*550, 4*550, 5*550}, 2000);
 //    while(true){
 //        printf("\n");
@@ -682,9 +954,10 @@ int main( int argc, char* args[] ){
 //        printf("\n");
 //    }
     
-    for(int i = 0; i < 10 ; i++){
-        playScaleOnce(genMinorChord(0));
-    }
+//    for(int i = 0; i < 10 ; i++){
+//        playScaleOnce(genMinorChord(0));
+//        playSquare(116.6, 2000);
+//    }
     
 //    while(true){
 //        //cout << giveMonickerPost( genName() ) << '\n';
@@ -745,6 +1018,9 @@ int main( int argc, char* args[] ){
     //This thread updates the background color
     std::thread backObj(background_color_thread);
     backObj.detach();
+    //This thread makes the creature gather
+    std::thread gatherObj(gather_thread, std::ref(cre5));
+    gatherObj.detach();
     
     //std::thread audioObj1(music_thread, std::ref(440));
     //wanderObj.join();
@@ -900,15 +1176,12 @@ int main( int argc, char* args[] ){
         cre2->draw();
         cre3->draw();
         cre4->draw();
+        cre5->draw();
         shroom1->draw();
         lov1->draw();
         
         draw_items();
         draw_constructions();
-        //DEBUG: Test generic wonky ass items not in list (BAD)
-        can1->draw(gRenderer, item_tiles_p, item_tiles_s);
-        item1->draw(gRenderer, item_tiles_p, item_tiles_s);
-        item2->draw(gRenderer, item_tiles_p, item_tiles_s);
         
         cre1->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         cre3->drawHat(gRenderer, item_tiles_p, item_tiles_s);
@@ -918,7 +1191,8 @@ int main( int argc, char* args[] ){
         //Draw Display windows
         if(inventoryDisplayOn){
             //showInventory(cre1, &e);
-            displayItemList(map_items[14*map_width+14], gRenderer, SCREEN_HEIGHT);
+            //displayItemList(map_items[3], gRenderer, SCREEN_HEIGHT);
+            displayItemList(cre5->inventory, gRenderer, SCREEN_HEIGHT);
         }
         
         SDL_RenderPresent( gRenderer ); //Update screen
@@ -928,6 +1202,10 @@ int main( int argc, char* args[] ){
     
     //Free up sprites and everything else
     cre1->free();
+    cre2->free();
+    cre3->free();
+    cre4->free();
+    cre5->free();
     shroom1->free();
     lov1->free();
     close();
