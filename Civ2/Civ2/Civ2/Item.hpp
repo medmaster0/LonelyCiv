@@ -27,12 +27,19 @@ public:
     Item(int xpos, int ypos, int tile_type);
     SDL_Color primColor; //the pirimary color of item
     SDL_Color secoColor; //the secondary color of the item
-    int x,y,z;
+    int x,y,z; //I think we actually don't keep track of position here....
     int type; //specifies item type
     void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s); //draws the item
     void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s,SDL_Texture** item_tiles_t); //overload
     
     
+};
+
+class Hat : public Item{
+    
+public:
+    virtual void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s); //draws the item
+    Hat(int xpos, int ypos, int tile_type);
 };
 
 //display list of items

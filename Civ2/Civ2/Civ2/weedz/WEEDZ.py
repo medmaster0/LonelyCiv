@@ -49,6 +49,12 @@ def generateWeed():
 		#maybe a little bigga, maybe a little smalla
 		baseL = random.randint(baseL-1,baseH)
 		baseH = random.randint(baseL,baseH+1)
+		#bounds checking?
+		if baseH >= 15:
+			baseH = 14 #leave one pixel for outline
+		if baseL >= 15:
+			baseL = 14
+
 		#baseH = swath+1
 		#swath = random.randint(baseL,baseH)
 		#print swath

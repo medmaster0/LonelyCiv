@@ -11,6 +11,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string>
+
+#include <iostream>
+
+#include <SDL2/SDL.h>
 
 using namespace std;
 
@@ -19,12 +24,14 @@ using namespace std;
 //There are two intermediate walls in open runs
 // 1 - BRICK
 // 0 - EMPTY SPACE
-vector<vector<short>> gen_maze_corridor(){
+// Inputs: Specify how many rows, cols
+// Output: maze[rows][cols]
+vector<vector<short>> gen_maze_corridor(int rows_in, int cols_in){
 
     vector<vector<short>> tmaze; //temporarily create the maze
     vector<short> trow; //tmemporarily create a row for the maze
-    int rows = 80; //how long the meze is
-    int cols = 20; //how wide the maze is
+    int rows = rows_in; //how long the meze is
+    int cols = cols_in; //how wide the maze is
     
     //these lists keep track where the mid walls are for each open row
     vector<short> walls1;
@@ -129,17 +136,6 @@ vector<vector<short>> gen_maze_corridor(){
         }
         
         
-        
-        //printf("sizeof: %d  ", adj_walls.size());
-        
-        
-//            //print out shit
-//            for(int i = 0 ; i<adj_walls.size(); i++){
-//                    printf("%d", adj_walls[i]);
-//        
-//                printf("\n");
-//            }
-        
     }
     
     
@@ -203,7 +199,8 @@ struct list{
 //An even better A*, gash damn!
 //Returns a list (vector) of steps from x1,y2 to x2,y2
 //Steps are in form of (x,y)
-vector<vector<int>> A_star(bool block_map[],int map_width, int x1, int y1, int x2, int y2){
+//returns error code {{9999,9999}} if can't find path
+vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x1, int y1, int x2, int y2){
     
     list open_set = {nullptr,nullptr}; //the start of the open_set
     list closed_set = {nullptr,nullptr};; //the start of the closed_set
@@ -282,6 +279,18 @@ vector<vector<int>> A_star(bool block_map[],int map_width, int x1, int y1, int x
         //For each neighbor/successor
         for(int i = 0; i<4; i++){
             
+            //if neighbor is out of bounds then we can throw it away
+            if( (neighbors[i]->y < 0) || (neighbors[i]->x < 0) || (neighbors[i]->x >= map_width) || (neighbors[i]->y >= map_height)    ){
+                delete neighbors[i]; //delete what we've created!!!
+                continue; //move on to next neighbor
+            }
+            
+            //if neighbor tile is blocked then we can stop
+            if(block_map[((neighbors[i]->y)*map_width)+neighbors[i]->x]==true){
+                delete neighbors[i]; //delete what we've created!!!
+                continue; //move on to next neighbor
+            }
+            
             //if neighbor is TARGET, then we can stop
             if((neighbors[i]->x==x2)&&(neighbors[i]->y==y2)){
 
@@ -301,12 +310,6 @@ vector<vector<int>> A_star(bool block_map[],int map_width, int x1, int y1, int x
                 
                 search_main = false;
                 break;
-            }
-            
-            //if neighbor tile is blocked then we can stop
-            if(block_map[(neighbors[i]->y*map_width)+neighbors[i]->x]==true){
-                delete neighbors[i]; //delete what we've created!!!
-                continue; //move on to next neighbor
             }
             
             //Calculate The 3 Values: f, g, h
@@ -377,6 +380,8 @@ vector<vector<int>> A_star(bool block_map[],int map_width, int x1, int y1, int x
             
         }//Done cycling through neighbors
         
+        if(open_set.first == nullptr){return {{9999,9999}}; }//THIS MEANS WE HIT THE END OF OPEN_SET AND HAVENT FOUND TARGET
+        
         
     }//end open_list empty
     
@@ -424,20 +429,86 @@ vector<vector<int>> A_star(bool block_map[],int map_width, int x1, int y1, int x
         
     }
     
-    printf("\nTarget aqcuired\n");
     return search_q;
 }
 
 
 
+//COLOR ALGORITHMS!
 
+//Compute the difference in colors
+//the sum of the individual differences in r,g, and b.
+int color_diff(SDL_Color col1, SDL_Color col2){
+    
+    int diff = 0;
+    
+    diff += abs(col1.r - col2.r) + abs(col1.g - col2.g) + abs(col1.b - col2.b);
+    
+    return diff;
+    
+}
 
+//determine the superior color
+//For cases where one color has to be matched up against another.
+//You find out which one has the greatest ROTATIONAL distance over the other
+//
+//Ex. For R component
+//col1.r is greater!
+// Consider col1.r - col2.r = e1 (how much col1 ahead of col2)
+//but also col2.r + (256 - col1.r) = e2 (how much col2 ahead of col1)
+//But when considering all 3 components, you have to keep track of which color is e1 or e2
+//
+//Input 2 colors
+//Output[0] = how much col1 LEADS col2
+//Output[1] = how much col2 LEADS col1
+vector<int> color_fight(SDL_Color col1, SDL_Color col2){
+    vector<int> lead_values; //2 element array containing how much each color leads the other
+    
+    int e1 = 0; //how much col1 leads col2
+    int e2 = 0; //how much col2 leads col1
+    
+    //Compute how much col1 LEADS col2
+    //R component
+    if(col1.r == col2.r){ //components are equal
+        e1 = e1;
+        e2 = e2;
+    }else if(col1.r > col2.r){ //col1.r is greater!
+        e1 = e1 + (col1.r - col2.r);
+        e2 = e2 + (col2.r + (256 - col1.r));
+    }else{ //col2.r is greater
+        e2 = e2 + (col2.r - col1.r);
+        e1 = e1 + (col1.r + (256 - col2.r));
+    }
+    //G component
+    if(col1.g == col2.g){ //components are equal
+        e1 = e1;
+        e2 = e2;
+    }else if(col1.g > col2.g){ //col1.g is greater!
+        e1 = e1 + (col1.g - col2.g);
+        e2 = e2 + (col2.g + (256 - col1.g));
+    }else{ //col2.g is greater
+        e2 = e2 + (col2.g - col1.g);
+        e1 = e1 + (col1.g + (256 - col2.g));
+    }
+    //B component
+    if(col1.b == col2.b){ //components are equal
+        e1 = e1;
+        e2 = e2;
+    }else if(col1.b > col2.b){ //col1.b is greater!
+        e1 = e1 + (col1.b - col2.b);
+        e2 = e2 + (col2.b + (256 - col1.b));
+    }else{ //col2.b is greater
+        e2 = e2 + (col2.b - col1.b);
+        e1 = e1 + (col1.b + (256 - col2.b));
+    }
+    
+    lead_values.push_back(e1);
+    lead_values.push_back(e2);
 
-
-
-
-
-
+    
+    return lead_values;
+    
+}
 
 
 

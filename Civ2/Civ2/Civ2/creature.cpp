@@ -10,7 +10,10 @@
 #include "dancez.hpp"
 #include "Item.hpp"
 #include <vector>
+#include <string>
 #include <iostream>
+#include "med_algo.hpp"
+#include "story.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -18,46 +21,24 @@ using namespace std;
 
 //////////////////
 //SPRITE CLASS
-//class Sprite{
-//public:
-//    Sprite(int xp, int yp);//Initializes variables
-//    void free(); //For clearing texture memory
-//    bool loadFromFile(std::string path1,std::string path2, int w, int h);//Load a texture from file for the sprite
-//    void draw(); //Draws the sprite to screen using MAP COORDS
-//    void moveDown();
-//    void moveUp();
-//    void moveRight();
-//    void moveLeft();
-//    void randomMove();
-//    int x,y,z; //Position of sprite (MAP COORDS!)
-//    vector<Item> inventory; //list of items the sprite is carrying
-//    void moveTo(int x1, int y1);
-//private:
-//    SDL_Texture* primTexture;//primary texture of the sprite
-//    SDL_Texture* secoTexture;//secondary texture of the sprite
-//    int mWidth;//Image dimensions - pixels
-//    int mHeight;//Image dimensions - pixels
-//    int r,g,b; //colors of the sprite
-//    vector<vector<int>> path; //a path to whatever target it has
-//    //Some vars for movement timing
-//    long int timer; //will later store a time stamp
-//    int moveSpeedPeriod; //how long (ms) it takes to move 1 step
-//    
-//};
 //Constructor
 Sprite::Sprite(int xp, int yp)
 {
     //Initialize
+    name = genName();
     primTexture = NULL;
     secoTexture = NULL;
     mWidth = 0;
     mHeight = 0;
+    hat = nullptr;
     x = xp;
     y = yp;
     z = 0;
     r = rand() %255;
     g = rand() %255;
     b = rand() %255;
+    faveColor = {static_cast<Uint8>(rand() %255), static_cast<Uint8>(rand() %255), static_cast<Uint8>(rand() %255)};
+    inThread = false; 
     
 }
 //Destructor
@@ -104,11 +85,6 @@ void Sprite::moveRight(){
     x=x+1;;
     return;
 }
-////Move Right (1 step) CHECKS BLOCKED
-//void Sprite::moveRight(int* blocked, vector<vector<Item>> map_items){
-//    x=x+1;;
-//    return;
-//}
 //Move Left (1 step)
 void Sprite::moveLeft(){
     x=x-1;;
@@ -118,25 +94,6 @@ void Sprite::moveLeft(){
 void Sprite::moveTo(int x1, int y1){
     x = x1;
     y = y1;
-}
-//Random movement
-//Sprite follows a random path
-void Sprite::randomMove(){
-    
-    //get a new random path if need be
-    if(path.empty()){
-        //path = findPathToCoord(map, x, y, (rand()%map_width)-1, (rand()%map_height)-1);
-        //Need to make sure it's small steps for now...
-        path = findPathToCoord(map, x, y, rand()%23, rand()%23);
-    }
-    
-    //Now move to next step in the path (if move Period has been reached
-    vector<int> next = path.back();
-    x = next[0];
-    y = next[1];
-    path.pop_back();
-    SDL_Delay(100);
-    
 }
 
 //Sprite's random path will be dance pattern
@@ -175,13 +132,19 @@ void Sprite::drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, 
     }
 }
 
+//Draw the sprite's hat
+void Sprite::drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s ){
+    
+    if(hat != nullptr){
+        hat->y = y; //move the hat to the right place
+        hat->x = x;
+        hat->draw(gRenderer, item_tiles_p, item_tiles_s);
+    }
+    
+}
+
 //END OF SPRITE CLASS
 ///////////////////////////
-
-
-
-
-
 
 
 
