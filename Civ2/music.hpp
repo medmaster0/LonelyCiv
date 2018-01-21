@@ -103,4 +103,8 @@ vector<int> genMinorChord(int tonic); //generates a minor chord based off the to
 void printScale(vector<int> scale); //prints out a list of integers (scale)
 void playScaleOnce(vector<int> scale); //plays out the list of integers (scale) with playToneOnce() function
 
+void compose_music_thread();//A thread for keeping the music playing/composing
+
+
+
 #endif /* music_hpp */

@@ -235,8 +235,6 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
 
 Hat::Hat(int xpos, int ypos, int tile_type) : Item(xpos, ypos, tile_type){
     
-    
-    
     //static SDL_Texture** tilesPrim = new SDL_Texture * [1]; //contains item tiles, the first version
     //static SDL_Texture** tilesSeco = new SDL_Texture * [1]; //contains item tiles, the secondary version
     //ALso load tiles
@@ -264,3 +262,28 @@ void Hat::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture*
     }
 }
 
+//////////////////////
+//Staff CLASS
+
+Staff::Staff(int xpos, int ypos, int tile_type) : Item(xpos, ypos, tile_type){
+    
+    x = xpos;
+    y = ypos;
+    type = tile_type;
+    primColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
+    secoColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
+    
+}
+
+//draw the staff ( slightly off grid )
+void Staff::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s ){
+    //Set rendering space and render to screen
+    SDL_Rect renderQuad = { x*16+16, y*16, 16, 16 };
+    SDL_Rect* clip = NULL;
+    SDL_SetTextureColorMod( item_tiles_p[type], primColor.r, primColor.g, primColor.b); //modulate color, update to match the new one
+    SDL_RenderCopy( gRenderer, item_tiles_p[type], clip, &renderQuad );//Render to screen
+    if(item_tiles_s[type] != (SDL_Texture*) 0x9999 ){
+        SDL_SetTextureColorMod( item_tiles_s[type], secoColor.r, secoColor.g, secoColor.b); //modulate color, update to match the new one
+        SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
+    }
+}

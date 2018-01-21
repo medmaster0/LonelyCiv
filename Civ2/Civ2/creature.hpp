@@ -20,6 +20,7 @@
 
 #include <vector>
 #include <string>
+#include <time.h>
 using namespace std;
 
 extern vector<vector<int> > map;
@@ -39,6 +40,7 @@ public:
     void draw(); //Draws the sprite to screen using MAP COORDS
     void drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //Draw's the sprite's inventory
     void drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the items' hat (just moved up 8 px)
+    void drawStaff(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the items' staff (just moved  right 16 px)
     void moveDown();
     void moveUp();
     void moveRight();
@@ -48,11 +50,16 @@ public:
     int x,y,z; //Position of sprite (MAP COORDS!)
     vector<Item> inventory; //list of items the sprite is carrying
     SDL_Color faveColor; //the sprite's favorite color
-    Hat* hat; //a single item containing the sprites hat
+    SDL_Color faveColor2; //the sprite's alternative favorite color
+    Hat* hat; //a single item containing the sprite's hat
+    Staff* staff; //a single item containing the sprite's staff
     void moveTo(int x1, int y1); //moves to a specific (x,y) coord
     //Targeting stuff, below - hopefully GENERAL PURPOSE
     vector<vector<int>> path; //a path to whatever target it has
     int target_index; //the index of the target (index of tile stack OR index of enemy for example
+    //For threads
+    bool inThread;
+    time_t thread_timer; //will later store a time stamp
 private:
     SDL_Texture* primTexture;//primary texture of the sprite
     SDL_Texture* secoTexture;//secondary texture of the sprite
@@ -60,9 +67,13 @@ private:
     int mHeight;//Image dimensions - pixels
     int r,g,b; //colors of the sprite
     //Some vars for movement timing
-    long int timer; //will later store a time stamp
-    int moveSpeedPeriod; //how long (ms) it takes to move 1 step
+
     
 };
+
+//MISC FUNCTIONS
+
+//Create a display window that prints out the status of a creature
+void displayStatus(Sprite spr1, SDL_Renderer* gRenderer, int SCREEN_HEIGHT );
 
 #endif /* creature_hpp */

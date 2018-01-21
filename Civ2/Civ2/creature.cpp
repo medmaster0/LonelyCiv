@@ -16,6 +16,7 @@
 #include "story.hpp"
 
 #include <SDL2/SDL.h>
+#include <SDL2_ttf/SDL_ttf.h>
 
 using namespace std;
 
@@ -26,11 +27,13 @@ Sprite::Sprite(int xp, int yp)
 {
     //Initialize
     name = genName();
+    name = giveMonicker(name); //maybe give Monicker
     primTexture = NULL;
     secoTexture = NULL;
     mWidth = 0;
     mHeight = 0;
     hat = nullptr;
+    staff = nullptr;
     x = xp;
     y = yp;
     z = 0;
@@ -38,6 +41,8 @@ Sprite::Sprite(int xp, int yp)
     g = rand() %255;
     b = rand() %255;
     faveColor = {static_cast<Uint8>(rand() %255), static_cast<Uint8>(rand() %255), static_cast<Uint8>(rand() %255)};
+    faveColor2 = {static_cast<Uint8>(rand() %255), static_cast<Uint8>(rand() %255), static_cast<Uint8>(rand() %255)};
+    inThread = false; 
     
 }
 //Destructor
@@ -142,9 +147,62 @@ void Sprite::drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Te
     
 }
 
+//Draw the sprite's staff
+void Sprite::drawStaff(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s ){
+    
+    if(staff != nullptr){
+        staff->y = y; //move the hat to the right place
+        staff->x = x;
+        staff->draw(gRenderer, item_tiles_p, item_tiles_s);
+    }
+    
+}
+
 //END OF SPRITE CLASS
 ///////////////////////////
 
+//Create a display window that prints out the status of a creature
+SDL_Surface* status_display_surface;
+SDL_Texture* status_display_texture;
+extern TTF_Font* font1; //item font
+SDL_Color status_font_clr = {255,255,255}; //color of font
+int status_texW = 250;//constants used in displaying fonts
+int status_texH = 0;//constants used in displaying fonts
+void displayStatus(Sprite spr1, SDL_Renderer* gRenderer, int SCREEN_HEIGHT ){
+    string status_text = "Status of " + spr1.name; //Char buffer that is displayed
+    //Blackout Box {x,y,w,h}
+    SDL_Rect r = {0,0,250,150};
+    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+    SDL_RenderFillRect(gRenderer, &r);
+    status_display_surface = TTF_RenderText_Blended_Wrapped(font1, status_text.c_str(), status_font_clr, 125);
+    status_display_texture = SDL_CreateTextureFromSurface(gRenderer, status_display_surface);
+    //create text rect (text box)
+    SDL_QueryTexture(status_display_texture, NULL, NULL, &status_texW, &status_texH); //gets the dimenstions of the font/text
+    SDL_Rect dstrect = {0, 0, status_texW, status_texH }; //so we can make the proper rect to dispay it
+    SDL_RenderCopy(gRenderer, status_display_texture, NULL, &dstrect); //write
+    //FREE MEMORY
+    SDL_DestroyTexture(status_display_texture);
+    SDL_FreeSurface(status_display_surface);
+    //FINISH PUtting the Title: Status
+
+    //Show Fave Colors
+    SDL_Color status_color1 = spr1.faveColor; //The prim color of the cre
+    SDL_Color status_color2 = spr1.faveColor2; //The seco color of the cre
+    //FIRST
+    SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND); //temporarily allow alpha
+    SDL_Rect colR ={ 0 , 3*15 , 7 , status_texH/2 };
+    SDL_SetRenderDrawColor( gRenderer, status_color1.r , status_color1.g, status_color1.b , 255); //color of box
+    SDL_RenderFillRect( gRenderer, &colR ); //copy box to renderer
+    //SECOND
+    SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND); //temporarily allow alpha
+    colR ={ 7 , 3*15 , 7 , status_texH/2 };
+    SDL_SetRenderDrawColor( gRenderer, status_color2.r , status_color2.g, status_color2.b , 255); //color of box
+    SDL_RenderFillRect( gRenderer, &colR ); //copy box to renderer
+    
+    
+    SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE); //turn alpha back off
+    
+}
 
 
 

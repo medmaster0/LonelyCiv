@@ -16,6 +16,8 @@
 		0C157BE11F59B187005FAAF0 /* med_algo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C157BDF1F59B187005FAAF0 /* med_algo.hpp */; };
 		0C542A4C1F562ACA00CC1D8C /* Item.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0C542A4B1F562ACA00CC1D8C /* Item.cpp */; };
 		0C542A4E1F562ADC00CC1D8C /* Item.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C542A4D1F562ADC00CC1D8C /* Item.hpp */; };
+		0C546A481FDD903D00503378 /* image_gen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0C546A461FDD903D00503378 /* image_gen.cpp */; };
+		0C546A491FDD903D00503378 /* image_gen.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C546A471FDD903D00503378 /* image_gen.hpp */; };
 		0C5BEAE01FC21D38003D61B1 /* story.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0C5BEADE1FC21D38003D61B1 /* story.cpp */; };
 		0C5BEAE11FC21D38003D61B1 /* story.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C5BEADF1FC21D38003D61B1 /* story.hpp */; };
 		0CA100A61F3A8476004836E0 /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CA100A51F3A8476004836E0 /* SDL2_ttf.framework */; };
@@ -31,7 +33,7 @@
 		0CE22EFF1EFF778800FC41F4 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
+			dstPath = /usr/share/man/man1;
 			dstSubfolderSpec = 0;
 			files = (
 			);
@@ -47,10 +49,15 @@
 		0C0F9A571F4658860049AD91 /* creature.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = creature.hpp; path = Civ2/creature.hpp; sourceTree = "<group>"; };
 		0C157BDE1F59B187005FAAF0 /* med_algo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = med_algo.cpp; path = Civ2/med_algo.cpp; sourceTree = "<group>"; };
 		0C157BDF1F59B187005FAAF0 /* med_algo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = med_algo.hpp; path = Civ2/med_algo.hpp; sourceTree = "<group>"; };
+		0C37C5BD1FDC5EFD009685EC /* libpngwriter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpngwriter.a; path = ../../../../Downloads/temp/pngwriter/build/libpngwriter.a; sourceTree = "<group>"; };
+		0C37C5BF1FDC60D5009685EC /* libpngwriter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpngwriter.a; path = ../../../../Downloads/temp/pngwriter/build/lib/libpngwriter.a; sourceTree = "<group>"; };
 		0C542A4B1F562ACA00CC1D8C /* Item.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Item.cpp; path = Civ2/Item.cpp; sourceTree = "<group>"; };
 		0C542A4D1F562ADC00CC1D8C /* Item.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Item.hpp; path = Civ2/Item.hpp; sourceTree = "<group>"; };
+		0C546A461FDD903D00503378 /* image_gen.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = image_gen.cpp; sourceTree = "<group>"; };
+		0C546A471FDD903D00503378 /* image_gen.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = image_gen.hpp; sourceTree = "<group>"; };
 		0C5BEADE1FC21D38003D61B1 /* story.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = story.cpp; sourceTree = "<group>"; };
 		0C5BEADF1FC21D38003D61B1 /* story.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = story.hpp; sourceTree = "<group>"; };
+		0CA06BAD1FDC62B2004F564A /* libpngwriter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpngwriter.a; path = Civ2/include/libpngwriter.a; sourceTree = "<group>"; };
 		0CA100A51F3A8476004836E0 /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
 		0CCDE8731FAD6187005CDAD6 /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = ../../../../../../Library/Frameworks/SDL2_mixer.framework; sourceTree = "<group>"; };
 		0CCDE8761FB29921005CDAD6 /* music.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = music.cpp; sourceTree = "<group>"; };
@@ -81,6 +88,8 @@
 		0CE22EF81EFF778800FC41F4 = {
 			isa = PBXGroup;
 			children = (
+				0C546A461FDD903D00503378 /* image_gen.cpp */,
+				0C546A471FDD903D00503378 /* image_gen.hpp */,
 				0C542A4D1F562ADC00CC1D8C /* Item.hpp */,
 				0C542A4B1F562ACA00CC1D8C /* Item.cpp */,
 				0C157BDE1F59B187005FAAF0 /* med_algo.cpp */,
@@ -120,6 +129,9 @@
 		0CE22F0B1EFF780000FC41F4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0C37C5BD1FDC5EFD009685EC /* libpngwriter.a */,
+				0C37C5BF1FDC60D5009685EC /* libpngwriter.a */,
+				0CA06BAD1FDC62B2004F564A /* libpngwriter.a */,
 				0CCDE8731FAD6187005CDAD6 /* SDL2_mixer.framework */,
 				0CA100A51F3A8476004836E0 /* SDL2_ttf.framework */,
 				0C092D1B1F004601001CA68F /* SDL2_image.framework */,
@@ -140,6 +152,7 @@
 				0C0F9A551F45437C0049AD91 /* dancez.hpp in Headers */,
 				0C157BE11F59B187005FAAF0 /* med_algo.hpp in Headers */,
 				0CCDE8791FB29921005CDAD6 /* music.hpp in Headers */,
+				0C546A491FDD903D00503378 /* image_gen.hpp in Headers */,
 				0C5BEAE11FC21D38003D61B1 /* story.hpp in Headers */,
 				0C0F9A591F4658860049AD91 /* creature.hpp in Headers */,
 			);
@@ -205,6 +218,7 @@
 			files = (
 				0C542A4C1F562ACA00CC1D8C /* Item.cpp in Sources */,
 				0C157BE01F59B187005FAAF0 /* med_algo.cpp in Sources */,
+				0C546A481FDD903D00503378 /* image_gen.cpp in Sources */,
 				0CF1F4DA1F6CDA400056FBB1 /* tent.cpp in Sources */,
 				0C5BEAE01FC21D38003D61B1 /* story.cpp in Sources */,
 				0C0F9A541F45437C0049AD91 /* dancez.cpp in Sources */,
@@ -315,8 +329,12 @@
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 				);
 				GENERATE_PROFILING_CODE = NO;
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
@@ -329,8 +347,12 @@
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 				);
 				GENERATE_PROFILING_CODE = NO;
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
 		};

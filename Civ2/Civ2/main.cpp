@@ -22,17 +22,15 @@
 #include "tent.hpp"
 #include "med_algo.hpp"
 #include "story.hpp"
+#include "image_gen.hpp"
 //#include <unistd.h>
-/* time */
-#include <ctime>
+
 
 using std::vector;
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 480;
-//const int SCREEN_WIDTH = 32;
-//const int SCREEN_HEIGHT = 32;
 
 //TileMap Stuff
 int map_width;
@@ -48,6 +46,9 @@ SDL_Texture** item_tiles_s; //seco item tiles
 SDL_Texture** item_tiles_t; //terto item tiles
 vector<SDL_Color> world_colors; //array of sdl_colors
 vector<vector<Item>> map_items; //a list of list of items on a tile. Index corresponds to [y*map_width + x]
+
+//Creatures Stuff
+vector<Sprite> map_creatures; //a list of all creatures on map
 
 //Tent Stuff
 SDL_Texture** tent_tiles_p; //primo tent tiles
@@ -73,6 +74,9 @@ int texH = 0;//constants used in displaying fonts
 //These are for control of what "windows" are displayed
 bool inventoryDisplayOn = false;
 int item_display_index = 0; //counter used with cursors for inventory pos
+int creature_inventory_index = 0; //which creature in map_creature to display inventory for
+//-----------------
+bool statusDisplayOn = false;
 
 /////////////////////////////////////////////////////////
 ////FUNCTIONS BEGIN////////////////////////////////////////
@@ -198,8 +202,7 @@ void loadTiles(){
 //        b = 0;
         a = 255;
         colorz.push_back({r,g,b,a});
-        
-        //AS WE INTEGRATE THESE "MATERIALS" INTO ITEMS, WE ALSO UPDATE THOSE LISTS
+
         item_tiles_p[i] = loadTexture("Civ2/Civ2/weedz/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
@@ -214,8 +217,7 @@ void loadTiles(){
         b = rand()%255;
         a = 255;
         colorz.push_back({r,g,b,a});
-        
-        //AS WE INTEGRATE THESE "MATERIALS" INTO ITEMS, WE ALSO UPDATE THOSE LISTS
+
         item_tiles_p[i] = loadTexture("Civ2/Civ2/stonez/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
@@ -231,8 +233,7 @@ void loadTiles(){
         b = rand()%255;
         a = 255;
         colorz.push_back({r,g,b,a});
-        
-        //AS WE INTEGRATE THESE "MATERIALS" INTO ITEMS, WE ALSO UPDATE THOSE LISTS
+
         item_tiles_p[i] = loadTexture("Civ2/Civ2/fruitz/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
@@ -270,6 +271,10 @@ void loadTiles(){
     item_tiles_p[306] = loadTexture("Civ2/Civ2/tiles/bow2Prim.png");
     item_tiles_s[306] = loadTexture("Civ2/Civ2/tiles/bow2Seco.png");
     item_tiles_t[306] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[307] = loadTexture("Civ2/Civ2/doodadz/staff.png");
+    item_tiles_s[307] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[307] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     //TENT TILES
     tent_tiles_p[0] = loadTexture("Civ2/Civ2/tiles/tent0Prim.png");
@@ -378,8 +383,8 @@ void init_items(){
     
     block_map = new bool[map_width*map_height](); //initialize a dynamically sized blocked map
     //Make a brick maze
-    vector<vector<short>> gmap = gen_maze_corridor(30,70);
-    int con_x = 20;//the starting point of construction
+    vector<vector<short>> gmap = gen_maze_corridor(30,80);
+    int con_x = 0;//the starting point of construction
     int con_y = 10;//the starting point of construction
     //redefine color
     p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
@@ -437,9 +442,32 @@ void init_items(){
 //    tempy = 8;
 //    temp_workshop = Workshop(tempx, tempy, 1);
 //    map_workshops[(tempy)*map_width+(tempx)].push_back(temp_workshop);
-    
-    
 }
+
+//Initialize Creatures
+void init_creatures(){
+    int num_creatures = 15; //How many creatures are on the ma
+    
+    for(int i = 0 ; i < num_creatures; i++){
+        Sprite temp_cre = Sprite(rand()%map_width, rand()%map_height);
+        temp_cre.loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
+        map_creatures.push_back(temp_cre);
+
+        //randomly give hats
+        if(rand()%2==1){
+            Hat* temp_hat = new Hat(0, 0, 305+(rand()%2) ); //a temp Item to be added to cre's inventory
+            map_creatures.back().hat = temp_hat;
+        }
+        
+        //randomly give staffs (staves?)
+        if(rand()%2==1){
+            Staff* temp_staff = new Staff(0,0,307); //a temp Item to be added to the cre's equip inventory
+            map_creatures.back().staff = temp_staff;
+        }
+        
+    }
+}
+
 //Draws all the items
 void draw_items(){
     //You know what to do
@@ -448,24 +476,15 @@ void draw_items(){
             map_items[i][j].draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
         }
     }
-    
-    
 }
-//Draws constructions
-void draw_constructions(){
-    
-    //Draw all tents
-    for(int i = 0; i < map_tents.size(); i++){
-        for(int j = 0 ; j < map_tents[i].size(); j++){
-            map_tents[i][j].draw(gRenderer, tent_tiles_p, tent_tiles_s);
-        }
-    }
-    
-    //Draw all workshops
-    for(int i = 0; i < map_workshops.size(); i++){
-        for(int j = 0 ; j < map_workshops[i].size(); j++){
-            map_workshops[i][j].draw(gRenderer, workshop_tiles_p, workshop_tiles_s);
-        }
+
+//Draws all the creatures
+void draw_creatures(){
+    //Cycle through all creatures and draw
+    for(int i = 0; i <= map_creatures.size(); i++){
+        map_creatures[i].draw();
+        map_creatures[i].drawHat(gRenderer, item_tiles_p, item_tiles_s);
+        map_creatures[i].drawStaff(gRenderer, item_tiles_p, item_tiles_s);
     }
 }
 
@@ -550,7 +569,8 @@ vector<vector<int>> faveColorSearch(Sprite* cre, int diff_threshold){
         if(node[0]-1 > 0){ //bounds checking
              if(block_map[((node[1])*map_width)+(node[0]-1)]==false){ //if adjacent is NOT blocked
                 for(int i = 0; i < map_items[((node[1])*map_width)+(node[0]-1)].size() ; i++){ //iterate through all items on the adjacent node
-                    if( color_diff( map_items[((node[1])*map_width)+(node[0]-1)][i].primColor , cre->faveColor) < diff_threshold){
+                    if( (color_diff( map_items[((node[1])*map_width)+(node[0]-1)][i].primColor , cre->faveColor) < diff_threshold)
+                       || ( color_diff( map_items[((node[1])*map_width)+(node[0]-1)][i].primColor , cre->faveColor2) < diff_threshold ) ){
                         //We found target!
                         temp = {node[0]-1, node[1], node[2]+1}; //temporary
                         search_q.push_back(temp); //add to search_q
@@ -706,6 +726,13 @@ void wander_thread(Sprite* spr1){
     
     while(true){
         
+        //check if thread should expire
+        if( difftime(time(NULL) , spr1->thread_timer) > 30.0 ){
+            printf("done wandering\n");
+            spr1->inThread = false;
+            break;
+        }
+        
         if(spr1->path.empty()){ //if path is empty
             spr1->path = A_Star(block_map, map_width, map_height, spr1->x, spr1->y, rand()%map_width, rand()%map_height );
         }
@@ -725,8 +752,6 @@ void wander_thread(Sprite* spr1){
         
         SDL_Delay(500);
     }
-    
-    
 }
 
 //a thread for picking up items of your favorite color
@@ -749,11 +774,13 @@ void gather_thread(Sprite* spr1){
         //Check if the search failed (error code (9999,9999)
         if(spr1->path[0][0] == 9999){
             spr1->path.pop_back();
-            continue; //search failed, try again....
-            //break;
+            //continue; //search failed, try again....
+            //search failed
+            //EXPIRE THREAD:
+            printf("can't gather");
+            spr1->inThread = false;
+            break;
         }
-        
-
         
         vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
         //Now actually move
@@ -764,11 +791,11 @@ void gather_thread(Sprite* spr1){
         
         //If we've reach target...
         if(spr1->path.empty()){
-            cout << "target reach";
-            
+
             //now look on tile and check if item is still there and pick up
             for(int i = 0; i < map_items[(spr1->y*map_width)+spr1->x].size(); i++){
-                if(color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor)<color_thresh ){
+                if(color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor)<color_thresh ||
+                   color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor2)<color_thresh){
                     
                     pickUpItem(spr1, spr1->x, spr1->y, i); //then pick up the item
                 }
@@ -783,6 +810,53 @@ void gather_thread(Sprite* spr1){
         
     }
     
+}
+
+//Free Path'- deletes the path of a given creature
+//Gotta delete each individually?
+void free_path(Sprite cre){
+    for(int i = 0; i < cre.path.size(); i++){
+        cre.path.erase(cre.path.begin()+cre.path.size()-1);
+    }
+}
+
+//periodically gives a new task to creatures
+void task_creatures_thread(){
+    
+    short choice = 0; //decides which thread to run
+    
+    while(true){
+        
+        //cycle through all creatures
+        for(int i = 0; i < map_creatures.size(); i++){
+            if(map_creatures[i].inThread == false){ //we need to assign it a new thread
+                //map_creatures[i].path.clear(); //clear the old path
+                free_path(map_creatures[i]);//clear old path, fuctionto individually delete
+                map_creatures[i].thread_timer = time(NULL);
+                map_creatures[i].inThread = true;
+                choice = rand()%2;
+                switch(choice){
+                    case 0: {
+                        //This thread makes the creature gather
+                        std::thread gatherObj(gather_thread, &map_creatures[i]);
+                        gatherObj.detach();
+                        break;
+                    }
+                    case 1: {
+                        //This thread wanders the input creature
+                        std::thread wanderObj(wander_thread, &map_creatures[i]);
+                        wanderObj.detach();
+                        break;
+                    }
+                }
+                
+            }
+        }
+        
+        
+        SDL_Delay(2000); //doesn't have to run all the time
+        
+    }
 }
 
 //void music_thread(int ToneHz){
@@ -856,10 +930,32 @@ void background_color_thread(){
     
 }
 
-
+//regenerates weedz periodically
+void regen_weedz_thread(){
+    
+    int x, y, item_id = 0;
+    while(true){
+        //pick a random spot
+        x = rand()%map_width;
+        y = rand()%map_height;
+        
+        if(!block_map[y*map_width+x]){ //check if bloecked
+            if(map_items[y*map_width+x].size()<2){ //if tile doesn't have too many items on it
+                item_id = rand()%300; //pick a random item id
+                Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(colorz[item_id][0]), static_cast<Uint8>(colorz[item_id][1]), static_cast<Uint8>(colorz[item_id][2]),255},{255,255,255,0} ); //temporary item
+                map_items[y*map_width+x].push_back(temp_item);
+                SDL_Delay(5000);
+            }
+        }
+        
+    }
+    
+}
 
 //////////////////////
 //OTHER FUNCTIONS
+
+
 
 //Make an attempt to free up  all the memory
 void close(){
@@ -890,10 +986,6 @@ int main( int argc, char* args[] ){
     cre2->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
     Sprite* cre3 = new Sprite(10,10);
     cre3->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
-    Sprite* cre4 = new Sprite(7,10);
-    cre4->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
-    Sprite* cre5 = new Sprite(24,24);
-    cre5->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
     Sprite* shroom1 = new Sprite(3,3);
     shroom1->loadFromFile("Civ2/Civ2/tiles/shroomPrim.png","Civ2/Civ2/tiles/shroomSeco.png", 16, 16);
     Sprite* lov1 = new Sprite(5,5);
@@ -904,6 +996,7 @@ int main( int argc, char* args[] ){
     //vector<vector<short>> maze = gen_maze_corridor();
     //printMaze(maze);
     init_items();
+    init_creatures();
     Hat temp_accessory = Hat(0, 0, 305); //a temp Item to be added to cre's inventory
     Hat temp_accessory2 = Hat(0, 0, 306); //a temp Item to be added to cre's inventory
     cre1->hat = &temp_accessory; //give him a hat
@@ -923,7 +1016,7 @@ int main( int argc, char* args[] ){
     //playToneCont(440);
     //playToneOnce(110, 2000);
     //playSquare(116.6, 2000);
-//    playToneOnce(116, 2000);
+    //playToneOnce(116, 2000);
 //    playToneOnce(117, 2000);
     
     
@@ -982,45 +1075,25 @@ int main( int argc, char* args[] ){
 //        cout << genPrayer() << '\n';
 //    }
     
-    //vector<vector<int>> test = findPathToCoord(map, 8, 3, 1, 0);
-    //TEST A* STAR ALGO
-    //bool block_map[map_width*map_height];
-//    for(int i = 0; i<map_width*map_height; i++){
-//        block_map[i] = false;
-//        //Test the algo block detection
-////        if(   (i == (5*map_width) + 8) || (i == (6*map_width) + 8) || (i == (4*map_width) + 8) || (i == (3*map_width) + 8)  ){
-////            block_map[i] = true;
-////        }
-//    }
-    //make a square of blocked map entries
-//    for(int i = 0 ; i < 6 ; i++){
-//        for(int j = 0; j < 6; j++) {
-//            block_map[(1+j)*map_width + (1 + i)]= true;
-//        }
-//    }
-    //vector<vector<int>> path_test = findPathToCoord_A_Star(block_map, 5, 5, 18, 5);
-    //while(true){
+    //genPNG();
+    //SDL_Texture* text1 = genTexture(gRenderer, gWindow);
     
-    //path test
-//        vector<vector<int>> path_test = A_Star(block_map,map_width, map_height, 7, 29, 17, 29);
-//        //vector<vector<int>> path_test = A_star(block_map,map_width, 5, 5, 5, 8);
-//        
-//        //print out the steps:
-//        for(int i = 0 ; i < path_test.size(); i++){
-//            printf("(%d,%d)",path_test[i][0],path_test[i][1]);
-//        }
+
     
     //
     //DEBUG TEST : SPAWN SOME THREAD DAWGd
-    //This thread wanders the input creature
-    std::thread wanderObj(wander_thread, std::ref(cre4));
-    wanderObj.detach();
     //This thread updates the background color
     std::thread backObj(background_color_thread);
     backObj.detach();
-    //This thread makes the creature gather
-    std::thread gatherObj(gather_thread, std::ref(cre5));
-    gatherObj.detach();
+    //This thread updates the audio
+//    std::thread audioObj(compose_music_thread);
+//    audioObj.detach();
+    //This thread regenerates weeds
+    std::thread regenObj(regen_weedz_thread);
+    regenObj.detach();
+    //This thread schedules new threads for halted creatures!
+    std::thread taskObj(task_creatures_thread);
+    taskObj.detach();
     
     //std::thread audioObj1(music_thread, std::ref(440));
     //wanderObj.join();
@@ -1131,6 +1204,25 @@ int main( int argc, char* args[] ){
                         break;
                     }
                         
+                    //cycle through different creature's inventories
+                    case SDLK_PERIOD:
+                        creature_inventory_index = creature_inventory_index+1;
+                        if(creature_inventory_index >= map_creatures.size()){
+                            creature_inventory_index = creature_inventory_index-1;
+                        }
+                        break;
+                    case SDLK_COMMA:
+                        creature_inventory_index = creature_inventory_index-1;
+                        if(creature_inventory_index < 0){
+                            creature_inventory_index = 0;
+                        }
+                        break;
+                        
+                    case SDLK_t:{
+                        statusDisplayOn = !statusDisplayOn;
+                        break;
+                    }
+                        
                     case SDLK_LSHIFT:
                     case SDLK_RSHIFT:
                         shiftDown = true;
@@ -1161,6 +1253,9 @@ int main( int argc, char* args[] ){
                     }
                 }
             }
+            if(statusDisplayOn){
+                //process input for status display
+            }
             
             
         }//End event while loop
@@ -1175,13 +1270,13 @@ int main( int argc, char* args[] ){
         cre1->draw();
         cre2->draw();
         cre3->draw();
-        cre4->draw();
-        cre5->draw();
         shroom1->draw();
         lov1->draw();
         
         draw_items();
-        draw_constructions();
+        draw_creatures();
+        
+        //drawTexture(gRenderer, text1, 5, 5);
         
         cre1->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         cre3->drawHat(gRenderer, item_tiles_p, item_tiles_s);
@@ -1192,10 +1287,14 @@ int main( int argc, char* args[] ){
         if(inventoryDisplayOn){
             //showInventory(cre1, &e);
             //displayItemList(map_items[3], gRenderer, SCREEN_HEIGHT);
-            displayItemList(cre5->inventory, gRenderer, SCREEN_HEIGHT);
+            displayItemList(map_creatures[creature_inventory_index].inventory, gRenderer, SCREEN_HEIGHT);
+        }
+        if(statusDisplayOn){
+            //show status (of creature)
+            displayStatus(map_creatures[creature_inventory_index], gRenderer, SCREEN_HEIGHT);
         }
         
-        SDL_RenderPresent( gRenderer ); //Update screen
+        SDL_RenderPresent( gRenderer ); //Update screen        
         
         
     }//END MAIN GAME LOOP
@@ -1204,8 +1303,6 @@ int main( int argc, char* args[] ){
     cre1->free();
     cre2->free();
     cre3->free();
-    cre4->free();
-    cre5->free();
     shroom1->free();
     lov1->free();
     close();

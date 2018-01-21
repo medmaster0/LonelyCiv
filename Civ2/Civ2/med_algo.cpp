@@ -202,9 +202,13 @@ struct list{
 //returns error code {{9999,9999}} if can't find path
 vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x1, int y1, int x2, int y2){
     
+    //DEBUG
+    int num_news = 0; //keeps track of calls to new
+    
     list open_set = {nullptr,nullptr}; //the start of the open_set
     list closed_set = {nullptr,nullptr};; //the start of the closed_set
     
+    num_news = num_news + 1;
     //create first node
     list_node* temp = new list_node;
     *temp = {nullptr, nullptr, nullptr, x1, y1, 0, 0, 0};
@@ -221,7 +225,7 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
         ///////////////////////////////////
         bool search_f = true;
         list_node* lowest_f = nullptr; //points to the node with lowest f
-        int least_f = 999999; //start with high (lol) number
+        int least_f = 999999; //start with high number
         list_node* current = open_set.first; //points to the current node, we're searching
         while(search_f){
             
@@ -229,7 +233,7 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
                 break;
             }
             
-            if(current->f<=least_f){ //if, it'shas a lesser f, point to it... THIS ALSO ENSURES THE LAST ONE POPPED ON GETS PICKED
+            if(current->f<=least_f){ //if, it has a lesser f, point to it... THIS ALSO ENSURES THE LAST ONE POPPED ON GETS PICKED
                 lowest_f = current;
                 least_f = lowest_f->f;
             }
@@ -259,6 +263,7 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
         }
         //open_set (and it's elements) are correct and up to date
         
+        num_news = num_news + 4;
         list_node* neighbors[4]; //The FOUR neighbors
         neighbors[0] = new list_node;
         *neighbors[0] = {nullptr, nullptr, q, (q->x)-1 , q->y , 9999, 9999, 9999};
@@ -282,12 +287,14 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
             //if neighbor is out of bounds then we can throw it away
             if( (neighbors[i]->y < 0) || (neighbors[i]->x < 0) || (neighbors[i]->x >= map_width) || (neighbors[i]->y >= map_height)    ){
                 delete neighbors[i]; //delete what we've created!!!
+                num_news = num_news - 1;
                 continue; //move on to next neighbor
             }
             
             //if neighbor tile is blocked then we can stop
             if(block_map[((neighbors[i]->y)*map_width)+neighbors[i]->x]==true){
                 delete neighbors[i]; //delete what we've created!!!
+                num_news = num_news - 1;
                 continue; //move on to next neighbor
             }
             
@@ -305,6 +312,7 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
                 int j = i + 1;
                 while(j<4){
                     delete neighbors[j];
+                    num_news = num_news - 1;
                     j = j + 1;
                 }
                 
@@ -340,6 +348,7 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
             }
             if(in_open){
                 delete neighbors[i]; //delete what we've created!!!
+                num_news = num_news - 1;
                 continue; //skip this neighbor
             }
             
@@ -366,6 +375,7 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
             }
             if(in_closed){
                 delete neighbors[i]; //delete what we've created!!!
+                num_news = num_news - 1;
                 continue; //skip this neighbor
             }
             
@@ -380,7 +390,44 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
             
         }//Done cycling through neighbors
         
-        if(open_set.first == nullptr){return {{9999,9999}}; }//THIS MEANS WE HIT THE END OF OPEN_SET AND HAVENT FOUND TARGET
+        //THIS MEANS WE HIT THE END OF OPEN_SET AND HAVENT FOUND TARGET
+        if(open_set.first == nullptr){
+            
+            
+            
+            //DELETIION
+            //Delete out the closed and open_sets
+            //...the closed set
+            bool erasing = true;
+            list_node* cur = closed_set.first; //the current node we mpointing at
+            while(erasing){
+                if(cur==nullptr){
+                    erasing = false;
+                    break;
+                }
+                list_node* temp = cur; //Fo deletion
+                cur = cur->next;
+                delete temp; //Also fo deletion
+                num_news = num_news - 1;
+            }
+            //...the open set
+            erasing = true;
+            cur = open_set.first;
+            while(erasing){
+                if(cur==nullptr){
+                    erasing = false;
+                    break;
+                }
+                list_node* temp = cur; //fo deletion
+                cur = cur->next;
+                delete temp; //also fo deletion
+                num_news = num_news - 1;
+                
+            }
+            
+
+            return {{9999,9999}};
+        }
         
         
     }//end open_list empty
@@ -413,6 +460,7 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
         list_node* temp = current; //Fo deletion
         current = current->next;
         delete temp; //Also fo deletion
+        num_news = num_news - 1;
         
     }
     //...the open set
@@ -426,6 +474,7 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
         list_node* temp = current; //fo deletion
         current = current->next;
         delete temp; //also fo deletion
+        num_news = num_news - 1;
         
     }
     
@@ -510,195 +559,12 @@ vector<int> color_fight(SDL_Color col1, SDL_Color col2){
     
 }
 
-
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//OLD OUTDATED CODE BELOW - PROBABLY STILL WORKS!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-////Utility to check if an element is in list
-//bool isIntIn(int e, vector<int> v){
-//    if(std::find(v.begin(), v.end(), e) != v.end()) {
-//        return true;
-//    } else {
-//        return false;
-//    }
-//}
-//
-//bool isNodeIn(vector<int> e, vector<vector<int>> v){
-//    
-//    vector<int> temp; //used to hold the nodes...
-//    for(int i = 0; i<v.size(); i++){ //cycle through all elements of v
-//        if(e[0] == v[i][0] && e[1] == v[i][1]){
-//            return true;//means we found a match!
-//        }
-//    }
-//    return false; //means we cycled list and couldn't find match
-//}
-
-
-////The searching Algorithm - One coord to another, considering blocked paths
-////Flood Search
-////Input - map, coord1, coord2
-////Output - a list of coords to fllow to get to target - BACKWARD - so POP element from list to find first step
-//vector<vector<int>> findPathToCoord(vector<vector<int>>, int x1, int y1, int x2, int y2){
-//    vector<vector<int>> search_q; //the main "list"
-//    vector<int> blocked = {201}; //list containing tile "types" that are blocked
-//    int k = 0; //the main counter used to keep track of where we are in the list
-//    vector<int> node; //This is a single node in the list representing <xpos, ypos, steps_from_dest>. Always changing
-//    vector<int> temp; //Temp node used to push new nodes onto queues AND LATER in filtering out irrelevant steps
-//    
-//    node = {x1, y1, 0}; //initialization
-//    search_q.push_back(node); //add first element to list
-//    bool findingTarget = true; //a flag signalling if we're still searching for target (and populating search_q)
-//    while(findingTarget){
-//        try{
-//            node = search_q[k]; //go to the next node in the queue
-//        }catch(...){
-//            return {{}}; //return an empty list signalling we tried all reachable points but couldn't find target
-//        }
-//        
-//        //            printf("one%d",node[0]-1);
-//        //            printf("two%d",x2);
-//        //            printf("three%d",node[1]);
-//        //            printf("four%d",y2);
-//        
-//        //Find all adjacent nodes.
-//        //Check if adjacent node is in fact target coord.
-//        //If not, Add it to search_q if is is eligible space (not blocked).
-//        //LEFT
-//        try{ //we use try-catch so we don't have to worry about bounds errors...
-//            if(node[0]-1 == x2 && node[1] == y2){ //means we found target!
-//                temp = {node[0]-1, node[1], node[2]+1};
-//                search_q.push_back(temp);
-//                findingTarget = false;
-//                break;
-//            }
-//            
-//            if(!(node[0]-1<=0)){
-//                if(!isIntIn(map[node[1]][node[0]-1], blocked)){//if index is *not* in blocked list
-//                    //we also gotta make sure node isn't in queue with lower distance already...
-//                    //cycle through the list and check for every lower distance...
-//                    if(!isNodeIn({node[0]-1,node[1],0}, search_q)){
-//                        temp = {node[0]-1, node[1], node[2]+1};
-//                        search_q.push_back(temp);
-//                    }
-//                }
-//            }
-//            
-//        }catch(...){
-//            k = k; //do nothing pretty much
-//        }
-//        
-//        //RIGHT
-//        try{ //we use try-catch so we don't have to worry about bounds errors...
-//            if(node[0]+1 == x2 && node[1] == y2){ //means we found target!
-//                temp = {node[0]+1, node[1], node[2]+1};
-//                search_q.push_back(temp);
-//                findingTarget = false;
-//                break;
-//            }
-//            if(!isIntIn(map[node[1]][node[0]+1], blocked)){//if index is *not* in blocked list
-//                //we also gotta make sure node isn't in queue with lower distance already...
-//                //cycle through the list and check for every lower distance...
-//                if(!isNodeIn({node[0]+1,node[1]}, search_q)){
-//                    temp = {node[0]+1, node[1], node[2]+1};
-//                    search_q.push_back(temp);
-//                }
-//                
-//            }
-//        }catch(...){
-//            k = k; //do nothing pretty much
-//        }
-//        
-//        //UP
-//        try{ //we use try-catch so we don't have to worry about bounds errors...
-//            if(node[0] == x2 && node[1]-1 == y2){ //means we found target!
-//                temp = {node[0], node[1]-1, node[2]+1};
-//                search_q.push_back(temp);
-//                findingTarget = false;
-//                break;
-//            }
-//            if(node[1]-1 >= 0){
-//                if(!isIntIn(map[node[1]-1][node[0]], blocked)){//if index is *not* in blocked list
-//                    //we also gotta make sure node isn't in queue with lower distance already...
-//                    //cycle through the list and check for every lower distance...
-//                    if(!isNodeIn({node[0],node[1]-1}, search_q)){
-//                        temp = {node[0], node[1]-1, node[2]+1};
-//                        search_q.push_back(temp);
-//                    }
-//                    
-//                }
-//            }
-//            
-//        }catch(...){
-//            k = k; //do nothing pretty much
-//        }
-//        
-//        //DOWN
-//        try{ //we use try-catch so we don't have to worry about bounds errors...
-//            if(node[0] == x2 && node[1]+1 == y2){ //means we found target!
-//                temp = {node[0], node[1]+1, node[2]+1};
-//                search_q.push_back(temp);
-//                findingTarget = false;
-//                break;
-//            }
-//            if(!(node[1]+1 > map_height-1)){ //bounds checking
-//                if(!isIntIn(map[node[1]+1][node[0]], blocked)){//if index is *not* in blocked list
-//                    //we also gotta make sure node isn't in queue with lower distance already...
-//                    //cycle through the list and check for every lower distance...
-//                    if(!isNodeIn({node[0],node[1]+1}, search_q)){
-//                        temp = {node[0], node[1]+1, node[2]+1};
-//                        search_q.push_back(temp);
-//                    }
-//                }
-//            }
-//        }catch(...){
-//            k = k; //do nothing pretty much
-//        }
-//        
-//        
-//        k++; //increase the index
-//        
-//    }//broke out of while loop means we found target
-//    
-//    
-//    //Now we need to go down the list (popping) and only keep nodes that apply to the CORRECT PATH
-//    //We create a list goind BACKWARD from target to current
-//    vector<vector<int>> path2target;//the list of nodes leading from target
-//    temp = search_q.back(); //get last element from list
-//    search_q.pop_back(); //now remove that element since we won't need it in list
-//    path2target.push_back(temp);//Add first node to path
-//    while(true){
-//        temp = search_q.back();
-//        search_q.pop_back(); //Get last value out of search queue
-//        if(temp[2] == 0){ //means 0 steps left and we found original node (our starting position
-//            break;
-//        }
-//        if(temp[2] == path2target.back()[2]- 1){ //if current node is actually a step closer
-//            //check if it's a step in the right direction (AND ONLY 1 unit away from last step)
-//            if(   ((abs(temp[0]-path2target.back()[0])==1)&&(abs(temp[1]-path2target.back()[1])==0)) || //check if x diff is 1
-//               ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==1)) ){ //check if y diff is 1
-//                path2target.push_back(temp);
-//            }
-//            
-//        }
-//        
-//    }
-//    //return search_q;
-//    return path2target;
-//}
-//
+//belnd two colors
+//blends each color by taking the average of each RGB component
+SDL_Color color_blend(SDL_Color col1, SDL_Color col2){
+    SDL_Color colF = {static_cast<Uint8>(((col1.r+col2.r)/2)),static_cast<Uint8>(((col1.g+col2.g)/2)),static_cast<Uint8>(((col1.b+col2.b)/2))};
+    return colF;
+}
 
 
 
