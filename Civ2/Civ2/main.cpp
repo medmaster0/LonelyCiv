@@ -276,6 +276,14 @@ void loadTiles(){
     item_tiles_s[307] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[307] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[308] = loadTexture("Civ2/Civ2/doodadz/candlePrim.png");
+    item_tiles_s[308] = loadTexture("Civ2/Civ2/doodadz/candleSeco.png");
+    item_tiles_t[308] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[309] = loadTexture("Civ2/Civ2/doodadz/flagPrim.png");
+    item_tiles_s[309] = loadTexture("Civ2/Civ2/doodadz/flagSeco.png");
+    item_tiles_t[309] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
     //TENT TILES
     tent_tiles_p[0] = loadTexture("Civ2/Civ2/tiles/tent0Prim.png");
     tent_tiles_s[0] = loadTexture("Civ2/Civ2/tiles/tent0Seco.png");
@@ -383,31 +391,87 @@ void init_items(){
     
     block_map = new bool[map_width*map_height](); //initialize a dynamically sized blocked map
     //Make a brick maze
-    vector<vector<short>> gmap = gen_maze_corridor(30,80);
-    int con_x = 0;//the starting point of construction
-    int con_y = 10;//the starting point of construction
+    vector<vector<short>> gmap = gen_maze_corridor(30,30);
+    int con_x = 01;//the starting point of construction
+    int con_y = 0;//the starting point of construction
     //redefine color
     p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
     s1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
     //BASIC RECIPE FOR MAKING A MAZE OUT OF PHYSICAL ITEMS
-    //(Switch i and j for rotation)
     for(int j = 0 ; j < gmap.size(); j++){ //the ROWS of
         for(int i = 0; i<gmap[j].size();i++){ //the COLS of
-//    for(int i = 0 ; i < gmap.size(); i++){ //the ROWS of
-//        for(int j = 0; j<gmap[i].size();j++){ //the COLS of
     
             tempx = i + con_x;
             if(tempx >= map_width){continue;}
             tempy = j + con_y;
             if( tempy >= map_height){continue;}
             //Now check if the space is empty or wall
-            if(gmap[j][i] == 1){
+            //(Switch i and j for rotation)
+            if(gmap[i][j] == 1){
+            //if(gmap[j][i] == 1){
+
                 //then we need a wall here
                 Item con_item = Item(tempx, tempy, 304, p1, s1);
                 map_items[(tempy*map_width)+tempx].push_back(con_item);
                 block_map[(tempy*map_width)+tempx] = true;
             }
             
+        }
+    }
+    
+    //Make anotha brick maze
+    gmap = gen_maze_corridor(30,30);
+    con_x = 30;//the starting point of construction
+    con_y = 00;//the starting point of construction
+    //redefine color
+    p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
+    s1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
+    //BASIC RECIPE FOR MAKING A MAZE OUT OF PHYSICAL ITEMS
+    for(int j = 0 ; j < gmap.size(); j++){ //the ROWS of
+        for(int i = 0; i<gmap[j].size();i++){ //the COLS of
+
+            tempx = i + con_x;
+            if(tempx >= map_width){continue;}
+            tempy = j + con_y;
+            if( tempy >= map_height){continue;}
+            //Now check if the space is empty or wall
+            //(Switch i and j for rotation)
+            //if(gmap[i][j] == 1){
+            if(gmap[j][i] == 1){
+                //then we need a wall here
+                Item con_item = Item(tempx, tempy, 304, p1, s1);
+                map_items[(tempy*map_width)+tempx].push_back(con_item);
+                block_map[(tempy*map_width)+tempx] = true;
+            }
+
+        }
+    }
+
+    //And anotha maze, trick
+    gmap = gen_maze_corridor(30,30);
+    con_x = 60;//the starting point of construction
+    con_y = 10;//the starting point of construction
+    //redefine color
+    p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
+    s1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
+    //BASIC RECIPE FOR MAKING A MAZE OUT OF PHYSICAL ITEMS
+        for(int j = 0 ; j < gmap.size(); j++){ //the ROWS of
+            for(int i = 0; i<gmap[j].size();i++){ //the COLS of
+
+            tempx = i + con_x;
+            if(tempx >= map_width){continue;}
+            tempy = j + con_y;
+            if( tempy >= map_height){continue;}
+            //Now check if the space is empty or wall
+            //(Switch i and j for rotation)
+            //if(gmap[i][j] == 1){
+            if(gmap[j][i] == 1){
+                //then we need a wall here
+                Item con_item = Item(tempx, tempy, 304, p1, s1);
+                map_items[(tempy*map_width)+tempx].push_back(con_item);
+                block_map[(tempy*map_width)+tempx] = true;
+            }
+
         }
     }
     
@@ -465,6 +529,14 @@ void init_creatures(){
             map_creatures.back().staff = temp_staff;
         }
         
+        //randomly give lights
+        if(rand()%2==1){
+            Light* temp_light = new Light(0, 0, 308); //a temp Item to be added to the cre's equip inventory
+            map_creatures.back().light = temp_light;
+        }
+        
+
+        
     }
 }
 
@@ -485,6 +557,7 @@ void draw_creatures(){
         map_creatures[i].draw();
         map_creatures[i].drawHat(gRenderer, item_tiles_p, item_tiles_s);
         map_creatures[i].drawStaff(gRenderer, item_tiles_p, item_tiles_s);
+        map_creatures[i].drawLight(gRenderer, item_tiles_p, item_tiles_s);
     }
 }
 
@@ -745,8 +818,9 @@ void wander_thread(Sprite* spr1){
         
         vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
         //Now actually move
-        spr1->x = next_step[0];
-        spr1->y = next_step[1];
+        spr1->moveTo(next_step[0], next_step[1]);
+//        spr1->x = next_step[0];
+//        spr1->y = next_step[1];
         //pop off the step from path
         spr1->path.pop_back();
         
@@ -784,8 +858,9 @@ void gather_thread(Sprite* spr1){
         
         vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
         //Now actually move
-        spr1->x = next_step[0];
-        spr1->y = next_step[1];
+        spr1->moveTo(next_step[0], next_step[1]);
+//        spr1->x = next_step[0];
+//        spr1->y = next_step[1];
         //pop off the step from path
         spr1->path.pop_back();
         
@@ -868,7 +943,7 @@ void task_creatures_thread(){
 //a thread for changing the background periodically
 void background_color_thread(){
     
-    short change = 1; //how much to change each component by
+    int change = 1; //for grey scale / even changing across rgb components
     //How much we change the colors
     int r_inc = 1;
     int g_inc = 1;
@@ -886,6 +961,9 @@ void background_color_thread(){
     int r2 = (rand()%154) + 1;
     int g2 = (rand()%154) + 1;
     int b2 = (rand()%154) + 1;
+    
+    //initialize background color (global)
+    back_col = {static_cast<Uint8>(rand()%(r2-5)), static_cast<Uint8>(rand()%(g2-5)), static_cast<Uint8>(rand()%(b2-5))};
     
     while(true){
         
@@ -924,8 +1002,8 @@ void background_color_thread(){
         }
         
         
-        //SDL_Delay(100); //Debug Quick
-        SDL_Delay(500); //Nice looking
+        SDL_Delay(100); //Debug Quick
+        //SDL_Delay(500); //Nice looking
     }
     
 }
@@ -1001,6 +1079,10 @@ int main( int argc, char* args[] ){
     Hat temp_accessory2 = Hat(0, 0, 306); //a temp Item to be added to cre's inventory
     cre1->hat = &temp_accessory; //give him a hat
     cre3->hat = &temp_accessory2; //give him a hat
+    
+    //Give cre1 a flag
+    Staff temp_staff = Staff(0,0,309); //a temp Item to be added to the cre's equip inventory
+    cre1->staff = &temp_staff;
     
     //DEBUG AUDIOOOOOOOOOOOOOOOO
 //    // NOTE: Sound test
@@ -1279,6 +1361,8 @@ int main( int argc, char* args[] ){
         //drawTexture(gRenderer, text1, 5, 5);
         
         cre1->drawHat(gRenderer, item_tiles_p, item_tiles_s);
+        cre1->drawStaff(gRenderer, item_tiles_p, item_tiles_s);
+        cre1->drawLight(gRenderer, item_tiles_p, item_tiles_s);
         cre3->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         
         

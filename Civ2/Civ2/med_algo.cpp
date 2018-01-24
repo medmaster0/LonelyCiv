@@ -46,9 +46,9 @@ vector<vector<short>> gen_maze_corridor(int rows_in, int cols_in){
             for(int j = 0 ; j<cols; j++){
                 trow.push_back(0);
             }
-            //but also add the boundaries on sides
-            trow[0] = 1;
-            trow[cols - 1] = 1;
+//            //but also add the boundaries on sides
+//            trow[0] = 1;
+//            trow[cols - 1] = 1;
             tmaze.push_back(trow);
         }else{ //on odd
             //fill in with 1s
@@ -138,6 +138,11 @@ vector<vector<short>> gen_maze_corridor(int rows_in, int cols_in){
         
     }
     
+    //clear last wall
+    for(int d = 0; d<cols_in; d++){
+        //tmaze[rows].push_back(0);
+        tmaze[rows-1][d] = 0;
+    }
     
     return tmaze;
 

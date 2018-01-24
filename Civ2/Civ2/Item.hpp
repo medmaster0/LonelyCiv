@@ -47,6 +47,12 @@ public:
     Staff(int xpos, int ypos, int tile_type);
 };
 
+class Light : public Item{
+public:
+    virtual void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s); //draws the item
+    Light(int xpos, int ypos, int tile_type);
+};
+
 //display list of items
 void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN_HEIGHT);
 

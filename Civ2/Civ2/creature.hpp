@@ -39,8 +39,9 @@ public:
     bool loadFromFile(std::string path1,std::string path2, int w, int h);//Load a texture from file for the sprite
     void draw(); //Draws the sprite to screen using MAP COORDS
     void drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //Draw's the sprite's inventory
-    void drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the items' hat (just moved up 8 px)
-    void drawStaff(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the items' staff (just moved  right 16 px)
+    void drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the creature's hat (just moved up 8 px)
+    void drawStaff(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the creatures' staff (just moved  right 16 px)
+    void drawLight(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the creature' light (just moved opposite staff 16 px)
     void moveDown();
     void moveUp();
     void moveRight();
@@ -48,11 +49,13 @@ public:
     void randomDance();
     string name; //the name of the creature
     int x,y,z; //Position of sprite (MAP COORDS!)
+    int prev_x, prev_y, prev_z; //the former pposition of the sprite
     vector<Item> inventory; //list of items the sprite is carrying
     SDL_Color faveColor; //the sprite's favorite color
     SDL_Color faveColor2; //the sprite's alternative favorite color
     Hat* hat; //a single item containing the sprite's hat
     Staff* staff; //a single item containing the sprite's staff
+    Light* light; //a single item containign the sprites light
     void moveTo(int x1, int y1); //moves to a specific (x,y) coord
     //Targeting stuff, below - hopefully GENERAL PURPOSE
     vector<vector<int>> path; //a path to whatever target it has

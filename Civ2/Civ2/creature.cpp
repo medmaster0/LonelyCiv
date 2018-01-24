@@ -34,9 +34,13 @@ Sprite::Sprite(int xp, int yp)
     mHeight = 0;
     hat = nullptr;
     staff = nullptr;
+    light = nullptr;
     x = xp;
     y = yp;
     z = 0;
+    prev_x = 0;
+    prev_y = 0;
+    prev_z = 0;
     r = rand() %255;
     g = rand() %255;
     b = rand() %255;
@@ -73,29 +77,41 @@ void Sprite::draw()
     SDL_Rect* clip = NULL;
     SDL_RenderCopy( gRenderer, primTexture, clip, &renderQuad );//Render to screen
     SDL_RenderCopy( gRenderer, secoTexture, clip, &renderQuad );//Render to screen
+    
 }
 //Move Down (1 step)
 void Sprite::moveDown(){
+    prev_y = y;
+    prev_x = x;
     y = y +1;
     return;
 }
 //Move Up (1 step)
 void Sprite::moveUp(){
+    prev_y = y;
+    prev_x = x;
     y = y -1;
     return;
 }
 //Move Right (1 step)
 void Sprite::moveRight(){
+    prev_x = x;
+    prev_y = y;
     x=x+1;;
     return;
 }
 //Move Left (1 step)
 void Sprite::moveLeft(){
+    prev_x = x;
+    prev_y = y;
     x=x-1;;
     return;
 }
 //Move TO
 void Sprite::moveTo(int x1, int y1){
+    prev_x = x;
+    prev_y = y;
+    prev_z = z;
     x = x1;
     y = y1;
 }
@@ -151,9 +167,42 @@ void Sprite::drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Te
 void Sprite::drawStaff(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s ){
     
     if(staff != nullptr){
-        staff->y = y; //move the hat to the right place
-        staff->x = x;
+        staff->y = prev_y;
+        staff->x = prev_x;
         staff->draw(gRenderer, item_tiles_p, item_tiles_s);
+    }
+    
+}
+
+//Draw the sprite's light
+void Sprite::drawLight(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s ){
+    
+    if(light != nullptr){
+        
+        //If has staff, then need to put candle on other side
+        if(staff!=nullptr){
+            if(prev_y < y && prev_x == x){
+                light->y = y+1;
+                light->x = x;
+            }
+            if(prev_y > y && prev_x == x){
+                light->y = y-1;
+                light->x = x;
+            }
+            if(prev_x < x && prev_y == y){
+                light->y = y;
+                light->x = x+1;
+            }
+            if(prev_x > x && prev_y == y){
+                light->y = y;
+                light->x = x-1;
+            }
+        }else{
+            light->y = prev_y;
+            light->x = prev_x;
+        }
+        
+        light->draw(gRenderer, item_tiles_p, item_tiles_s);
     }
     
 }
