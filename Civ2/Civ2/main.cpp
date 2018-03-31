@@ -49,6 +49,7 @@ vector<vector<Item>> map_items; //a list of list of items on a tile. Index corre
 
 //Creatures Stuff
 vector<Sprite> map_creatures; //a list of all creatures on map
+vector<Sprite> map_shrooms; //a list of all shroom sprites on map
 
 //Tent Stuff
 SDL_Texture** tent_tiles_p; //primo tent tiles
@@ -77,6 +78,9 @@ int item_display_index = 0; //counter used with cursors for inventory pos
 int creature_inventory_index = 0; //which creature in map_creature to display inventory for
 //-----------------
 bool statusDisplayOn = false;
+//-----------------
+bool shroomDepoDisplayOn = false;
+int shroom_inventory_index = 0; //which shroom in map_shrooms to display invontory for
 
 /////////////////////////////////////////////////////////
 ////FUNCTIONS BEGIN////////////////////////////////////////
@@ -284,6 +288,18 @@ void loadTiles(){
     item_tiles_s[309] = loadTexture("Civ2/Civ2/doodadz/flagSeco.png");
     item_tiles_t[309] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[310] = loadTexture("Civ2/Civ2/doodadz/herbPrim.png");
+    item_tiles_s[310] = loadTexture("Civ2/Civ2/doodadz/herbSecotry.png");
+    item_tiles_t[310] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[311] = loadTexture("Civ2/Civ2/doodadz/fruitPrim.png");
+    item_tiles_s[311] = loadTexture("Civ2/Civ2/doodadz/fruitSeco.png");
+    item_tiles_t[311] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[312] = loadTexture("Civ2/Civ2/doodadz/stonePrim.png");
+    item_tiles_s[312] = loadTexture("Civ2/Civ2/doodadz/stoneSeco.png");
+    item_tiles_t[312] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
     //TENT TILES
     tent_tiles_p[0] = loadTexture("Civ2/Civ2/tiles/tent0Prim.png");
     tent_tiles_s[0] = loadTexture("Civ2/Civ2/tiles/tent0Seco.png");
@@ -355,39 +371,52 @@ void init_items(){
 //        
 //    }
     
-    //Create some random weedz with fruit!
-    for(int i = 0; i < 450; i++){
-        tempx = rand()%(map_width);
-        tempy = rand()%(map_height);
-//        tempx = 3;
-//        tempy = 0;
-        temp_tile = rand()%99;
-        
-        //Create the weed
-        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(colorz[temp_tile][0]), static_cast<Uint8>(colorz[temp_tile][1]), static_cast<Uint8>(colorz[temp_tile][2]),255},{255,255,255,0} ); //temporary item
-        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
-        
-        //then the fruits
-        temp_item = Item(tempx, tempy, temp_tile+200, {static_cast<Uint8>(colorz[temp_tile+200][0]), static_cast<Uint8>(colorz[temp_tile+200][1]), static_cast<Uint8>(colorz[temp_tile+200][2]),255},{255,255,255,0} ); //temporary item
-        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
-        
-        
-    }
-    
-    
-//    for(int b = 0 ; b<50; b++){
+//    //Create some random weedz with fruit!
+//    for(int i = 0; i < 450; i++){
 //        tempx = rand()%(map_width);
 //        tempy = rand()%(map_height);
-//        if(rand()%2 == 1){
-//            temp_tile = 305; //+ (rand()%2);
-//        }else{
-//            temp_tile=306;
-//        }
-//        //temp_tile = rand()%7 + 300;
-//        //if(temp_tile == 301 || temp_tile == 304){temp_tile = 305;}
-//        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
+////        tempx = 3;
+////        tempy = 0;
+//        temp_tile = rand()%99;
+//
+//        //Create the weed
+//        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(colorz[temp_tile][0]), static_cast<Uint8>(colorz[temp_tile][1]), static_cast<Uint8>(colorz[temp_tile][2]),255},{255,255,255,0} ); //temporary item
+//        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+//
+//        //then the fruits
+//        temp_item = Item(tempx, tempy, temp_tile+200, {static_cast<Uint8>(colorz[temp_tile+200][0]), static_cast<Uint8>(colorz[temp_tile+200][1]), static_cast<Uint8>(colorz[temp_tile+200][2]),255},{255,255,255,0} ); //temporary item
 //        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
 //    }
+    
+    //Create some random weedz with fruit, (using generic tiles)
+    for(int i = 0; i < 50; i++){
+        tempx = rand()%(map_width);
+        tempy = rand()%(map_height);
+
+        //Create the weed
+        Item temp_item = Item(tempx, tempy, 310, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255), 255},{255,255,255,0} ); //temporary item
+        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+
+//        //then the fruits
+//        temp_item = Item(tempx, tempy, 311, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)},{255,255,255,0} ); //temporary item
+//        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+    }
+
+    
+    //for dispersing random items on map
+    for(int b = 0 ; b<450; b++){
+        tempx = rand()%(map_width);
+        tempy = rand()%(map_height);
+        if(rand()%2 == 1){
+            temp_tile = 310; //+ (rand()%2);
+        }else{
+            temp_tile=312;
+        }
+        //temp_tile = rand()%7 + 300;
+        //if(temp_tile == 301 || temp_tile == 304){temp_tile = 305;}
+        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{255,255,255,0} ); //temporary item
+        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+    }
     
     block_map = new bool[map_width*map_height](); //initialize a dynamically sized blocked map
     //Make a brick maze
@@ -419,33 +448,33 @@ void init_items(){
         }
     }
     
-    //Make anotha brick maze
-    gmap = gen_maze_corridor(30,30);
-    con_x = 30;//the starting point of construction
-    con_y = 00;//the starting point of construction
-    //redefine color
-    p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
-    s1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
-    //BASIC RECIPE FOR MAKING A MAZE OUT OF PHYSICAL ITEMS
-    for(int j = 0 ; j < gmap.size(); j++){ //the ROWS of
-        for(int i = 0; i<gmap[j].size();i++){ //the COLS of
-
-            tempx = i + con_x;
-            if(tempx >= map_width){continue;}
-            tempy = j + con_y;
-            if( tempy >= map_height){continue;}
-            //Now check if the space is empty or wall
-            //(Switch i and j for rotation)
-            //if(gmap[i][j] == 1){
-            if(gmap[j][i] == 1){
-                //then we need a wall here
-                Item con_item = Item(tempx, tempy, 304, p1, s1);
-                map_items[(tempy*map_width)+tempx].push_back(con_item);
-                block_map[(tempy*map_width)+tempx] = true;
-            }
-
-        }
-    }
+//    //Make anotha brick maze
+//    gmap = gen_maze_corridor(30,30);
+//    con_x = 30;//the starting point of construction
+//    con_y = 00;//the starting point of construction
+//    //redefine color
+//    p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
+//    s1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
+//    //BASIC RECIPE FOR MAKING A MAZE OUT OF PHYSICAL ITEMS
+//    for(int j = 0 ; j < gmap.size(); j++){ //the ROWS of
+//        for(int i = 0; i<gmap[j].size();i++){ //the COLS of
+//
+//            tempx = i + con_x;
+//            if(tempx >= map_width){continue;}
+//            tempy = j + con_y;
+//            if( tempy >= map_height){continue;}
+//            //Now check if the space is empty or wall
+//            //(Switch i and j for rotation)
+//            //if(gmap[i][j] == 1){
+//            if(gmap[j][i] == 1){
+//                //then we need a wall here
+//                Item con_item = Item(tempx, tempy, 304, p1, s1);
+//                map_items[(tempy*map_width)+tempx].push_back(con_item);
+//                block_map[(tempy*map_width)+tempx] = true;
+//            }
+//
+//        }
+//    }
 
     //And anotha maze, trick
     gmap = gen_maze_corridor(30,30);
@@ -455,8 +484,8 @@ void init_items(){
     p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
     s1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
     //BASIC RECIPE FOR MAKING A MAZE OUT OF PHYSICAL ITEMS
-        for(int j = 0 ; j < gmap.size(); j++){ //the ROWS of
-            for(int i = 0; i<gmap[j].size();i++){ //the COLS of
+    for(int j = 0 ; j < gmap.size(); j++){ //the ROWS of
+        for(int i = 0; i<gmap[j].size();i++){ //the COLS of
 
             tempx = i + con_x;
             if(tempx >= map_width){continue;}
@@ -510,8 +539,9 @@ void init_items(){
 
 //Initialize Creatures
 void init_creatures(){
-    int num_creatures = 15; //How many creatures are on the ma
     
+    //Creatures
+    int num_creatures = 15; //How many creatures are on the map
     for(int i = 0 ; i < num_creatures; i++){
         Sprite temp_cre = Sprite(rand()%map_width, rand()%map_height);
         temp_cre.loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
@@ -522,22 +552,35 @@ void init_creatures(){
             Hat* temp_hat = new Hat(0, 0, 305+(rand()%2) ); //a temp Item to be added to cre's inventory
             map_creatures.back().hat = temp_hat;
         }
-        
         //randomly give staffs (staves?)
         if(rand()%2==1){
             Staff* temp_staff = new Staff(0,0,307); //a temp Item to be added to the cre's equip inventory
             map_creatures.back().staff = temp_staff;
         }
-        
         //randomly give lights
         if(rand()%2==1){
             Light* temp_light = new Light(0, 0, 308); //a temp Item to be added to the cre's equip inventory
             map_creatures.back().light = temp_light;
         }
-        
-
-        
     }
+    
+    //Shrooms
+    int num_shrooms = 5; //How man shrooms are on the map
+    //Sprite temp_shroom;
+    for(int i = 0; i < num_shrooms; i++){
+        int tx, ty;
+        while(true){
+            tx = rand()%map_width;
+            ty = rand()%map_height;
+            if(block_map[(ty*map_width)+tx]==false){ //if adjacent is NOT blocked
+                Sprite temp_shroom = Sprite(tx,ty);
+                temp_shroom.loadFromFile("Civ2/Civ2/tiles/shroomPrim.png","Civ2/Civ2/tiles/shroomSeco.png", 16, 16);
+                map_shrooms.push_back(temp_shroom);
+                break;
+            }
+        }
+    }
+    
 }
 
 //Draws all the items
@@ -558,6 +601,11 @@ void draw_creatures(){
         map_creatures[i].drawHat(gRenderer, item_tiles_p, item_tiles_s);
         map_creatures[i].drawStaff(gRenderer, item_tiles_p, item_tiles_s);
         map_creatures[i].drawLight(gRenderer, item_tiles_p, item_tiles_s);
+    }
+    
+    //Cucle through all shrooms and draw
+    for(int i = 0; i <= map_shrooms.size(); i++){
+        map_shrooms[i].draw();
     }
 }
 
@@ -785,6 +833,13 @@ vector<vector<int>> faveColorSearch(Sprite* cre, int diff_threshold){
     
 }
 
+//Free Path'- deletes the path of a given creature
+//Gotta delete each individually?
+void free_path(Sprite cre){
+    for(int i = 0; i < cre.path.size(); i++){
+        cre.path.erase(cre.path.begin()+cre.path.size()-1);
+    }
+}
 
 ////////////////////////////
 //THREADS - ACTIONS
@@ -801,7 +856,6 @@ void wander_thread(Sprite* spr1){
         
         //check if thread should expire
         if( difftime(time(NULL) , spr1->thread_timer) > 30.0 ){
-            printf("done wandering\n");
             spr1->inThread = false;
             break;
         }
@@ -826,6 +880,58 @@ void wander_thread(Sprite* spr1){
         
         SDL_Delay(500);
     }
+}
+
+//A thread for finding the nearest shroom depot
+//Call the AStar search algorithm
+//Travels to the given shroom
+//Transfers item from inventory
+void shroom_depo_thread(Sprite* spr1){
+    
+    int shroom_index = rand()%map_shrooms.size(); //pick a random shroom to go to
+    
+    //trying to find a path to shroom
+    while(true){
+        if(spr1->path.empty()){ //if path is empty
+            //find a new target path
+            spr1->path = A_Star(block_map, map_width, map_height, spr1->x, spr1->y, map_shrooms[shroom_index].x, map_shrooms[shroom_index].y );
+        }
+    
+        //Check if the search failed (error code (9999,9999)
+        if(spr1->path[0][0] == 9999){
+            spr1->path.pop_back();
+            continue; //search failed, try again....
+        }
+        shroom_index = rand()%map_shrooms.size(); //pick another random shroom to go to
+        
+        break;
+    }
+    
+    //now the actual going to the shroom
+    while(true){
+        vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
+        
+        //Now actually move
+        spr1->moveTo(next_step[0], next_step[1]);
+        //pop off the step from path
+        spr1->path.pop_back();
+        
+        //Check if done with path
+        if(spr1->path.size()<=1){ //then it's empty
+            printf("this path is an EMPTY ONE/n");
+            
+            //now switch the item into the shroom inventory
+            map_shrooms[shroom_index].inventory.push_back(spr1->inventory[ spr1->inventory.size() - 1 ]);
+            spr1->inventory.pop_back();
+            
+            spr1->inThread = false;
+            break;
+        }
+        
+        SDL_Delay(500);
+    }
+    return;
+    
 }
 
 //a thread for picking up items of your favorite color
@@ -873,6 +979,16 @@ void gather_thread(Sprite* spr1){
                    color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor2)<color_thresh){
                     
                     pickUpItem(spr1, spr1->x, spr1->y, i); //then pick up the item
+                    
+                    //Start trek to shroom depot...
+                    //we're going to transfer it to another thread...
+                    free_path(*spr1); //clear old path
+                    //spr1->inThread = false; //we can keep the status as true since we're changing threads.( normally have to set this flag)
+                    //This thread makes the creature gather
+                    std::thread shroomDepoObj(shroom_depo_thread, spr1);
+                    shroomDepoObj.detach();
+                    return;
+                    
                 }
                 
             }
@@ -884,15 +1000,8 @@ void gather_thread(Sprite* spr1){
         SDL_Delay(500);
         
     }
-    
-}
-
-//Free Path'- deletes the path of a given creature
-//Gotta delete each individually?
-void free_path(Sprite cre){
-    for(int i = 0; i < cre.path.size(); i++){
-        cre.path.erase(cre.path.begin()+cre.path.size()-1);
-    }
+    spr1->inThread = false; //if it reaches here and exits ,then clear flag
+    return;
 }
 
 //periodically gives a new task to creatures
@@ -906,7 +1015,7 @@ void task_creatures_thread(){
         for(int i = 0; i < map_creatures.size(); i++){
             if(map_creatures[i].inThread == false){ //we need to assign it a new thread
                 //map_creatures[i].path.clear(); //clear the old path
-                free_path(map_creatures[i]);//clear old path, fuctionto individually delete
+                free_path(map_creatures[i]);//clear old path, fuction to individually delete path
                 map_creatures[i].thread_timer = time(NULL);
                 map_creatures[i].inThread = true;
                 choice = rand()%2;
@@ -924,7 +1033,6 @@ void task_creatures_thread(){
                         break;
                     }
                 }
-                
             }
         }
         
@@ -958,20 +1066,26 @@ void background_color_thread(){
 //    int r2 = 143;
 //    int g2 = 133;
 //    int b2 = 254;
-    int r2 = (rand()%154) + 1;
-    int g2 = (rand()%154) + 1;
-    int b2 = (rand()%154) + 1;
+//    int r2 = (rand()%154) + 1;
+//    int g2 = (rand()%154) + 1;
+//    int b2 = (rand()%154) + 1;
+    int r2 = (rand()%253) + 1;
+    int g2 = (rand()%253) + 1;
+    int b2 = (rand()%253) + 1;
+    //BOUNCES BACK AND FORTH BETWEeN THE VALUES
+
     
     //initialize background color (global)
     back_col = {static_cast<Uint8>(rand()%(r2-5)), static_cast<Uint8>(rand()%(g2-5)), static_cast<Uint8>(rand()%(b2-5))};
     
+    vector<int> fave_color;
     while(true){
         
         //change is an opportunity for growth
 //        back_col.r=back_col.r+change;
 //        back_col.g=back_col.g+change;
 //        back_col.b=back_col.b+change;
-//        
+//
 //        //bounds checking
 //        if(back_col.r>254){
 //            change = -1;
@@ -983,13 +1097,13 @@ void background_color_thread(){
 
 
         //oscilates between the two
-        
+
         //change is an opportunity for growth
         //let's only change one color - nice effect :)
         back_col.r=back_col.r+r_inc;
         back_col.g=back_col.g+g_inc;
         back_col.b=back_col.b+b_inc;
-        
+
         //bounds checking
         if( (back_col.r>r2) || (back_col.r<r1) ){
             r_inc = r_inc * -1;
@@ -1001,6 +1115,12 @@ void background_color_thread(){
             b_inc = b_inc * -1;
         }
         
+//        //set background color - remember, back_col is GLOBAL!!!
+//        fave_color = return_fave_rgb();
+//        back_col.r = fave_color[0];
+//        back_col.g = fave_color[1];
+//        back_col.b = fave_color[2];
+//        SDL_Delay(10000);
         
         SDL_Delay(100); //Debug Quick
         //SDL_Delay(500); //Nice looking
@@ -1160,7 +1280,8 @@ int main( int argc, char* args[] ){
     //genPNG();
     //SDL_Texture* text1 = genTexture(gRenderer, gWindow);
     
-
+    cout << genPotionName(); 
+    
     
     //
     //DEBUG TEST : SPAWN SOME THREAD DAWGd
@@ -1224,10 +1345,6 @@ int main( int argc, char* args[] ){
                         cre1->moveUp();
                         break;
                         
-                    case SDLK_b: //FOR DEBUGGING!!!!
-                        for(int i = 0; i < map_width*map_height; i++) cout << block_map[i];
-                        break;
-                        
                     case SDLK_a:
                         if(cre1->x<1){ //bounds check
                             break;
@@ -1286,6 +1403,11 @@ int main( int argc, char* args[] ){
                         break;
                     }
                         
+                    case SDLK_p:{
+                        shroomDepoDisplayOn = !shroomDepoDisplayOn;
+                        break;
+                    }
+                        
                     //cycle through different creature's inventories
                     case SDLK_PERIOD:
                         creature_inventory_index = creature_inventory_index+1;
@@ -1338,6 +1460,34 @@ int main( int argc, char* args[] ){
             if(statusDisplayOn){
                 //process input for status display
             }
+            if(shroomDepoDisplayOn){
+                //Process input for shroomDepoDisplay
+                if(e.type == SDL_KEYDOWN){
+                    switch(e.key.keysym.sym){
+                        case SDLK_COMMA:
+                            shroom_inventory_index--;
+                            //bounds checking
+                            if(shroom_inventory_index <= 0){
+                                shroom_inventory_index = 0;
+                            }
+                            break;
+                        case SDLK_PERIOD:
+                            shroom_inventory_index++;
+                            //bounds checking
+                            if(shroom_inventory_index >= map_shrooms.size()){
+                                shroom_inventory_index = shroom_inventory_index-1;
+                            }
+                            break;
+                        case SDLK_EQUALS:
+                            item_display_index++;
+                            break;
+                        case SDLK_MINUS:
+                            item_display_index--;
+                            break;
+                    }
+                    
+                }
+            }
             
             
         }//End event while loop
@@ -1376,6 +1526,16 @@ int main( int argc, char* args[] ){
         if(statusDisplayOn){
             //show status (of creature)
             displayStatus(map_creatures[creature_inventory_index], gRenderer, SCREEN_HEIGHT);
+        }
+        if(shroomDepoDisplayOn){
+            //display inventory of shroom
+            displayItemList(map_shrooms[shroom_inventory_index].inventory, gRenderer, SCREEN_HEIGHT);
+//            //DEBUG
+//            for(int i = 0; i<map_shrooms[shroom_inventory_index].inventory.size(); i++){
+//                printf("inv:%d\n",map_shrooms[shroom_inventory_index].inventory.size());
+//                printf("item: %d,%d,%d\n",map_creatures[shroom_inventory_index].inventory[i].primColor.r,map_creatures[shroom_inventory_index].inventory[i].primColor.g,map_creatures[shroom_inventory_index].inventory[i].primColor.b);
+//            };
+            
         }
         
         SDL_RenderPresent( gRenderer ); //Update screen        

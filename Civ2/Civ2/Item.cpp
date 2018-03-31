@@ -197,6 +197,12 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
             item_name = "    hat";
         }else if(item_list[item_index].type==306){ //Then it's a stone
             item_name = "    bow";
+        }else if(item_list[item_index].type==310){ //Then it's a stone
+            item_name = "    weed";
+        }else if(item_list[item_index].type==311){ //Then it's a stone
+            item_name = "    fruit";
+        }else if(item_list[item_index].type==312){ //Then it's a stone
+            item_name = "    stone";
         }
     
         //Determine Color

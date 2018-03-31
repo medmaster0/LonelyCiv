@@ -53,8 +53,11 @@ public:
     void printLaw(); //prints itself out
 private:
 
-    
-    
 };
+
+//Magic
+vector<int> return_fave_rgb(); //returns the rgb value of a random ravorite color
+string rgb_to_trigram(int r, int g, int b); //return the equivalent I ching trigram of the color
+string genPotionName(); //generates random name of a potion
 
 #endif /* story_hpp */

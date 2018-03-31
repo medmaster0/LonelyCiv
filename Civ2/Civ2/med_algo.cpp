@@ -352,7 +352,7 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
                 
             }
             if(in_open){
-                delete neighbors[i]; //delete what we've created!!!
+                delete neighbors[i]; //delete temporary neighbor
                 num_news = num_news - 1;
                 continue; //skip this neighbor
             }
@@ -570,6 +570,7 @@ SDL_Color color_blend(SDL_Color col1, SDL_Color col2){
     SDL_Color colF = {static_cast<Uint8>(((col1.r+col2.r)/2)),static_cast<Uint8>(((col1.g+col2.g)/2)),static_cast<Uint8>(((col1.b+col2.b)/2))};
     return colF;
 }
+
 
 
 
