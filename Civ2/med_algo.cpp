@@ -583,7 +583,20 @@ SDL_Color generate_brown(){
     
     SDL_Color brown = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b),255};
     return brown;
+}
+
+//generates a random shade of pink
+//Returns a random shade of pink
+//Choose a red component
+//Choose a Blue, less than Red
+//Choose a Green, less than Blue
+SDL_Color generate_pink(){
+    int r = 125+rand()%126;
+    int b = rand()%(r+1);
+    int g = rand()%(b+1);
     
+    SDL_Color pink = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b),255};
+    return pink;
     
 }
 

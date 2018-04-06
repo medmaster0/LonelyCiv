@@ -2412,10 +2412,46 @@ string genSaltName(){
         chem_name += vowels[rand()%5];
         chem_name += consonants[rand()%21];
     }
-    chem_name += "ium ";
+    chem_name += "ide";
     
     return chem_name;
     
+}
+
+//Generates a glass name
+//either a (Pyr)-ex name
+string genGlassName(){
+    
+    char consonants[] = "bcdfghjklmnpqrstvwxyz";
+    char vowels[] = "aeiou";
+    
+    string glass_name = "";
+        
+    glass_name += toupper(consonants[rand()%21]);
+    glass_name += vowels[rand()%5];
+    glass_name += consonants[rand()%21];
+    glass_name += "ex";
+    
+    return glass_name;
+    
+}
+
+//Generates a cloth name
+// consonant - vowel - consonant - consonant
+//Ex: "hemp" or "gexj" - (kind of occult-sounding)
+string genClothName(){
+    char consonants[] = "bcdfghjklmnpqrstvwxyz";
+    char vowels[] = "aeiou";
+    
+    string cloth_name = "";
+    
+    cloth_name += consonants[rand()%21];
+    cloth_name += vowels[rand()%5];
+    cloth_name += consonants[rand()%21];
+    //cloth_name += "'";
+    cloth_name += consonants[rand()%21];
+    
+    return cloth_name;
 }
 
 //ZODIAC

@@ -19,6 +19,7 @@
 #include "dancez.hpp"
 #include "music.hpp"
 #include "creature.hpp"
+#include "effects.hpp"
 #include "Item.hpp"
 #include "tent.hpp"
 #include "med_algo.hpp"
@@ -54,6 +55,9 @@ vector<vector<Item>> map_scenery; //a list of list of scenery on a tile. Index c
 //Creatures Stuff
 vector<Sprite> map_creatures; //a list of all creatures on map
 vector<Sprite> map_shrooms; //a list of all shroom sprites on map
+
+//Effects Stuff
+vector<vector<Effect>> map_effects; //a list of list of effects on a tile. Index corresponds to [y*map_width + x]
 
 SDL_Texture** misc_tiles; //Symbols and Effects Tile Stuff misc. (tiles (symbols, effects, etc.)
 
@@ -353,6 +357,10 @@ void loadTiles(){
     misc_tiles[16] = loadTexture("Civ2/Civ2/tiles/tarot_wand.png");
     misc_tiles[17] = loadTexture("Civ2/Civ2/tiles/tarot_cup.png");
     misc_tiles[18] = loadTexture("Civ2/Civ2/tiles/tarot_pentacle.png");
+    //Tiles for Effects
+    misc_tiles[19] = loadTexture("Civ2/Civ2/tiles/heartsPrim.png");
+    misc_tiles[20] = loadTexture("Civ2/Civ2/tiles/sparklesPrim.png");
+    misc_tiles[21] = loadTexture("Civ2/Civ2/tiles/smokePrim.png");
     
 }
 
@@ -382,6 +390,7 @@ void drawVectorMap(){
 
 //////DEBUG OR SOMEHTING LIKE IT
 //generates the initial items on the map
+//This also initializes effects
 void init_items(){
     
     //Calculate map (grid) dimensions
@@ -393,9 +402,7 @@ void init_items(){
     map_scenery.resize(map_width*map_height);
     map_tents.resize(map_width*map_height);
     map_workshops.resize(map_width*map_height);
-    //colors used throughout
-    SDL_Color p1;
-    SDL_Color s1;
+    map_effects.resize(map_width*map_height);
     
     //we're going to create 300 random items (basic first kind)
     //we have to generate items, and also add them to the correct element in the array
@@ -498,6 +505,18 @@ void init_items(){
         map_items[(tempy*map_width)+tempx].push_back(temp_item);
     }
     
+    
+    //DEBUG, Create some effects
+    for(int e = 0; e<5; e++){
+        tempx = rand()%(map_width);
+        tempy = rand()%(map_height);
+        temp_tile = rand()%3;
+        Effect temp_effect = Effect(tempx, tempy, temp_tile);
+        map_effects[(tempy*map_width)+tempx].push_back(temp_effect);
+    }
+    
+    
+    
     block_map = new bool[map_width*map_height](); //initialize a dynamically sized blocked map
 //    //Make a brick maze
 //    vector<vector<short>> gmap = gen_maze_corridor(30,30);
@@ -584,37 +603,6 @@ void init_items(){
 //        }
 //    }
     
-    
-    //for testing inventory, specific tile...
-    for(int b = 0 ; b<1; b++){
-        tempx = 14;
-        tempy = 0;
-        if(rand()%2 == 1){
-            temp_tile = 305; //+ (rand()%2);
-        }else{
-            temp_tile=306;
-        }
-        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
-        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
-    }
-    
-//    //Make some tents
-//    tempx = 23;
-//    tempy = 8;
-//    //Tent temp_tent = Tent(tempx, tempy, 0);
-//    Tent temp_tent = Tent(tempx, tempy, 0, {static_cast<Uint8>(127+rand()%127), static_cast<Uint8>(127+rand()%127), static_cast<Uint8>(127+rand()%127), 255},{static_cast<Uint8>(127+rand()%127), static_cast<Uint8>(127+rand()%127), static_cast<Uint8>(127+rand()%127),255});
-//    map_tents[(tempy)*map_width+(tempx)].push_back(temp_tent);
-//    
-//    //Make some workshops
-//    tempx = 25;
-//    tempy = 8;
-//    Workshop temp_workshop = Workshop(tempx, tempy, 0);
-//    map_workshops[(tempy)*map_width+(tempx)].push_back(temp_workshop);
-//    
-//    tempx = 27;
-//    tempy = 8;
-//    temp_workshop = Workshop(tempx, tempy, 1);
-//    map_workshops[(tempy)*map_width+(tempx)].push_back(temp_workshop);
 }
 
 //Initialize Creatures
@@ -623,7 +611,7 @@ void init_creatures(){
     //Creatures
     int num_creatures = 15; //How many creatures are on the map
     for(int i = 0 ; i < num_creatures; i++){
-        Sprite temp_cre = Sprite(rand()%map_width, rand()%map_height);
+        Sprite temp_cre = Sprite(1+rand()%(map_width-2), 1+rand()%(map_height-1));
         temp_cre.loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
         map_creatures.push_back(temp_cre);
 
@@ -665,7 +653,7 @@ void init_creatures(){
 
 //Draws all the items
 void draw_items(){
-    //You know what to do
+    //Cycle through all items on map
     for(int i = 0; i < map_items.size(); i++){
         for(int j = 0 ; j < map_items[i].size(); j++){
             map_items[i][j].draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
@@ -683,7 +671,7 @@ void draw_items(){
 //Draws all the creatures
 void draw_creatures(){
     //Cycle through all creatures and draw
-    for(int i = 0; i <= map_creatures.size(); i++){
+    for(int i = 0; i < map_creatures.size(); i++){
         map_creatures[i].draw();
         map_creatures[i].drawHat(gRenderer, item_tiles_p, item_tiles_s);
         map_creatures[i].drawStaff(gRenderer, item_tiles_p, item_tiles_s);
@@ -691,8 +679,19 @@ void draw_creatures(){
     }
     
     //Cucle through all shrooms and draw
-    for(int i = 0; i <= map_shrooms.size(); i++){
+    for(int i = 0; i < map_shrooms.size(); i++){
         map_shrooms[i].draw();
+    }
+}
+
+//Draws all of the effects
+void draw_effects(){
+    //Cycle through all effects on amp
+    for(int i = 0; i < map_effects.size(); i++){
+        for(int j = 0 ; j < map_effects[i].size(); j++){
+            //map_effects[i][j].draw(gRenderer);
+            map_effects[i][j].drawScroll(gRenderer);
+        }
     }
 }
 
@@ -1117,11 +1116,16 @@ void free_path(Sprite cre){
 
 //a thread for wandering to a random place
 void wander_thread(Sprite* spr1){
-//    for(int i = 0; i<401; i++){
-//    //while(true){
-//        //printf("%d", spr1.x );
-//        printf("XXXXXXXX%dXXXXXXXX",spr1->x);
-//    }
+    //    for(int i = 0; i<401; i++){
+    //    //while(true){
+    //        //printf("%d", spr1.x );
+    //        printf("XXXXXXXX%dXXXXXXXX",spr1->x);
+    //    }
+    
+    //Standard movement timing stuff
+    spr1->move_timer = SDL_GetTicks(); //start move timer
+    int steps_to_pop = 0; //how many steps need to be popped off path
+    int carry_over = 0; //how many ticks were rounded off
     
     while(true){
         
@@ -1134,22 +1138,40 @@ void wander_thread(Sprite* spr1){
         if(spr1->path.empty()){ //if path is empty
             spr1->path = A_Star(block_map, map_width, map_height, spr1->x, spr1->y, rand()%map_width, rand()%map_height );
         }
-        
+    
         //Check if the search failed (error code (9999,9999)
         if(spr1->path[0][0] == 9999){
             spr1->path.pop_back();
             continue; //search failed, try again....
         }
         
+        //Determine how many steps have to be moved while time has passed
+        steps_to_pop = ( (SDL_GetTicks() - spr1->move_timer)*(spr1->move_speed/1000.0) );
+        if(steps_to_pop <= 0){
+            continue; //no steps need to be taken, continue
+        }
+        //Now pop off that many steps
+        for(int j = 0 ; j < steps_to_pop-1 ; j++){
+            if(spr1->path.size()>1){ //if the path list is non-empty
+                //Need to register the skipped steps in "prev values"
+                spr1->moveTo(spr1->path[spr1->path.size()-1][0], spr1->path[spr1->path.size()-1][1]);
+                spr1->path.pop_back(); //pop off the last element (skip it)
+            }
+        }
+    
         vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
         //Now actually move
         spr1->moveTo(next_step[0], next_step[1]);
-//        spr1->x = next_step[0];
-//        spr1->y = next_step[1];
         //pop off the step from path
         spr1->path.pop_back();
         
-        SDL_Delay(500);
+        //update timer
+        //First, determine how much carry-over we need to keep (time we haven't accounted for due to rounding
+        carry_over = (SDL_GetTicks() - spr1->move_timer); //How much time we have on timer, total
+        carry_over = carry_over - (steps_to_pop*1000.0/spr1->move_speed); //now subtract how much time we've accounted for
+                                                                          //carry_over now has how many ticks we haven't updated for
+        spr1->move_timer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+        
     }
     return;
 }
@@ -1160,6 +1182,11 @@ void wander_thread(Sprite* spr1){
 //Transfers item from inventory
 void shroom_depo_thread(Sprite* spr1){
     
+    //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
+    spr1->move_timer = SDL_GetTicks(); //start move timer
+    int steps_to_pop = 0; //how many steps need to be popped off path
+    int carry_over = 0; //how many ticks were rounded off
+    
     int shroom_index = rand()%map_shrooms.size(); //pick a random shroom to go to
     
     //trying to find a path to shroom
@@ -1168,7 +1195,7 @@ void shroom_depo_thread(Sprite* spr1){
             //find a new target path
             spr1->path = A_Star(block_map, map_width, map_height, spr1->x, spr1->y, map_shrooms[shroom_index].x, map_shrooms[shroom_index].y );
         }
-    
+        
         //Check if the search failed (error code (9999,9999)
         if(spr1->path[0][0] == 9999){
             spr1->path.pop_back();
@@ -1181,8 +1208,24 @@ void shroom_depo_thread(Sprite* spr1){
     
     //now the actual going to the shroom
     while(true){
-        vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
         
+        //STANDARD MOVEMENT TIMING CALCULATIONS
+        //Determine how many steps have to be moved while time has passed
+        steps_to_pop = ( (SDL_GetTicks() - spr1->move_timer)*(spr1->move_speed/1000.0) );
+        if(steps_to_pop <= 0){
+            continue; //no steps need to be taken, continue
+        }
+        //Now pop off that many steps
+        for(int j = 0 ; j < steps_to_pop-1 ; j++){
+            if(spr1->path.size()>1){ //if the path list is non-empty
+                //Need to register the skipped steps in "prev values"
+                spr1->moveTo(spr1->path[spr1->path.size()-1][0], spr1->path[spr1->path.size()-1][1]);
+                spr1->path.pop_back(); //pop off the last element (skip it)
+            }
+        }
+        //END MOVEMENT TIMING
+        
+        vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
         //Now actually move
         spr1->moveTo(next_step[0], next_step[1]);
         //pop off the step from path
@@ -1200,7 +1243,13 @@ void shroom_depo_thread(Sprite* spr1){
             break;
         }
         
-        SDL_Delay(500);
+        //STANDARD MOVEMENT TIMER UPDATE SEQUENCE
+        //First, determine how much carry-over we need to keep (time we haven't accounted for due to rounding
+        carry_over = (SDL_GetTicks() - spr1->move_timer); //How much time we have on timer, total
+        carry_over = carry_over - (steps_to_pop*1000.0/spr1->move_speed); //now subtract how much time we've accounted for
+        //carry_over now has how many ticks we haven't updated for
+        spr1->move_timer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+        
     }
     return;
     
@@ -1211,6 +1260,11 @@ void shroom_depo_thread(Sprite* spr1){
 //Travels to proper tile
 //picks up item (if it's still there)
 void gather_thread(Sprite* spr1){
+    
+    //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
+    spr1->move_timer = SDL_GetTicks(); //start move timer
+    int steps_to_pop = 0; //how many steps need to be popped off path
+    int carry_over = 0; //how many ticks were rounded off
     
     int color_thresh = 100; //the maximum difference between item color and fave color,  allowable
     int search_item = 313; //the item type we are searching for
@@ -1236,22 +1290,38 @@ void gather_thread(Sprite* spr1){
             break;
         }
         
+        //STANDARD MOVEMENT TIMING CALCULATIONS
+        //Determine how many steps have to be moved while time has passed
+        steps_to_pop = ( (SDL_GetTicks() - spr1->move_timer)*(spr1->move_speed/1000.0) );
+        if(steps_to_pop <= 0){
+            continue; //no steps need to be taken, continue
+        }
+        //Now pop off that many steps
+        for(int j = 0 ; j < steps_to_pop-1 ; j++){
+            if(spr1->path.size()>1){ //if the path list is non-empty
+                //Need to register the skipped steps in "prev values"
+                spr1->moveTo(spr1->path[spr1->path.size()-1][0], spr1->path[spr1->path.size()-1][1]);
+                spr1->path.pop_back(); //pop off the last element (skip it)
+            }
+        }
+        //END MOVEMENT TIMING
+        
         vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
         //Now actually move
         spr1->moveTo(next_step[0], next_step[1]);
-//        spr1->x = next_step[0];
-//        spr1->y = next_step[1];
+        //        spr1->x = next_step[0];
+        //        spr1->y = next_step[1];
         //pop off the step from path
         spr1->path.pop_back();
         
         //If we've reach target...
         if(spr1->path.empty()){
-
+            
             //now look on tile and check if item is still there and pick up
             for(int i = 0; i < map_items[(spr1->y*map_width)+spr1->x].size(); i++){
                 if(color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor)<color_thresh ||
                    color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor2)<color_thresh){
-                //if(map_items[(spr1->y*map_width)+spr1->x][i].type == search_item){
+                    //if(map_items[(spr1->y*map_width)+spr1->x][i].type == search_item){
                     
                     pickUpItem(spr1, spr1->x, spr1->y, i); //then pick up the item
                     
@@ -1259,7 +1329,8 @@ void gather_thread(Sprite* spr1){
                     //we're going to transfer it to another thread...
                     free_path(*spr1); //clear old path
                     //spr1->inThread = false; //we can keep the status as true since we're changing threads.( normally have to set this flag)
-                    //This thread makes the creature gather
+                    //This thread makes the creature go to shroom
+                    //std::thread shroomDepoObj(shroom_depo_thread, spr1);
                     std::thread shroomDepoObj(shroom_depo_thread, spr1);
                     shroomDepoObj.detach();
                     return;
@@ -1268,16 +1339,22 @@ void gather_thread(Sprite* spr1){
                 
             }
             
-            
             //break;
         }
         
-        SDL_Delay(500);
+        //STANDARD MOVEMENT TIMER UPDATE SEQUENCE
+        //First, determine how much carry-over we need to keep (time we haven't accounted for due to rounding
+        carry_over = (SDL_GetTicks() - spr1->move_timer); //How much time we have on timer, total
+        carry_over = carry_over - (steps_to_pop*1000.0/spr1->move_speed); //now subtract how much time we've accounted for
+        //carry_over now has how many ticks we haven't updated for
+        spr1->move_timer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+        //SDL_Delay(500);
         
     }
     spr1->inThread = false; //if it reaches here and exits ,then clear flag
     return;
 }
+
 
 //periodically gives a new task to creatures
 void task_creatures_thread(){
@@ -1297,12 +1374,14 @@ void task_creatures_thread(){
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
+                        //std::thread gatherObj(gather_thread, &map_creatures[i]);
                         std::thread gatherObj(gather_thread, &map_creatures[i]);
                         gatherObj.detach();
                         break;
                     }
                     case 1: {
                         //This thread wanders the input creature
+                        //std::thread wanderObj(wander_thread, &map_creatures[i]);
                         std::thread wanderObj(wander_thread, &map_creatures[i]);
                         wanderObj.detach();
                         break;
@@ -1438,6 +1517,9 @@ void regen_weedz_thread(){
                 Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
                 map_items[y*map_width+x].push_back(temp_item);
                 SDL_Delay(5000);
+                
+                x = rand()%map_width;
+                y = rand()%map_height;
                 
                 //Create a basic single-tone item
                 //item_id = rand()%300; //pick a random item id
@@ -1631,22 +1713,23 @@ int main( int argc, char* args[] ){
     
     //genPNG();
     //SDL_Texture* text1 = genTexture(gRenderer, gWindow);
-    for(int j = 0; j <1; j++){
+    for(int j = 0; j <3; j++){
         cout << "This is the potion, ";
         cout << genPotionName();
         cout << ". It is made of ";
         cout << genOilName() << ".\n";
         
-        addToConsoleLog("This is the potion, "+ genPotionName()+". It is made of "+ genOilName() +".");
-        addToConsoleLog("This is the powder, "+ genPotionName()+". It is made of "+ genSaltName() +".");
+        addToConsoleLog("This is the potion, "+ genPotionName()+". It is made of "+ genOilName() +"."+" It's in a "+genGlassName()+" glass vial.");
+        addToConsoleLog("This is the powder, "+ genPotionName()+". It is made of "+ genSaltName() +"."+" It's in a "+genClothName()+" cloth bag.");
+        cout << "This is the potion, "+ genPotionName()+". It is made of "+ genOilName() +"."+" It's in a "+genGlassName()+" glass vial.";
+        cout << "This is the powder, "+ genPotionName()+". It is made of "+ genSaltName() +"."+" It's in a "+genClothName()+" cloth bag."; 
+        
         
 //        if(find_compatibility(1, 2)==0){
 //            addToConsoleLog("es compatible.");
 //        }else{
 //            addToConsoleLog("no compatible.");
 //        }
-        
-        addToConsoleLog("");
         
         cout << "This is the powder, ";
         cout << genPotionName();
@@ -1883,6 +1966,7 @@ int main( int argc, char* args[] ){
         
         draw_items();
         draw_creatures();
+        draw_effects();
         
         //drawTexture(gRenderer, text1, 5, 5);
         
@@ -1891,7 +1975,7 @@ int main( int argc, char* args[] ){
         cre1->drawLight(gRenderer, item_tiles_p, item_tiles_s);
         cre3->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         
-        
+        draw_effects();
         
         //Draw Display windows
         if(inventoryDisplayOn){

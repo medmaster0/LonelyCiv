@@ -48,7 +48,10 @@ Sprite::Sprite(int xp, int yp)
     faveColor2 = {static_cast<Uint8>(rand() %255), static_cast<Uint8>(rand() %255), static_cast<Uint8>(rand() %255)};
     zodiac_sign = rand()%12; //assign a random zodiac sign
     zodiac_element = find_zodiac_element(zodiac_sign); //determine the element, based on the zodiac sign
-    inThread = false; 
+    inThread = false;
+    move_timer = 0; //keeps track of SDL_GetTicks() for last movement
+    move_speed = 2.0; //how many tiles to move per 1 second
+    isNeededByThread = false; //prevents scheduler from starting another thread
     
 }
 //Destructor
@@ -77,6 +80,7 @@ void Sprite::draw()
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { x*16, y*16, mWidth, mHeight };
     SDL_Rect* clip = NULL;
+    //printf("%d,%d,%d,%d\n",x,y,mWidth,mHeight);
     SDL_RenderCopy( gRenderer, primTexture, clip, &renderQuad );//Render to screen
     SDL_RenderCopy( gRenderer, secoTexture, clip, &renderQuad );//Render to screen
     
@@ -143,6 +147,42 @@ void Sprite::moveTo(int x1, int y1){
     prev_z = z;
     x = x1;
     y = y1;
+    
+//    //Also update position of sprite's items
+//    if(hat != nullptr){
+//        hat->y = y; //move the hat to the right place
+//        hat->x = x;
+//    }
+//    if(staff != nullptr){
+//        staff->y = prev_y;
+//        staff->x = prev_x;
+//    }
+//    if(light != nullptr){
+//        //If has staff, then need to put candle on other side
+//        if(staff!=nullptr){
+//            if(prev_y < y && prev_x == x){
+//                light->y = y+1;
+//                light->x = x;
+//            }
+//            if(prev_y > y && prev_x == x){
+//                light->y = y-1;
+//                light->x = x;
+//            }
+//            if(prev_x < x && prev_y == y){
+//                light->y = y;
+//                light->x = x+1;
+//            }
+//            if(prev_x > x && prev_y == y){
+//                light->y = y;
+//                light->x = x-1;
+//            }
+//        }else{
+//            light->y = prev_y;
+//            light->x = prev_x;
+//        }
+//    }
+//    //End updating sprite's items
+    
 }
 
 //Sprite's random path will be dance pattern
