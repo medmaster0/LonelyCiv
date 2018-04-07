@@ -26,6 +26,8 @@ string genLatinSentence(int punctuation); //generates random latin sentence, all
 
 string genCuss(); //generates a random cuss
 
+string roman_numerals(int number); //returns the roman numeral equivalent of an entered value
+
 //LAWS
 
 //Article struct - most basic unit of law
@@ -66,5 +68,7 @@ string genClothName(); //Generates a cloth name // consonant - vowel - consonant
 int find_compatibility(int z1, int z2); //returns the compatibility of the entered zodiac sign codes: 0 - Good, 1 - Fine, 2 - Bad
 int find_zodiac_element(int z); //returns the element of the entered zodiac sign code: 1: Air, 2: Fire, 3: Water, 4:Earth
 
+//HOTEL
+string genWine(); //Generates a wine name with a saint, vintage year, sweetness level, and fruit/aroma taste
 
 #endif /* story_hpp */

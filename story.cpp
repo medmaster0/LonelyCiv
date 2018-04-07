@@ -99,6 +99,94 @@ string genCuss(){
 
 vector<string> written_by_syns = {"written by", "according to", "as proclaimed by", "in the words of"}; //synynoms for "written by" - to spruce things ups
 
+//returns the roman numeral equivalent of an entered value
+string roman_numerals(int number){
+    string roman_numerals = "";
+    
+    //MAGNITUDE: 1000's
+    //DETERMINE M's (Simple, Inelegant... TODO: Come up with further ROMAN NUMERALS)
+    int num_M = number / 1000;
+    number = number - (num_M * 1000);
+    for(int i = 0; i<num_M; i++){
+        roman_numerals.append("M");
+    }
+    
+    //MAGNITUDE: 100's
+    //DETERMINE C's and D's (maybe CM/CD)
+    int num_C = number / 100;
+    number = number - (num_C * 100);
+    //If 9, put CM
+    if(num_C == 9){
+        roman_numerals.append("CM");
+        num_C = 0; //set to 0, so we don't add any more in this 10's magnitude
+    }
+    //Determine if need D ( > 5 )
+    if(num_C >= 5){
+        roman_numerals.append("D");
+        num_C = num_C - 5;
+    }
+    //If 4, put CD
+    if(num_C == 4){
+        roman_numerals.append("CD");
+        num_C = 0;
+    }
+    //Put remaining C's
+    for(int i = 0; i<num_C; i++){
+        roman_numerals.append("C");
+    }
+    
+    //MAGNITUDE: 10's
+    //DETERMINE X's and L's (maybe XC/XL)
+    int num_X = number / 10;
+    number = number - (num_X * 10);
+    //If 9, put XC
+    if(num_X == 9){
+        roman_numerals.append("XC");
+        num_X = 0; //set to 0, so we don't add any more in this 10's magnitude
+    }
+    //Determine if need L ( > 5 )
+    if(num_X >= 5){
+        roman_numerals.append("L");
+        num_X = num_X - 5;
+    }
+    //If 4, put XL
+    if(num_X == 4){
+        roman_numerals.append("XL");
+        num_X = 0;
+    }
+    //Put remaining X's
+    for(int i = 0; i<num_X; i++){
+        roman_numerals.append("X");
+    }
+    
+    //MAGNITUDE: 1's
+    //DETERMINE I's and V's (maybe IX/IV)
+    int num_I = number / 1;
+    number = number - (num_I * 1);
+    //If 9, put IX
+    if(num_I == 9){
+        roman_numerals.append("IX");
+        num_I = 0; //set to 0, so we don't add any more in this 10's magnitude
+    }
+    //Determine if need V ( > 5 )
+    if(num_I >= 5){
+        roman_numerals.append("V");
+        num_I = num_I - 5;
+    }
+    //If 4, put IV
+    if(num_I == 4){
+        roman_numerals.append("IV");
+        num_I = 0;
+    }
+    //Put remaining I's
+    for(int i = 0; i<num_I; i++){
+        roman_numerals.append("I");
+    }
+    
+    return roman_numerals;
+}
+
+
 
 /////////////////
 //LAW CLASS
@@ -389,38 +477,13 @@ vector<string> hexagrams = {
     "Not Yet Fording"
 };
 
-vector<string> fave_color_names = {
-    "Cloudy blue",
-    "Dark pastel green",
-    "Dust",
-    "Electric lime",
-    "Fresh green",
-    "Light eggplant",
-    "Nasty green",
-    "Really light blue",
-    "Tea",
-    "Warm purple",
-    "Yellowish tan",
-    "Cement",
-    "Dark grass green",
-    "Dusty teal",
-    "Grey teal",
-    "Macaroni and cheese",
-    "Pinkish tan",
-    "Spruce",
-    "Strong blue",
-    "Toxic green",
-    "Windows blue",
-    "Blue blue",
-    "Blue with a hint of purple",
-    "Booger",
-    "Bright sea green",
-    "Dark green blue",
-    "Deep turquoise",
-    "Green teal",
-    "Strong pink",
-    "Bland",
-    "Deep aqua",
+vector<string> fave_color_names = {"Cloudy blue","Dark pastel green","Dust","Electric lime","Fresh green","Light eggplant",
+    "Nasty green","Really light blue",
+    "Tea","Warm purple",
+    "Yellowish tan","Cement","Dark grass green",
+    "Dusty teal","Grey teal","Macaroni and cheese",
+    "Pinkish tan","Spruce","Strong blue",
+    "Toxic green","Windows blue","Blue blue","Blue with a hint of purple","Booger","Bright sea green","Dark green blue","Deep turquoise","Green teal","Strong pink","Bland","Deep aqua",
     "Lavender pink",
     "Light moss green",
     "Light seafoam green",
@@ -556,52 +619,32 @@ vector<string> fave_color_names = {
     "Warm blue",
     "Dark hot pink",
     "Deep sea blue",
-    "Carmine",
-    "Dark yellow green",
+    "Carmine","Dark yellow green",
     "Pale peach",
     "Plum purple",
     "Golden rod",
     "Neon red",
     "Old pink",
-    "Very pale blue",
-    "Blood orange",
-    "Grapefruit",
-    "Sand yellow",
-    "Clay brown",
+    "Very pale blue","Blood orange","Grapefruit",
+    "Sand yellow","Clay brown",
     "Dark blue grey",
-    "Flat green",
-    "Light green blue",
-    "Warm pink",
-    "Dodger blue",
-    "Gross green",
-    "Ice",
-    "Metallic blue",
-    "Pale salmon",
-    "Sap green",
-    "Algae",
-    "Bluey grey",
-    "Greeny grey",
-    "Highlighter green",
+    "Flat green","Light green blue","Warm pink",
+    "Dodger blue",    "Gross green",
+    "Ice",    "Metallic blue","Pale salmon","Sap green",
+    "Algae",    "Bluey grey","Greeny grey","Highlighter green",
     "Light light blue",
     "Light mint",
     "Raw umber",
     "Vivid blue",
-    "Deep lavender",
-    "Dull teal",
-    "Light greenish blue",
-    "Mud green",
-    "Pinky",
-    "Red wine",
-    "Shit green",
-    "Tan brown",
-    "Darkblue",
+    "Deep lavender","Dull teal","Light greenish blue",
+    "Mud green","Pinky",
+    "Red wine","Shit green",
+    "Tan brown","Darkblue",
     "Rosa",
-    "Lipstick",
-    "Pale mauve",
+    "Lipstick","Pale mauve",
     "Claret",
     "Dandelion",
-    "Orangered",
-    "Poop green",
+    "Orangered","Poop green",
     "Ruby",
     "Dark",
     "Greenish turquoise",
@@ -620,47 +663,28 @@ vector<string> fave_color_names = {
     "Dark sand",
     "Purple/blue",
     "Saffron",
-    "Twilight",
-    "Warm brown",
+    "Twilight","Warm brown",
     "Bluegrey",
-    "Bubble gum pink",
-    "Duck egg blue",
+    "Bubble gum pink","Duck egg blue",
     "Greenish cyan",
     "Petrol",
     "Royal",
-    "Butter",
-    "Dusty orange",
+    "Butter","Dusty orange",
     "Off yellow",
     "Pale olive green",
-    "Orangish",
-    "Leaf",
+    "Orangish","Leaf",
     "Light blue grey",
     "Dried blood",
     "Lightish purple",
-    "Rusty red",
-    "Lavender blue",
+    "Rusty red","Lavender blue",
     "Light grass green",
     "Light mint green",
-    "Sunflower",
-    "Velvet",
+    "Sunflower","Velvet",
     "Brick orange",
-    "Lightish red",
-    "Pure blue",
-    "Twilight blue",
-    "Violet red",
-    "Yellowy brown",
-    "Carnation",
-    "Muddy yellow",
-    "Dark seafoam green",
-    "Deep rose",
-    "Dusty red",
-    "Grey/blue",
-    "Lemon lime",
-    "Purple/pink",
-    "Brown yellow",
+    "Lightish red","Pure blue","Twilight blue","Violet red","Yellowy brown","Carnation","Muddy yellow","Dark seafoam green","Deep rose","Dusty red","Grey/blue","Lemon lime","Purple/pink",
+"Brown yellow",
     "Purple brown",
-    "Wisteria",
-    "Banana yellow",
+    "Wisteria","Banana yellow",
     "Lipstick red",
     "Water blue",
     "Brown grey",
@@ -1415,52 +1439,20 @@ vector<vector<int>> fave_rgb_colors = {
     {31, 99, 87},    {1, 115, 116},
     {12, 181, 119},    {255, 7, 137},
     {175, 168, 139},    {8, 120, 127},
-    {221, 133, 215},    {166, 200, 117},
-    {167, 255, 181},    {194, 183, 9},
-    {231, 142, 165},    {150, 110, 189},
-    {204, 173, 96},    {172, 134, 168},
-    {148, 126, 148},
-    {152, 63, 178},
-    {255, 99, 233},
-    {178, 251, 165},
-    {99, 179, 101},
-    {142, 229, 63},
-    {183, 225, 161},
-    {255, 111, 82},
-    {189, 248, 163},
-    {211, 182, 131},
-    {255, 252, 196},
-    {67, 5, 65},
-    {255, 178, 208},
-    {153, 117, 112},
-    {173, 144, 13},
-    {196, 142, 253},
-    {80, 123, 156},
-    {125, 113, 3},
-    {255, 253, 120},
-    {218, 70, 125},
-    {65, 2, 0},
-    {201, 209, 121},
-    {255, 250, 134},
-    {86, 132, 174},
-    {107, 124, 133},
-    {111, 108, 10},
-    {126, 64, 113},
-    {0, 147, 55},
-    {208, 228, 41},
-    {255, 249, 23},
-    {29, 93, 236},
-    {5, 73, 7},
+    {221, 133, 215},    {166, 200, 117},{167, 255, 181},    {194, 183, 9},{231, 142, 165},    {150, 110, 189},{204, 173, 96},    {172, 134, 168},
+    {148, 126, 148},{152, 63, 178},{255, 99, 233},{178, 251, 165},{99, 179, 101},{142, 229, 63},
+    {183, 225, 161},{255, 111, 82},{189, 248, 163},{211, 182, 131},{255, 252, 196},{67, 5, 65},{255, 178, 208},{153, 117, 112},{173, 144, 13},{196, 142, 253},
+{80, 123, 156},{125, 113, 3},{255, 253, 120},{218, 70, 125},{65, 2, 0},{201, 209, 121},
+    {255, 250, 134},{86, 132, 174},{107, 124, 133},{111, 108, 10},
+    {126, 64, 113},{0, 147, 55},{208, 228, 41},{255, 249, 23},{29, 93, 236},{5, 73, 7},
     {181, 206, 8},
     {143, 182, 123},
     {200, 255, 176},
-    {253, 222, 108},
-    {255, 223, 34},
+    {253, 222, 108},{255, 223, 34},
     {169, 190, 112},
     {104, 50, 227},
     {253, 177, 71},
-    {199, 172, 125},
-    {255, 243, 154},
+    {199, 172, 125},{255, 243, 154},
     {133, 14, 4},
     {239, 192, 254},
     {64, 253, 20},
@@ -1495,24 +1487,19 @@ vector<vector<int>> fave_rgb_colors = {
     {123, 242, 218},
     {188, 245, 166},
     {202, 107, 2},
-    {16, 122, 176},
-    {33, 56, 171},
-    {113, 159, 145},
+{16, 122, 176},
+    {33, 56, 171},{113, 159, 145},
     {253, 185, 21},
     {254, 252, 175},
     {252, 246, 121},
     {29, 2, 0},
-    {203, 104, 67},
-    {49, 102, 138},
+    {203, 104, 67},{49, 102, 138},
     {36, 122, 253},
     {255, 255, 182},
-    {144, 253, 169},
-    {134, 161, 125},
+    {144, 253, 169},{134, 161, 125},
     {253, 220, 92},
-    {120, 209, 182},
-    {19, 187, 175},
-    {251, 95, 252},
-    {32, 249, 134},
+    {120, 209, 182},{19, 187, 175},
+    {251, 95, 252},{32, 249, 134},
     {255, 227, 110},
     {157, 7, 89},
     {58, 24, 177},
@@ -2525,9 +2512,67 @@ int find_zodiac_element(int z){
 }
 
 
+//////////////////
+//HOTEL
 
+vector<string> wine_aromas = {
+    //Primary
+    "iris", "peony", "elderflower", "acacia", "lilac", "jasmine", "honeysuckle", "violet", "lavender", "rose", "potpourri", "hibiscus",
+    "lime", "lemon", "grapefruit", "orange", "marmalade",
+    "quince", "apple", "pear", "nectarine", "peach", "apricot", "persimmon",
+    "pineapple", "mango", "guava", "passion fruit", "lychee", "bubblegum",
+    "cranberry", "red plum", "pomegranate", "sour cherry", "strawberry", "cherry", "raspbery",
+    "boysenberry", "black currant", "black cherry", "plum", "blackberry", "blueberry", "olive",
+    "raisin", "fig", "date", "fruitcake",
+    "beeswax", "ginger", "honey",
+    "white pepper", "red pepper", "black pepper", "cinnamon", "anise", "5-spice", "fennel", "eucalyptus", "mint", "thyme",
+    "grass", "tomato leaf", "gooseberry", "bell pepper", "jalapeno", "bitter almond", "tomato", "sun-dried tomato", "black tea",
+    "clay pot", "slate", "wet gravel", "potting soil", "red beet", "volcanic rocks", "petroleum",
+    
+    //Secondary
+    "butter", "cream", "sourdough", "lager", "truffle", "mushroom",
+    
+    //Tertiary
+    "vanilla", "coconut", "baking spices", "cigar box", "smoke", "dill",
+    "dried fruit", "nuts", "tobacco", "coffee", "cocoa", "leather",
+    
+    //Faults & Other
+    "musty cardboard", "wet dog",
+    "cured meat", "boiled eggs", "burnt rubber", "lit match", "garlic", "onion", "cat pee",
+    "black cardamon", "band-aid", "sweaty leather saddle", "horse manure",
+    "toffee", "stewed fruit",
+    "vinegar", "nail polish remover"
+    
+};
+vector<string> wine_sweetness = {"sweet", "semi-sweet", "dry", "sparkling"};
 
-
+//Generates a wine name with a saint, vintage year, sweetness level, and fruit/aroma taste
+//Ex. Saint Calire's wine MCXLII. It's semi-sweet with a hints of ___, ___, and ___.
+string genWine(){
+    
+    string wine_name = "";
+    wine_name.append(saints[rand()%saints.size()]);
+    wine_name.append("'s ");
+    wine_name.append("wine ");
+    wine_name.append(roman_numerals(rand()%2010));
+    wine_name.append(". It's ");
+    wine_name.append(wine_sweetness[rand()%wine_sweetness.size()]);
+    wine_name.append(" with hints of ");
+    wine_name.append(wine_aromas[rand()%wine_aromas.size()]);
+    wine_name.append(", ");
+    wine_name.append(wine_aromas[rand()%wine_aromas.size()]);
+    wine_name.append(", and ");
+    wine_name.append(wine_aromas[rand()%wine_aromas.size()]);
+    wine_name.append(".");
+    
+    //As far as meta-data, every wine bottle should have a cork-and-lebel type
+//    wine_name.append(" It has a ");
+//    wine_name.append(genClothName());
+//    wine_name.append(" cork and label.");
+    
+    return wine_name;
+    
+}
 
 
 
