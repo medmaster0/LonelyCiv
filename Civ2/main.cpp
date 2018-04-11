@@ -58,6 +58,8 @@ vector<Sprite> map_shrooms; //a list of all shroom sprites on map
 
 //Effects Stuff
 vector<vector<Effect>> map_effects; //a list of list of effects on a tile. Index corresponds to [y*map_width + x]
+//Animation Stuff
+vector<vector<Animation>> map_animations; //a list of list of animations on a tile. Index corresponds to [y*map_width + x]
 
 SDL_Texture** misc_tiles; //Symbols and Effects Tile Stuff misc. (tiles (symbols, effects, etc.)
 
@@ -365,6 +367,11 @@ void loadTiles(){
     misc_tiles[19] = loadTexture("Civ2/Civ2/tiles/heartsPrim.png");
     misc_tiles[20] = loadTexture("Civ2/Civ2/tiles/sparklesPrim.png");
     misc_tiles[21] = loadTexture("Civ2/Civ2/tiles/smokePrim.png");
+    //Tiles for Fire Animation
+    misc_tiles[22] = loadTexture("Civ2/Civ2/tiles/fire_animate/T1Prim.png");
+    misc_tiles[23] = loadTexture("Civ2/Civ2/tiles/fire_animate/T2Prim.png");
+    misc_tiles[24] = loadTexture("Civ2/Civ2/tiles/fire_animate/T3Prim.png");
+    misc_tiles[25] = loadTexture("Civ2/Civ2/tiles/fire_animate/T4Prim.png");
     
 }
 
@@ -407,6 +414,7 @@ void init_items(){
     map_tents.resize(map_width*map_height);
     map_workshops.resize(map_width*map_height);
     map_effects.resize(map_width*map_height);
+    map_animations.resize(map_width*map_height);
     
     //we're going to create 300 random items (basic first kind)
     //we have to generate items, and also add them to the correct element in the array
@@ -487,16 +495,16 @@ void init_items(){
         map_scenery[(tempy*map_width)+tempx].push_back(temp_item);
     }
     
-    //create random wine
-    for(int g = 0 ; g<32; g++){
-        tempx = rand()%(map_width);
-        tempy = rand()%(map_height);
-        temp_tile = 316;
-        //Item temp_item = Item(tempx, tempy, temp_tile,generate_brown(),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-        Item temp_item = Item(tempx, tempy, temp_tile,{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-//        Item temp_item = Item(tempx, tempy, temp_tile,color_to_pastel({static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255}),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-        map_items[(tempy*map_width)+tempx].push_back(temp_item);
-    }
+//    //create random wine
+//    for(int g = 0 ; g<32; g++){
+//        tempx = rand()%(map_width);
+//        tempy = rand()%(map_height);
+//        temp_tile = 316;
+//        //Item temp_item = Item(tempx, tempy, temp_tile,generate_brown(),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
+//        Item temp_item = Item(tempx, tempy, temp_tile,{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
+////        Item temp_item = Item(tempx, tempy, temp_tile,color_to_pastel({static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255}),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
+//        map_items[(tempy*map_width)+tempx].push_back(temp_item);
+//    }
     
 //    //create random beer
 //    for(int g = 0 ; g<32; g++){
@@ -509,27 +517,35 @@ void init_items(){
 //        map_items[(tempy*map_width)+tempx].push_back(temp_item);
 //    }
     
-    //create random test assets
-    for(int g = 0 ; g<64; g++){
-        tempx = rand()%(map_width);
-        tempy = rand()%(map_height);
-        temp_tile = 314;
-        //Item temp_item = Item(tempx, tempy, temp_tile,generate_brown(),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-        Item temp_item = Item(tempx, tempy, temp_tile,{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-//        Item temp_item = Item(tempx, tempy, temp_tile,color_to_pastel({static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255}),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-        map_items[(tempy*map_width)+tempx].push_back(temp_item);
-    }
+//    //create random test assets
+//    for(int g = 0 ; g<64; g++){
+//        tempx = rand()%(map_width);
+//        tempy = rand()%(map_height);
+//        temp_tile = 314;
+//        //Item temp_item = Item(tempx, tempy, temp_tile,generate_brown(),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
+//        Item temp_item = Item(tempx, tempy, temp_tile,{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
+////        Item temp_item = Item(tempx, tempy, temp_tile,color_to_pastel({static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255}),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
+//        map_items[(tempy*map_width)+tempx].push_back(temp_item);
+//    }
     
     
-    //DEBUG, Create some effects
-    for(int e = 0; e<5; e++){
-        tempx = rand()%(map_width);
-        tempy = rand()%(map_height);
-        temp_tile = rand()%3;
-        Effect temp_effect = Effect(tempx, tempy, temp_tile);
-        map_effects[(tempy*map_width)+tempx].push_back(temp_effect);
-    }
+//    //DEBUG, Create some effects
+//    for(int e = 0; e<5; e++){
+//        tempx = rand()%(map_width);
+//        tempy = rand()%(map_height);
+//        temp_tile = rand()%3;
+//        Effect temp_effect = Effect(tempx, tempy, temp_tile);
+//        map_effects[(tempy*map_width)+tempx].push_back(temp_effect);
+//    }
     
+//    //DEBUG, Create some animations
+//    for(int e = 0; e<10; e++){
+//        tempx = rand()%(map_width);
+//        tempy = rand()%(map_height);
+//        int list[4] = {22, 23, 24, 25};
+//        Animation temp_animation = Animation(tempx, tempy, list);
+//        map_animations[(tempy*map_width)+tempx].push_back(temp_animation);
+//    }
     
     
     block_map = new bool[map_width*map_height](); //initialize a dynamically sized blocked map
@@ -625,8 +641,9 @@ void init_creatures(){
     
     //Creatures
     int num_creatures = 15; //How many creatures are on the map
+    //int num_creatures = 1; //DEBUG How many creatures are on the map
     for(int i = 0 ; i < num_creatures; i++){
-        Sprite temp_cre = Sprite(1+rand()%(map_width-2), 1+rand()%(map_height-1));
+        Sprite temp_cre = Sprite(1+rand()%(map_width-2), 1+rand()%(map_height-2));
         temp_cre.loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
         map_creatures.push_back(temp_cre);
 
@@ -706,6 +723,17 @@ void draw_effects(){
         for(int j = 0 ; j < map_effects[i].size(); j++){
             //map_effects[i][j].draw(gRenderer);
             map_effects[i][j].drawScroll(gRenderer);
+        }
+    }
+}
+
+//Draws all of the animations
+void draw_animations(){
+    //Cycle through all effects on map
+    for(int i = 0; i < map_animations.size(); i++){
+        for(int j = 0 ; j < map_animations[i].size(); j++){;
+            //printf("drawing anme");
+            map_animations[i][j].draw(gRenderer, misc_tiles);
         }
     }
 }
@@ -1247,11 +1275,13 @@ void shroom_depo_thread(Sprite* spr1){
         spr1->path.pop_back();
         
         //Check if done with path
-        if(spr1->path.size()<=1){ //then it's empty
+        if(spr1->path.empty()){ //then it's empty
             
             //now switch the item into the shroom inventory
             map_shrooms[shroom_index].inventory.push_back(spr1->inventory[ spr1->inventory.size() - 1 ]);
             spr1->inventory.pop_back();
+            
+            printf("shroom done\n");
             
             spr1->inThread = false;
             break;
@@ -1274,25 +1304,25 @@ void shroom_depo_thread(Sprite* spr1){
 //Travels to proper tile
 //picks up item (if it's still there)
 void gather_thread(Sprite* spr1){
-    
+
     //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
     spr1->move_timer = SDL_GetTicks(); //start move timer
     int steps_to_pop = 0; //how many steps need to be popped off path
     int carry_over = 0; //how many ticks were rounded off
-    
+
     int color_thresh = 100; //the maximum difference between item color and fave color,  allowable
-    int search_item = 313; //the item type we are searching for
-    
+    //int search_item = 313; //the item type we are searching for
+
     //spr1->path.clear(); //clear path and start clean
-    
+
     while(true){
-        
+
         //find a new target path
         if(spr1->path.empty()){ //if path is empty
             faveColorSearch(spr1, color_thresh);
             //itemTypeSearch(spr1, search_item);
         }
-        
+
         //Check if the search failed (error code (9999,9999)
         if(spr1->path[0][0] == 9999){
             spr1->path.pop_back();
@@ -1303,7 +1333,7 @@ void gather_thread(Sprite* spr1){
             spr1->inThread = false;
             break;
         }
-        
+
         //STANDARD MOVEMENT TIMING CALCULATIONS
         //Determine how many steps have to be moved while time has passed
         steps_to_pop = ( (SDL_GetTicks() - spr1->move_timer)*(spr1->move_speed/1000.0) );
@@ -1319,7 +1349,7 @@ void gather_thread(Sprite* spr1){
             }
         }
         //END MOVEMENT TIMING
-        
+
         vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
         //Now actually move
         spr1->moveTo(next_step[0], next_step[1]);
@@ -1327,18 +1357,18 @@ void gather_thread(Sprite* spr1){
         //        spr1->y = next_step[1];
         //pop off the step from path
         spr1->path.pop_back();
-        
+
         //If we've reach target...
         if(spr1->path.empty()){
-            
+
             //now look on tile and check if item is still there and pick up
             for(int i = 0; i < map_items[(spr1->y*map_width)+spr1->x].size(); i++){
                 if(color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor)<color_thresh ||
                    color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor2)<color_thresh){
                     //if(map_items[(spr1->y*map_width)+spr1->x][i].type == search_item){
-                    
+
                     pickUpItem(spr1, spr1->x, spr1->y, i); //then pick up the item
-                    
+
                     //Start trek to shroom depot...
                     //we're going to transfer it to another thread...
                     free_path(*spr1); //clear old path
@@ -1347,15 +1377,17 @@ void gather_thread(Sprite* spr1){
                     //std::thread shroomDepoObj(shroom_depo_thread, spr1);
                     std::thread shroomDepoObj(shroom_depo_thread, spr1);
                     shroomDepoObj.detach();
+                    if(spr1->inThread){printf("passing to shroom\n");}
+                    if(spr1->isNeededByThread){printf("is neeeded'\n");}
                     return;
-                    
+
                 }
-                
+
             }
-            
+
             //break;
         }
-        
+
         //STANDARD MOVEMENT TIMER UPDATE SEQUENCE
         //First, determine how much carry-over we need to keep (time we haven't accounted for due to rounding
         carry_over = (SDL_GetTicks() - spr1->move_timer); //How much time we have on timer, total
@@ -1363,7 +1395,7 @@ void gather_thread(Sprite* spr1){
         //carry_over now has how many ticks we haven't updated for
         spr1->move_timer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
         //SDL_Delay(500);
-        
+
     }
     spr1->inThread = false; //if it reaches here and exits ,then clear flag
     return;
@@ -1374,12 +1406,15 @@ void gather_thread(Sprite* spr1){
 //Takes care of setting the path and walking to
 //Will turn off the inThread flag when finished
 //Makes spr1 walk to coord (x,y)
+//INPUTTED CREATURE spr1 MUST HAVE EMPTY PATH!!!!
 void walk_to_thread(Sprite* spr1, int to_x, int to_y){
     
     //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
     spr1->move_timer = SDL_GetTicks(); //start move timer
     int steps_to_pop = 0; //how many steps need to be popped off path
     int carry_over = 0; //how many ticks were rounded off
+    
+    free_path(*spr1); //clear old path
     
     while(true){
         
@@ -1391,6 +1426,7 @@ void walk_to_thread(Sprite* spr1, int to_x, int to_y){
         //Check if the search failed (error code (9999,9999)
         if(spr1->path[0][0] == 9999){
             spr1->path.pop_back();
+            printf("search failed");
             continue; //search failed, try again....
         }
         
@@ -1415,7 +1451,7 @@ void walk_to_thread(Sprite* spr1, int to_x, int to_y){
         spr1->path.pop_back();
         
         //Check if done with path
-        if(spr1->path.size()<=1){ //then it's empty
+        if(spr1->path.size()<1){ //then it's empty
             spr1->inThread = false;
             break;
         }
@@ -1428,12 +1464,152 @@ void walk_to_thread(Sprite* spr1, int to_x, int to_y){
         spr1->move_timer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
         
     }
+    free_path(*spr1); //clear old path
     return;
     
 }
 
+////a thread for picking up items of your favorite color
+////Call the faveColorSearch algorithm
+////Travels to proper tile
+////picks up item (if it's still there)
+////REDOING THREADS TO MAKE USE OF GENERIC WALK-TO-THREAD
+//void gather_thread_WALKTO(Sprite* spr1){
+//
+//    int color_thresh = 100; //the maximum difference between item color and fave color,  allowable
+//
+//    //FIRST, PERFORM SEARCH
+//    //find a new target path
+//    if(spr1->path.empty()){ //if path is empty
+//        faveColorSearch(spr1, color_thresh);
+//        //itemTypeSearch(spr1, search_item);
+//    }
+//
+//    //Check if the search failed (error code (9999,9999)
+//    if(spr1->path[0][0] == 9999){
+//        spr1->path.pop_back();
+//        //continue; //search failed, try again....
+//        //search failed
+//        //EXPIRE THREAD:
+//        printf("can't gather");
+//        spr1->inThread = false;
+//        return;
+//    }
+//    ///////////////////////////////////////
+//
+//    //SECOND, WALK TO ITEM
+//    //Start walking to location (last member of returned search array
+//    //Spawns a new thread (GNERIC walk_to_thread), and waits for it to finish (join)
+//    int loc_x = spr1->path[spr1->path.size()-1][0];
+//    int loc_y = spr1->path[spr1->path.size()-1][1];
+//    std::thread walkToObj(walk_to_thread, spr1, loc_x, loc_y);
+//    //walkToObj.detach();
+//    walkToObj.join(); //block (wait for it to complete)
+//
+//    //Once there, pick up item
+//    //now look on tile and check if item is still there and pick up
+//    for(int i = 0; i < map_items[(spr1->y*map_width)+spr1->x].size(); i++){
+//        if(color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor)<color_thresh ||
+//           color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor2)<color_thresh){
+//            //if(map_items[(spr1->y*map_width)+spr1->x][i].type == search_item){
+//
+//            pickUpItem(spr1, spr1->x, spr1->y, i); //then pick up the item
+//
+//            //Start trek to shroom depot...
+//            //we're going to transfer it to another thread...
+//            //spr1->inThread = false; //we can keep the status as true since we're changing threads.( normally have to set this flag)
+//            //This thread makes the creature go to shroom
+//            std::thread shroomDepoObj(shroom_depo_thread, spr1);
+//            shroomDepoObj.detach();
+//            if(spr1->inThread){printf("passing to shroom\n");}
+//            if(spr1->isNeededByThread){printf("is neeeded'\n");}
+//            return;
+//
+//        }
+//    }
+//
+//    //If still can't find suitable item after searching, return and exit thread
+//    spr1->inThread = false;
+//    return;
+//
+//}
+
+//Thread that performs a ritual
+//spawns other threads (walkTo) and also handles isNeededByThread flag
+void perform_ritual_thread(Sprite* spr1){
+    
+    //determine random ritual location
+    //TODO: Make sure location isn't blocked or have an animation on currently
+    int loc_x = 1+(rand()%(map_width-2));
+    int loc_y = 1+(rand()%(map_height-2));
+    
+    //Firstly, indicate to the sprites that we need them...
+    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
+    //mainly used for OTHER creatures, outside thread...
+    spr1->isNeededByThread = true;
+    
+    //Start walking to location
+    std::thread walkToObj(walk_to_thread, spr1, loc_x+1, loc_y);
+    walkToObj.detach();
+    //walkToObj.join(); //block (wait for it to complete)
+    
+    //Wait for spr1 to get to destination (walk_to_thread signals end by setting inThread to false)
+    while(true){
+        
+//        //Check if spr1 reached the proper desitnation??
+//        if( (spr1->x-1 == loc_x) && (spr1->y == loc_y) ){
+//            printf("got there\n");
+//        }
+        
+        //if done with walk_to_thread
+        if(spr1->inThread == false){
+            
+            //Start a fire Animation (standard protocol)
+            int list[4] = {22, 23, 24, 25};
+            Animation temp_animation = Animation(loc_x, loc_y, list);
+            map_animations[ ( (loc_y) * map_width ) + (loc_x) ].push_back(temp_animation);
+            
+            //Start Timer on sprite
+            spr1->thread_timer = SDL_GetTicks();
+            
+            break; //break out of wait loop
+        }
+        
+    }
+    
+    //Now wait a certain amount of time to complete ritual
+    while(true){
+        
+        if(SDL_GetTicks() > spr1->thread_timer + 10000){ //waiting 10 seconds
+            
+            //BREAK OUT OF RITUAL
+            
+            //Turn off flags
+            spr1->inThread = false;
+            spr1->isNeededByThread = false;
+            
+            //Delete Animation Object
+            // erase the 6th element
+            //myvector.erase (myvector.begin()+5);
+            if(map_animations[(loc_y*map_width)+loc_x].size()>0){ //make sure the animation in question is still there...
+                printf("delete ritual at: %d,%d    im at: %d,%d\n",loc_x,loc_y,spr1->x,spr1->y);
+                //printf("im at: %d,%d\n",spr1->x,spr1->y);
+                map_animations[(loc_y*map_width)+loc_x].erase(map_animations[(loc_y*map_width)+loc_x].begin());
+            }
+            
+            break;
+            
+        }
+        
+    }
+    
+    return;
+    
+}
 
 //periodically gives a new task to creatures
+//This function starts threads and sets inThread flag = true
+//**Individual spawned threads are responsible for inThread flag = false again
 void task_creatures_thread(){
     
     short choice = 0; //decides which thread to run
@@ -1442,12 +1618,19 @@ void task_creatures_thread(){
         
         //cycle through all creatures
         for(int i = 0; i < map_creatures.size(); i++){
+            
+            //Check if isNeededByThread flag is set (indicating another thread will take responsibility for setting flags )
+            if(map_creatures[i].isNeededByThread == true){
+                continue; //don't do anything to creature
+            }
+            
             if(map_creatures[i].inThread == false){ //we need to assign it a new thread
                 //map_creatures[i].path.clear(); //clear the old path
                 free_path(map_creatures[i]);//clear old path, fuction to individually delete path
                 map_creatures[i].thread_timer = time(NULL);
                 map_creatures[i].inThread = true;
-                choice = rand()%2;
+                //choice = rand()%3;
+                choice = rand()%2 * 2; 
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
@@ -1464,12 +1647,12 @@ void task_creatures_thread(){
                         break;
                     }
                         
-//                    case 2: {
-//                        //This thread makes the creatures walk somewhere specifc
-//                        std::thread walkToObj(walk_to_thread, &map_creatures[i], 20, 20);
-//                        walkToObj.detach();
-//                        break;
-//                    }
+                    case 2: {
+                        //This thread makes the creatures walk somewhere specifc
+                        std::thread ritualObj(perform_ritual_thread, &map_creatures[i]);
+                        ritualObj.detach();
+                        break;
+                    }
                 }
             }
         }
@@ -1591,16 +1774,15 @@ void regen_weedz_thread(){
                     }
                 }
                 
-                
-                //Create an dual-tone item
-                //item_id = rand()%300; //pick a random item id
-                item_id = (313+rand()%3); //pick a random item id
-                printf("spawn: %d\n", item_id);
-                //Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(colorz[item_id][0]), static_cast<Uint8>(colorz[item_id][1]), static_cast<Uint8>(colorz[item_id][2]),255},{255,255,255,0} ); //temporary item
-                //Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{255,255,255,0} ); //temporary item
-                Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
-                map_items[y*map_width+x].push_back(temp_item);
-                SDL_Delay(5000);
+//                //Create an dual-tone item
+//                //item_id = rand()%300; //pick a random item id
+//                item_id = (313+rand()%3); //pick a random item id
+//                printf("spawn: %d\n", item_id);
+//                //Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(colorz[item_id][0]), static_cast<Uint8>(colorz[item_id][1]), static_cast<Uint8>(colorz[item_id][2]),255},{255,255,255,0} ); //temporary item
+//                //Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{255,255,255,0} ); //temporary item
+//                Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
+//                map_items[y*map_width+x].push_back(temp_item);
+//                SDL_Delay(5000);
                 
                 x = rand()%map_width;
                 y = rand()%map_height;
@@ -1608,10 +1790,9 @@ void regen_weedz_thread(){
                 //Create a basic single-tone item
                 //item_id = rand()%300; //pick a random item id
                 item_id = (310+rand()%3); //pick a random item id
-                printf("spawn: %d\n", item_id);
                 //Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(colorz[item_id][0]), static_cast<Uint8>(colorz[item_id][1]), static_cast<Uint8>(colorz[item_id][2]),255},{255,255,255,0} ); //temporary item
                 //Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{255,255,255,0} ); //temporary item
-                temp_item = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{255, 255, 255,0} ); //temporary item
+                Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{255, 255, 255,0} ); //temporary item
                 map_items[y*map_width+x].push_back(temp_item);
                 SDL_Delay(5000);
                 
@@ -2058,7 +2239,6 @@ int main( int argc, char* args[] ){
         
         draw_items();
         draw_creatures();
-        draw_effects();
         
         //drawTexture(gRenderer, text1, 5, 5);
         
@@ -2067,6 +2247,7 @@ int main( int argc, char* args[] ){
         cre1->drawLight(gRenderer, item_tiles_p, item_tiles_s);
         cre3->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         
+        draw_animations();
         draw_effects();
         
         //Draw Display windows

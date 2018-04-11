@@ -103,3 +103,53 @@ void Effect::drawScroll(SDL_Renderer* gRenderer){
     
 }
 
+//CONSTRUCTOR FOR ANIMATION
+//Right now, tile_list_in must be a 4-element array of ints, speicfying seuqnece on animation
+Animation::Animation(int xp, int yp, int tile_list_in[]){
+    mWidth = 16;
+    mHeight = 16;
+    x = xp;
+    y = yp;
+    animate_index = 0;
+    tile_list[0] = tile_list_in[0];
+    tile_list[1] = tile_list_in[1];
+    tile_list[2] = tile_list_in[2];
+    tile_list[3] = tile_list_in[3];
+    
+    animate_timer = SDL_GetTicks(); //start timer bitch
+    
+}
+
+void Animation::draw(SDL_Renderer* gRenderer, SDL_Texture** misc_tiles){
+    
+    //determine if need to change tile index, animate_index
+    if(SDL_GetTicks() > animate_timer + 100){ //if more than 1 second has passed since last tick
+    
+        //Update Animation tile index
+        animate_index = animate_index + 1;
+        if(animate_index >= 4){
+            animate_index = 0; 
+        }
+        
+        //Update Timer
+        animate_timer = SDL_GetTicks();
+        
+    }
+    
+    //determine the required tile
+    int tile = tile_list[animate_index];
+    
+    //Set rendering space and render to screen
+    SDL_Rect renderQuad = { x*16, y*16, mWidth, mHeight };
+    SDL_Rect* clip = NULL;
+    SDL_RenderCopy( gRenderer, misc_tiles[tile], clip, &renderQuad );//Render to screen
+}
+
+
+
+
+
+
+
+
+

@@ -100,6 +100,12 @@ string genCuss(){
 vector<string> written_by_syns = {"written by", "according to", "as proclaimed by", "in the words of"}; //synynoms for "written by" - to spruce things ups
 
 //returns the roman numeral equivalent of an entered value
+//TODO Extend ROMAN NUMERAL system beyond the digit M...
+// I,
+// V, X
+// L, C
+// D, M
+//New Extended System: J, W, Y, K, B, E, N (letter afterwards (unless taken, then you go backwards (L->M->K instead) )
 string roman_numerals(int number){
     string roman_numerals = "";
     
