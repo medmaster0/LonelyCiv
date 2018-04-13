@@ -26,8 +26,9 @@ public:
     Effect(int xp, int yp, int effect_type); //Constructor: input xy-pos and effect_type
     bool loadFromFile(std::string path); //load's the object's image from the specified path
     void draw(SDL_Renderer* gRenderer); //Draws the sprite to screen using stored MAP COORDS
-    void drawScroll(SDL_Renderer* gRenderer); //Draws the sprite effect but also scrolls
+    void drawScroll(SDL_Renderer* gRenderer, SDL_Texture** misc_tiles); //Draws the sprite effect but also scrolls
     int x,y,z; //the location of effect
+    SDL_Color color1; //the color of the effect
     //FOr Animation
 //    int animate_code; //determines how the sprite gets animated: 1: scroll, 2: sprite sheet sequence
 //    int animate_tiles[4]; //list of tiles used in the animation
@@ -37,6 +38,7 @@ private:
     int mHeight;//Image dimensions - pixels
     int r,g,b; //colors of the sprite
     int effect_type; //type of effect (code)
+    int tile_index; //the inddex that corresponds to the tile in misc_tiles that corresponds to our effect
     int scrollPos; //the position (in tile) where we draw the first line of the sprite in the scroll
     unsigned int animate_timer; //a timer used in animation
 };
@@ -47,6 +49,7 @@ public:
     Animation(int xp, int yp, int tile_list_in[]); //Constructor: input xy-pos and a list of tiles to follow
     void draw(SDL_Renderer* gRenderer, SDL_Texture** misc_tiles); //Draws the sprite to the screen using stored MAP COORDS, changes the tile periodically
     int x,y,z; //the location of the animation
+    //SDL_Color color1; //the color of the effect
     
 private:
     int mWidth;//Image dimensions - pixels

@@ -28,25 +28,27 @@ Effect::Effect(int xp, int yp, int type){
     y = yp;
     scrollPos = 0; 
     effect_type = type;
-    r = rand()%255;
-    g = rand()%255;
-    b = rand()%255;
     
     SDL_Color pink;
     SDL_Color gold; 
     switch (effect_type) {
-        case 0:
-            loadFromFile("/Users/medz/Documents/0/Cplus/Civ2/Civ2/tiles/heartsPrim.png");
-            pink = generate_pink();
-            SDL_SetTextureColorMod( primTexture,pink.r, pink.g, pink.b); //generate pinks
+        case 0: //LUVVY DUVVY HEARTS EFFECT
+            //loadFromFile("/Users/medz/Documents/0/Cplus/Civ2/Civ2/tiles/heartsPrim.png");
+            color1 = generate_pink(); //give effect a random shade of pink
+            tile_index = 19;
+            //SDL_SetTextureColorMod( primTexture,pink.r, pink.g, pink.b); //generate pinks
             break;
-        case 1:
-            loadFromFile("/Users/medz/Documents/0/Cplus/Civ2/Civ2/tiles/sparklesPrim.png");
-            SDL_SetTextureColorMod( primTexture,255,209,0); //nice shade of gold
+        case 1: //SPARKLES
+            //loadFromFile("/Users/medz/Documents/0/Cplus/Civ2/Civ2/tiles/sparklesPrim.png");
+            //SDL_SetTextureColorMod( primTexture,255,209,0); //nice shade of gold
+            color1 = {255,209,0,255}; //give the effect a nice shade of gold
+            tile_index = 20; //specify the correct tile index for our effect
             break;
-        case 2:
-            loadFromFile("/Users/medz/Documents/0/Cplus/Civ2/Civ2/tiles/smokePrim.png");
-            SDL_SetTextureAlphaMod( primTexture, 126); //modulate color, update to match the new one
+        case 2: //SHMOKE
+            //loadFromFile("/Users/medz/Documents/0/Cplus/Civ2/Civ2/tiles/smokePrim.png");
+            //SDL_SetTextureAlphaMod( primTexture, 126); //modulate color, update to match the new one
+            color1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 126};
+            tile_index = 21;
             break;
         default:
             break;
@@ -73,20 +75,24 @@ void Effect::draw(SDL_Renderer* gRenderer)
 
 }
 //Draws the sprite effect but also scrolls
-void Effect::drawScroll(SDL_Renderer* gRenderer){
-    //Set rendering space and render to screen
-    SDL_Rect* clip = NULL;
-    SDL_RendererFlip flippy = SDL_FLIP_NONE;
-    SDL_Rect renderQuad = { x*16, y*16, mWidth, mHeight };
+void Effect::drawScroll(SDL_Renderer* gRenderer, SDL_Texture** misc_tiles){
     
+    //Set up thw two rectangles used for displaying scrolling picture
+    SDL_RendererFlip flippy = SDL_FLIP_NONE; //don''t flip the picture
     SDL_Rect sourceQuad_1 = { 0,scrollPos,16,16-scrollPos}; //The first half of the scroll picture (on the texture) -> grab bottom portion
     SDL_Rect destQuad_1 = { x*16,y*16,16,16-scrollPos}; //where on the main map we should draw -> and stick it on top part of map tile
     
     SDL_Rect sourceQuad_2 = { 0,0,16,scrollPos}; //The second half of the scroll picture (on the texture) -> grab top portion
     SDL_Rect destQuad_2 = { x*16,(y*16)+(16-scrollPos),16,scrollPos}; //where on the main map we should draw -> and stick it on bottom part of map tile
-
-    SDL_RenderCopyEx(gRenderer, primTexture, &sourceQuad_1, &destQuad_1, 0, NULL, flippy);
-    SDL_RenderCopyEx(gRenderer, primTexture, &sourceQuad_2, &destQuad_2, 0, NULL, flippy);
+    
+    //Apply the specific color and alpha (if applicable) to effect.
+    SDL_SetTextureColorMod( misc_tiles[tile_index],color1.r, color1.g, color1.b);
+    if(effect_type == 2){ //if smoke effect type
+        SDL_SetTextureAlphaMod( misc_tiles[tile_index], 126); //modulate color, update to match the new one
+    }
+    
+    SDL_RenderCopyEx(gRenderer, misc_tiles[tile_index], &sourceQuad_1, &destQuad_1, 0, NULL, flippy);
+    SDL_RenderCopyEx(gRenderer, misc_tiles[tile_index], &sourceQuad_2, &destQuad_2, 0, NULL, flippy);
     //SDL_RenderCopyEx( gRenderer, primTexture, clip, &renderQuad );//Render to screen
     
     //Decide if it's time to tick the scroll

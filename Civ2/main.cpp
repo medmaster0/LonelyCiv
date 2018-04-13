@@ -274,7 +274,6 @@ void loadTiles(){
     item_tiles_p[302] = loadTexture("Civ2/Civ2/tiles/saxPrim.png");
     item_tiles_s[302] = loadTexture("Civ2/Civ2/tiles/saxSeco.png");
     item_tiles_t[302] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
-
     
     item_tiles_p[303] = loadTexture("Civ2/Civ2/tiles/celloPrim.png");
     item_tiles_s[303] = loadTexture("Civ2/Civ2/tiles/celloSeco.png");
@@ -722,7 +721,7 @@ void draw_effects(){
     for(int i = 0; i < map_effects.size(); i++){
         for(int j = 0 ; j < map_effects[i].size(); j++){
             //map_effects[i][j].draw(gRenderer);
-            map_effects[i][j].drawScroll(gRenderer);
+            map_effects[i][j].drawScroll(gRenderer, misc_tiles);
         }
     }
 }
@@ -1402,11 +1401,12 @@ void gather_thread(Sprite* spr1){
 }
 
 //General thread to make creature walk somewhere
-//Can someday be the premier go-to thread for walking to a specific coord
+//Can someday be the premier go-to thread for walking to a specific coord?
 //Takes care of setting the path and walking to
 //Will turn off the inThread flag when finished
 //Makes spr1 walk to coord (x,y)
 //INPUTTED CREATURE spr1 MUST HAVE EMPTY PATH!!!!
+//IN CHARGE OF FINDING PATH - BUT DOESN"T KNOW WHAT TO DO IF YOU CAN"T FIND A PATH!!!!
 void walk_to_thread(Sprite* spr1, int to_x, int to_y){
     
     //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
@@ -1431,13 +1431,13 @@ void walk_to_thread(Sprite* spr1, int to_x, int to_y){
         }
         
         //Determine how many steps have to be moved while time has passed
-        steps_to_pop = ( (SDL_GetTicks() - spr1->move_timer)*(spr1->move_speed/1000.0) );
+        steps_to_pop = ( (SDL_GetTicks() - spr1->move_timer)*(spr1->move_speed/1000.0) ); // (elapsed time * movement speed) / 1000 ms
         if(steps_to_pop <= 0){
             continue; //no steps need to be taken, continue
         }
         //Now pop off that many steps
         for(int j = 0 ; j < steps_to_pop-1 ; j++){
-            if(spr1->path.size()>1){ //if the path list is non-empty
+            if(spr1->path.size()>1){ //if the path list is non-empty (and has at least 1 element, which will be saved for actual movement)
                 //Need to register the skipped steps in "prev values"
                 spr1->moveTo(spr1->path[spr1->path.size()-1][0], spr1->path[spr1->path.size()-1][1]);
                 spr1->path.pop_back(); //pop off the last element (skip it)
@@ -1464,6 +1464,61 @@ void walk_to_thread(Sprite* spr1, int to_x, int to_y){
         spr1->move_timer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
         
     }
+    free_path(*spr1); //clear old path
+    return;
+    
+}
+
+//A thread that moves the input sprite along it's stored path
+//Thread is timed to reflect Sprite's movement speed
+//The sprite should have it's path set before starting this thread (or else it does nothing)
+void walk_path_thread(Sprite* spr1){
+    //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
+    spr1->move_timer = SDL_GetTicks(); //start move timer
+    int steps_to_pop = 0; //how many steps need to be popped off path
+    int carry_over = 0; //how many ticks were rounded off
+    
+    //Check to make sure path is non-empty
+    if(spr1->path.size() <= 0){
+        spr1->inThread = false;
+        return;
+    }
+    
+    while( true ){
+        //Determine how many steps have to be moved while time has passed
+        steps_to_pop = ( (SDL_GetTicks() - spr1->move_timer)*(spr1->move_speed/1000.0) ); // (elapsed time * movement speed) / 1000 ms
+        if(steps_to_pop <= 0){
+            continue; //no steps need to be taken, continue
+        }
+        //Now pop off that many steps
+        for(int j = 0 ; j < steps_to_pop-1 ; j++){
+            if(spr1->path.size()>1){ //if the path list is non-empty (and has at least 1 element, which will be saved for actual movement)
+                //Need to register the skipped steps in "prev values"
+                spr1->moveTo(spr1->path[spr1->path.size()-1][0], spr1->path[spr1->path.size()-1][1]);
+                spr1->path.pop_back(); //pop off the last element (skip it)
+            }
+        }
+        
+        vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
+        //Now actually move
+        spr1->moveTo(next_step[0], next_step[1]);
+        //pop off the step from path
+        spr1->path.pop_back();
+        
+        //Check if done with path
+        if(spr1->path.size()<1){ //then it's empty
+            spr1->inThread = false;
+            break;
+        }
+        
+        //update timer
+        //First, determine how much carry-over we need to keep (time we haven't accounted for due to rounding
+        carry_over = (SDL_GetTicks() - spr1->move_timer); //How much time we have on timer, total
+        carry_over = carry_over - (steps_to_pop*1000.0/spr1->move_speed); //now subtract how much time we've accounted for
+        //carry_over now has how many ticks we haven't updated for
+        spr1->move_timer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+    }
+    
     free_path(*spr1); //clear old path
     return;
     
@@ -1603,6 +1658,33 @@ void perform_ritual_thread(Sprite* spr1){
         
     }
     
+    //at this point, spr1 is elegible for new tasks and Animation is deleted
+    //We now want to create a new item in it's place
+    int new_item_ids[5] = {300, 313, 314, 315, 316}; //a list of possible items we can create
+    int new_item = new_item_ids[rand()%5]; //the actual item we'll be creating
+    //Create an dual-tone item
+    Item temp_item = Item(loc_x, loc_y, new_item, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
+    map_items[loc_y*map_width+loc_x].push_back(temp_item);
+    
+    //we also wanna add some effects to spruce things up for a bit
+    Effect temp_effect = Effect(loc_x, loc_y - 1, 1); //create the effect above the newly created item. Effect code for sparkles is 1 (last argument)
+    map_effects[((loc_y - 1)*map_width)+loc_x].push_back(temp_effect); //add the effect to global queue so it can be drawn
+    
+    //Now wait 10 seconds to delete the effect
+    int ritual_timer = SDL_GetTicks(); //start the timer
+    while(true){
+        
+        if(SDL_GetTicks() > ritual_timer+10000){ //waiting 10 seconds
+            if(map_effects[((loc_y - 1)*map_width)+loc_x].size() > 0){
+                map_effects[((loc_y - 1)*map_width)+loc_x].erase(map_effects[((loc_y - 1)*map_width)+loc_x].begin());
+            }
+            
+            break;
+            
+        }
+        
+    }
+    
     return;
     
 }
@@ -1675,7 +1757,8 @@ void background_color_thread(){
     int change = 1; //for grey scale / even changing across rgb components
     //How much we change the colors
     int r_inc = 1;
-    int g_inc = 1;
+    //int g_inc = 1;
+    int g_inc = 0; 
     int b_inc = 1;
     
     //THESE COLORS SHOULD RANGE FROM 1 to 254 (NO 0 or 255!!!!)
