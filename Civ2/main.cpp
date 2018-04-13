@@ -1524,71 +1524,6 @@ void walk_path_thread(Sprite* spr1){
     
 }
 
-////a thread for picking up items of your favorite color
-////Call the faveColorSearch algorithm
-////Travels to proper tile
-////picks up item (if it's still there)
-////REDOING THREADS TO MAKE USE OF GENERIC WALK-TO-THREAD
-//void gather_thread_WALKTO(Sprite* spr1){
-//
-//    int color_thresh = 100; //the maximum difference between item color and fave color,  allowable
-//
-//    //FIRST, PERFORM SEARCH
-//    //find a new target path
-//    if(spr1->path.empty()){ //if path is empty
-//        faveColorSearch(spr1, color_thresh);
-//        //itemTypeSearch(spr1, search_item);
-//    }
-//
-//    //Check if the search failed (error code (9999,9999)
-//    if(spr1->path[0][0] == 9999){
-//        spr1->path.pop_back();
-//        //continue; //search failed, try again....
-//        //search failed
-//        //EXPIRE THREAD:
-//        printf("can't gather");
-//        spr1->inThread = false;
-//        return;
-//    }
-//    ///////////////////////////////////////
-//
-//    //SECOND, WALK TO ITEM
-//    //Start walking to location (last member of returned search array
-//    //Spawns a new thread (GNERIC walk_to_thread), and waits for it to finish (join)
-//    int loc_x = spr1->path[spr1->path.size()-1][0];
-//    int loc_y = spr1->path[spr1->path.size()-1][1];
-//    std::thread walkToObj(walk_to_thread, spr1, loc_x, loc_y);
-//    //walkToObj.detach();
-//    walkToObj.join(); //block (wait for it to complete)
-//
-//    //Once there, pick up item
-//    //now look on tile and check if item is still there and pick up
-//    for(int i = 0; i < map_items[(spr1->y*map_width)+spr1->x].size(); i++){
-//        if(color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor)<color_thresh ||
-//           color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor2)<color_thresh){
-//            //if(map_items[(spr1->y*map_width)+spr1->x][i].type == search_item){
-//
-//            pickUpItem(spr1, spr1->x, spr1->y, i); //then pick up the item
-//
-//            //Start trek to shroom depot...
-//            //we're going to transfer it to another thread...
-//            //spr1->inThread = false; //we can keep the status as true since we're changing threads.( normally have to set this flag)
-//            //This thread makes the creature go to shroom
-//            std::thread shroomDepoObj(shroom_depo_thread, spr1);
-//            shroomDepoObj.detach();
-//            if(spr1->inThread){printf("passing to shroom\n");}
-//            if(spr1->isNeededByThread){printf("is neeeded'\n");}
-//            return;
-//
-//        }
-//    }
-//
-//    //If still can't find suitable item after searching, return and exit thread
-//    spr1->inThread = false;
-//    return;
-//
-//}
-
 //Thread that performs a ritual
 //spawns other threads (walkTo) and also handles isNeededByThread flag
 void perform_ritual_thread(Sprite* spr1){
@@ -1603,10 +1538,35 @@ void perform_ritual_thread(Sprite* spr1){
     //mainly used for OTHER creatures, outside thread...
     spr1->isNeededByThread = true;
     
-    //Start walking to location
-    std::thread walkToObj(walk_to_thread, spr1, loc_x+1, loc_y);
-    walkToObj.detach();
-    //walkToObj.join(); //block (wait for it to complete)
+//    //Start walking to location
+//    std::thread walkToObj(walk_to_thread, spr1, loc_x+1, loc_y);
+//    walkToObj.detach();
+//    //walkToObj.join(); //block (wait for it to complete)
+    
+    //START WALKING TO LOCATION
+    
+    //Find a path to target
+    free_path(*spr1); //clear path on sprite for starters
+    while(true){
+        if(spr1->path.empty()){ //if path is empty
+            spr1->path = A_Star(block_map, map_width, map_height, spr1->x, spr1->y, loc_x+1, loc_y );
+        }
+    
+        //Check if the search failed (error code (9999,9999)
+        if(spr1->path[0][0] == 9999){
+            spr1->path.pop_back();
+            printf("search failed");
+            loc_x = 1+(rand()%(map_width-2));
+            loc_y = 1+(rand()%(map_height-2)); //try a different location, as well
+            continue; //search failed, try again....
+        }
+        
+        break; //if it reaches this point, it means it found a succesful path and can move on to the next step
+    }
+    //Now start the thread that will actually walk the path to target
+    std::thread walkPathObj(walk_path_thread, spr1);
+    walkPathObj.detach();
+    //walkPathObj.join(); //block (wait for it to complete)
     
     //Wait for spr1 to get to destination (walk_to_thread signals end by setting inThread to false)
     while(true){
@@ -1757,8 +1717,8 @@ void background_color_thread(){
     int change = 1; //for grey scale / even changing across rgb components
     //How much we change the colors
     int r_inc = 1;
-    //int g_inc = 1;
-    int g_inc = 0; 
+    int g_inc = 1;
+    //int g_inc = 0; 
     int b_inc = 1;
     
     //THESE COLORS SHOULD RANGE FROM 1 to 254 (NO 0 or 255!!!!)
@@ -1775,6 +1735,7 @@ void background_color_thread(){
 //    int b2 = (rand()%154) + 1;
     int r2 = (rand()%253) + 1;
     int g2 = (rand()%253) + 1;
+    //int g2 = (rand()%153) + 1;
     int b2 = (rand()%253) + 1;
     //BOUNCES BACK AND FORTH BETWEeN THE VALUES
 
