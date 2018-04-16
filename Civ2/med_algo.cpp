@@ -606,14 +606,14 @@ SDL_Color generate_pink(){
 //The original color is mapped onto the last 55 values.
 SDL_Color color_to_pastel(SDL_Color in_col){
     
-    Uint8 r = 200;
-    Uint8 g = 200;
-    Uint8 b = 200;
+    Uint8 r = 180;
+    Uint8 g = 180;
+    Uint8 b = 180;
     
     //mapping on to last 55 of the color value
-    r = r + ((55.0/255)*in_col.r);
-    g = g + ((55.0/255)*in_col.g);
-    b = b + ((55.0/255)*in_col.b);
+    r = r + ((75.0/255)*in_col.r);
+    g = g + ((75.0/255)*in_col.g);
+    b = b + ((75.0/255)*in_col.b);
     
     SDL_Color pastel = {r,g,b,255};
     return pastel;

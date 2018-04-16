@@ -25,6 +25,7 @@
 #include "med_algo.hpp"
 #include "story.hpp"
 #include "image_gen.hpp"
+#include "building.hpp"
 //#include <unistd.h>
 
 
@@ -40,7 +41,7 @@ int map_width;
 int map_height;
 SDL_Color back_col = {0,0,0}; //The background color
 vector<vector<int>> colorz; //every randomly gen. resource (stone, weed) has it's own unique color
-int blockable[2] = {301,304};
+//int blockable[2] = {301,304};
 bool* block_map; //this is the map indicating whether a tile is blocked
 
 //ItemTile Stuff
@@ -632,6 +633,15 @@ void init_items(){
 //
 //        }
 //    }
+    
+    //Create some buildings
+    building_5x5(&map_scenery, block_map, map_width, 12, 10);
+    building_NxN(&map_scenery, block_map, map_width, 18, 20,7);
+    building_5x5(&map_scenery, block_map, map_width, 24, 10);
+    building_5x5(&map_scenery, block_map, map_width, 30, 20);
+    building_5x5(&map_scenery, block_map, map_width, 36, 10);
+    building_5x5(&map_scenery, block_map, map_width, 42, 20);
+    building_5x5(&map_scenery, block_map, map_width, 48, 10);
     
 }
 
@@ -1241,6 +1251,7 @@ void shroom_depo_thread(Sprite* spr1){
         //Check if the search failed (error code (9999,9999)
         if(spr1->path[0][0] == 9999){
             spr1->path.pop_back();
+            printf("Search failed in shroom depo");
             continue; //search failed, try again....
         }
         shroom_index = rand()%map_shrooms.size(); //pick another random shroom to go to
@@ -1400,78 +1411,10 @@ void gather_thread(Sprite* spr1){
     return;
 }
 
-//General thread to make creature walk somewhere
-//Can someday be the premier go-to thread for walking to a specific coord?
-//Takes care of setting the path and walking to
-//Will turn off the inThread flag when finished
-//Makes spr1 walk to coord (x,y)
-//INPUTTED CREATURE spr1 MUST HAVE EMPTY PATH!!!!
-//IN CHARGE OF FINDING PATH - BUT DOESN"T KNOW WHAT TO DO IF YOU CAN"T FIND A PATH!!!!
-void walk_to_thread(Sprite* spr1, int to_x, int to_y){
-    
-    //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
-    spr1->move_timer = SDL_GetTicks(); //start move timer
-    int steps_to_pop = 0; //how many steps need to be popped off path
-    int carry_over = 0; //how many ticks were rounded off
-    
-    free_path(*spr1); //clear old path
-    
-    while(true){
-        
-        //Make sure we have a path to target
-        if(spr1->path.empty()){ //if path is empty
-            spr1->path = A_Star(block_map, map_width, map_height, spr1->x, spr1->y, to_x, to_y );
-        }
-        
-        //Check if the search failed (error code (9999,9999)
-        if(spr1->path[0][0] == 9999){
-            spr1->path.pop_back();
-            printf("search failed");
-            continue; //search failed, try again....
-        }
-        
-        //Determine how many steps have to be moved while time has passed
-        steps_to_pop = ( (SDL_GetTicks() - spr1->move_timer)*(spr1->move_speed/1000.0) ); // (elapsed time * movement speed) / 1000 ms
-        if(steps_to_pop <= 0){
-            continue; //no steps need to be taken, continue
-        }
-        //Now pop off that many steps
-        for(int j = 0 ; j < steps_to_pop-1 ; j++){
-            if(spr1->path.size()>1){ //if the path list is non-empty (and has at least 1 element, which will be saved for actual movement)
-                //Need to register the skipped steps in "prev values"
-                spr1->moveTo(spr1->path[spr1->path.size()-1][0], spr1->path[spr1->path.size()-1][1]);
-                spr1->path.pop_back(); //pop off the last element (skip it)
-            }
-        }
-        
-        vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
-        //Now actually move
-        spr1->moveTo(next_step[0], next_step[1]);
-        //pop off the step from path
-        spr1->path.pop_back();
-        
-        //Check if done with path
-        if(spr1->path.size()<1){ //then it's empty
-            spr1->inThread = false;
-            break;
-        }
-        
-        //update timer
-        //First, determine how much carry-over we need to keep (time we haven't accounted for due to rounding
-        carry_over = (SDL_GetTicks() - spr1->move_timer); //How much time we have on timer, total
-        carry_over = carry_over - (steps_to_pop*1000.0/spr1->move_speed); //now subtract how much time we've accounted for
-        //carry_over now has how many ticks we haven't updated for
-        spr1->move_timer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
-        
-    }
-    free_path(*spr1); //clear old path
-    return;
-    
-}
-
 //A thread that moves the input sprite along it's stored path
 //Thread is timed to reflect Sprite's movement speed
 //The sprite should have it's path set before starting this thread (or else it does nothing)
+//THe sprite's inThread flag is set to false when this thread finishes running
 void walk_path_thread(Sprite* spr1){
     //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
     spr1->move_timer = SDL_GetTicks(); //start move timer
@@ -1528,41 +1471,47 @@ void walk_path_thread(Sprite* spr1){
 //spawns other threads (walkTo) and also handles isNeededByThread flag
 void perform_ritual_thread(Sprite* spr1){
     
+    int loc_x, loc_y; //the location of ritual
+    
     //determine random ritual location
-    //TODO: Make sure location isn't blocked or have an animation on currently
-    int loc_x = 1+(rand()%(map_width-2));
-    int loc_y = 1+(rand()%(map_height-2));
+    while(true){
+        //TODO: Make sure location isn't blocked or have an animation on currently
+        loc_x = 1+(rand()%(map_width-2));
+        loc_y = 1+(rand()%(map_height-2));
+        //Check to make sure location isn't blocked or has an animation on it currently
+        if( (block_map[(loc_y*map_width)+loc_x]==true) || map_animations[(loc_y*map_width)+loc_x].size() > 0){
+            continue;
+        }else{
+            break;
+        }
+    }
+    
     
     //Firstly, indicate to the sprites that we need them...
     //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
     //mainly used for OTHER creatures, outside thread...
     spr1->isNeededByThread = true;
     
-//    //Start walking to location
-//    std::thread walkToObj(walk_to_thread, spr1, loc_x+1, loc_y);
-//    walkToObj.detach();
-//    //walkToObj.join(); //block (wait for it to complete)
-    
     //START WALKING TO LOCATION
     
     //Find a path to target
     free_path(*spr1); //clear path on sprite for starters
-    while(true){
-        if(spr1->path.empty()){ //if path is empty
-            spr1->path = A_Star(block_map, map_width, map_height, spr1->x, spr1->y, loc_x+1, loc_y );
-        }
-    
-        //Check if the search failed (error code (9999,9999)
-        if(spr1->path[0][0] == 9999){
-            spr1->path.pop_back();
-            printf("search failed");
-            loc_x = 1+(rand()%(map_width-2));
-            loc_y = 1+(rand()%(map_height-2)); //try a different location, as well
-            continue; //search failed, try again....
-        }
-        
-        break; //if it reaches this point, it means it found a succesful path and can move on to the next step
+    if(spr1->path.empty()){ //if path is empty
+        spr1->path = A_Star(block_map, map_width, map_height, spr1->x, spr1->y, loc_x+1, loc_y );
     }
+
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, no path to ritual");
+        
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+        
+
     //Now start the thread that will actually walk the path to target
     std::thread walkPathObj(walk_path_thread, spr1);
     walkPathObj.detach();
@@ -1948,8 +1897,8 @@ int main( int argc, char* args[] ){
     cre1->staff = &temp_staff;
     
     //test out walk_to_thread
-    std::thread walkObj(walk_to_thread, lov1, 30,10);
-    walkObj.detach();
+//    std::thread walkObj(walk_to_thread, lov1, 30,10);
+//    walkObj.detach();
     
     //DEBUG AUDIOOOOOOOOOOOOOOOO
 //    // NOTE: Sound test
