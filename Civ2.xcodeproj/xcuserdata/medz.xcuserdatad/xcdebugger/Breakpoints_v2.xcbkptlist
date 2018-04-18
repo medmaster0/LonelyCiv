@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Civ2/med_algo.cpp"
-            timestampString = "545538703.279663"
+            timestampString = "545546115.346687"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "173"
@@ -58,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Civ2/main.cpp"
-            timestampString = "545538703.2800699"
+            timestampString = "545705809.799643"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2242"
-            endingLineNumber = "2242"
+            startingLineNumber = "2264"
+            endingLineNumber = "2264"
             landmarkName = "main( int argc, char* args[] )"
             landmarkType = "9">
          </BreakpointContent>
@@ -74,11 +74,27 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Civ2/main.cpp"
-            timestampString = "545538703.282095"
+            timestampString = "545705809.800128"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2245"
-            endingLineNumber = "2245"
+            startingLineNumber = "2267"
+            endingLineNumber = "2267"
+            landmarkName = "main( int argc, char* args[] )"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Civ2/main.cpp"
+            timestampString = "545705809.800446"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "2287"
+            endingLineNumber = "2287"
             landmarkName = "main( int argc, char* args[] )"
             landmarkType = "9">
          </BreakpointContent>

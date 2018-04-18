@@ -31,3 +31,5 @@ SDL_Color color_blend(SDL_Color col1, SDL_Color col2); //belnd two colors
 SDL_Color generate_brown(); //generates a random shade of brown
 SDL_Color generate_pink(); //generates a random shade of pink
 SDL_Color color_to_pastel(SDL_Color in_col); //given n input color, convert it to a pastel version (increase the lightness)
+
+SDL_Color redNoise(SDL_Color redHue); //takes a color and gradually changes it along the redish/orange spectrum

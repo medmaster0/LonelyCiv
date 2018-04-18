@@ -332,6 +332,11 @@ void loadTiles(){
     item_tiles_s[316] = loadTexture("Civ2/Civ2/doodadz/wineSeco.png");
     item_tiles_t[316] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[317] = loadTexture("Civ2/Civ2/tiles/curtainsPrim.png");
+    item_tiles_s[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    
     //TENT TILES
     tent_tiles_p[0] = loadTexture("Civ2/Civ2/tiles/tent0Prim.png");
     tent_tiles_s[0] = loadTexture("Civ2/Civ2/tiles/tent0Seco.png");
@@ -635,13 +640,30 @@ void init_items(){
 //    }
     
     //Create some buildings
-    building_5x5(&map_scenery, block_map, map_width, 12, 10);
-    building_NxN(&map_scenery, block_map, map_width, 18, 20,7);
-    building_5x5(&map_scenery, block_map, map_width, 24, 10);
-    building_5x5(&map_scenery, block_map, map_width, 30, 20);
-    building_5x5(&map_scenery, block_map, map_width, 36, 10);
-    building_5x5(&map_scenery, block_map, map_width, 42, 20);
-    building_5x5(&map_scenery, block_map, map_width, 48, 10);
+    
+//    build_box_NxN(&map_scenery, block_map, map_width, 55, 15, 7);
+    
+    int build_x, build_y; //temporary locations for building
+    int build_dim; //dimensinos of building
+    for(int b = 0; b < 12; b++){ //we're going to build 6 buildings
+
+        //keep trying random locations until we can build there
+        while(true){
+            build_dim = 5 + rand()%4;
+            build_x = rand()%(map_width-build_dim-1);
+            build_y = rand()%(map_height-build_dim-1);
+
+            if(is_square_clear(block_map, map_width, build_x-1, build_y-1, build_dim+2)){ //If we are all clear, start building... keep a 1 tile wide perimeter
+                build_box_NxN_door(&map_scenery, block_map, map_width, build_x, build_y, build_dim);
+                break; //break out of while loop and move on to next iteration in for loop
+            }
+
+
+        }
+        
+
+    }
+    
     
 }
 
@@ -1252,9 +1274,10 @@ void shroom_depo_thread(Sprite* spr1){
         if(spr1->path[0][0] == 9999){
             spr1->path.pop_back();
             printf("Search failed in shroom depo");
+            shroom_index = rand()%map_shrooms.size(); //pick another random shroom to go to
             continue; //search failed, try again....
         }
-        shroom_index = rand()%map_shrooms.size(); //pick another random shroom to go to
+        
         
         break;
     }
@@ -1290,8 +1313,6 @@ void shroom_depo_thread(Sprite* spr1){
             //now switch the item into the shroom inventory
             map_shrooms[shroom_index].inventory.push_back(spr1->inventory[ spr1->inventory.size() - 1 ]);
             spr1->inventory.pop_back();
-            
-            printf("shroom done\n");
             
             spr1->inThread = false;
             break;
@@ -1387,7 +1408,6 @@ void gather_thread(Sprite* spr1){
                     //std::thread shroomDepoObj(shroom_depo_thread, spr1);
                     std::thread shroomDepoObj(shroom_depo_thread, spr1);
                     shroomDepoObj.detach();
-                    if(spr1->inThread){printf("passing to shroom\n");}
                     if(spr1->isNeededByThread){printf("is neeeded'\n");}
                     return;
 
@@ -1556,7 +1576,6 @@ void perform_ritual_thread(Sprite* spr1){
             // erase the 6th element
             //myvector.erase (myvector.begin()+5);
             if(map_animations[(loc_y*map_width)+loc_x].size()>0){ //make sure the animation in question is still there...
-                printf("delete ritual at: %d,%d    im at: %d,%d\n",loc_x,loc_y,spr1->x,spr1->y);
                 //printf("im at: %d,%d\n",spr1->x,spr1->y);
                 map_animations[(loc_y*map_width)+loc_x].erase(map_animations[(loc_y*map_width)+loc_x].begin());
             }
@@ -1663,6 +1682,8 @@ void task_creatures_thread(){
 //a thread for changing the background periodically
 void background_color_thread(){
     
+    int change_color_timer; //used as a timer for when to change the color bounds
+    
     int change = 1; //for grey scale / even changing across rgb components
     //How much we change the colors
     int r_inc = 1;
@@ -1684,7 +1705,6 @@ void background_color_thread(){
 //    int b2 = (rand()%154) + 1;
     int r2 = (rand()%253) + 1;
     int g2 = (rand()%253) + 1;
-    //int g2 = (rand()%153) + 1;
     int b2 = (rand()%253) + 1;
     //BOUNCES BACK AND FORTH BETWEeN THE VALUES
 
@@ -1735,6 +1755,8 @@ void background_color_thread(){
 //        back_col.g = fave_color[1];
 //        back_col.b = fave_color[2];
 //        SDL_Delay(10000);
+        
+//        back_col = redNoise(back_col); //slowly shift around a red color
         
         SDL_Delay(100); //Debug Quick
         //SDL_Delay(500); //Nice looking
@@ -1999,9 +2021,9 @@ int main( int argc, char* args[] ){
         cout << genSaltName() << ".\n";
     }
     
-    for(int j = 0;  j < 2314; j++){
-        cout << genWine() << "\n";
-    }
+//    for(int j = 0;  j < 2314; j++){
+//        cout << genWine() << "\n";
+//    }
     
     //
     //DEBUG TEST : SPAWN SOME THREAD DAWGd

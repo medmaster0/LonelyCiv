@@ -619,7 +619,57 @@ SDL_Color color_to_pastel(SDL_Color in_col){
     return pastel;
 }
 
-
+//takes a color and gradually changes it along the redish/orange spectrum
+//Takes a redHue as input to use as a jumping off point
+//randomly adjust the r,g,b channels
+//Red needs to be higher than green by at least 50
+//Green has to be above 75
+//Blue can be anything below 125
+SDL_Color redNoise(SDL_Color redHue){
+    
+    SDL_Color temp_red = redHue;
+    
+    //if current_red is out of the spectrum, initialize at a default red_shade
+    if(redHue.g < 75 || redHue.b > 125 || redHue.r < redHue.g+50){
+        printf("adjusted red. \n");
+        temp_red = {200,76,91,255 } ;
+    }
+    
+    //Now start manipulating it
+    int r_inc = rand() % 2;
+    int g_inc = rand() % 2;
+    int b_inc = rand() % 2;
+    int change = 1 + (-2 * (rand()%2) ); //either 1 or -1
+    
+    temp_red.r = temp_red.r + (change * r_inc);
+    change = 1 + (-2 * (rand()%2) ); //either 1 or -1
+    temp_red.g = temp_red.g + (change * g_inc);
+    change = 1 + (-2 * (rand()%2) ); //either 1 or -1
+    temp_red.r = temp_red.b + (change * b_inc);
+    
+    //bounds checking
+    if(temp_red.g < 75){
+        temp_red.g = 75;
+    }
+    if(temp_red.g > 205){
+        temp_red.g = 205;
+    }
+    if(temp_red.b < 0){
+        temp_red.b = 0;
+    }
+    if(temp_red.b > 125){
+        temp_red.b = 125;
+    }
+    if(temp_red.r < temp_red.g + 50){
+        temp_red.r = temp_red.g + 50;
+    }
+    if(temp_red.r > 255){
+        temp_red.r = 255;
+    }
+    
+    return temp_red;
+    
+}
 
 
 
