@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0C092D1C1F004601001CA68F /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C092D1B1F004601001CA68F /* SDL2_image.framework */; };
+		0C0D8B9C2089830700754F85 /* recipes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0C0D8B9A2089830700754F85 /* recipes.cpp */; };
+		0C0D8B9D2089830700754F85 /* recipes.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C0D8B9B2089830700754F85 /* recipes.hpp */; };
 		0C0F9A541F45437C0049AD91 /* dancez.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0C0F9A521F45437C0049AD91 /* dancez.cpp */; };
 		0C0F9A551F45437C0049AD91 /* dancez.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C0F9A531F45437C0049AD91 /* dancez.hpp */; };
 		0C0F9A581F4658860049AD91 /* creature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0C0F9A561F4658860049AD91 /* creature.cpp */; };
@@ -47,6 +49,8 @@
 
 /* Begin PBXFileReference section */
 		0C092D1B1F004601001CA68F /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = ../../../../../../Library/Frameworks/SDL2_image.framework; sourceTree = "<group>"; };
+		0C0D8B9A2089830700754F85 /* recipes.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = recipes.cpp; sourceTree = "<group>"; };
+		0C0D8B9B2089830700754F85 /* recipes.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = recipes.hpp; sourceTree = "<group>"; };
 		0C0F9A521F45437C0049AD91 /* dancez.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dancez.cpp; path = Civ2/dancez.cpp; sourceTree = "<group>"; };
 		0C0F9A531F45437C0049AD91 /* dancez.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = dancez.hpp; path = Civ2/dancez.hpp; sourceTree = "<group>"; };
 		0C0F9A561F4658860049AD91 /* creature.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = creature.cpp; path = Civ2/creature.cpp; sourceTree = "<group>"; };
@@ -96,6 +100,8 @@
 		0CE22EF81EFF778800FC41F4 = {
 			isa = PBXGroup;
 			children = (
+				0C0D8B9A2089830700754F85 /* recipes.cpp */,
+				0C0D8B9B2089830700754F85 /* recipes.hpp */,
 				0CE85D262083BDB200C0FC49 /* building.cpp */,
 				0CE85D272083BDB200C0FC49 /* building.hpp */,
 				0C5DEA5B2074A6EC0095EA59 /* effects.cpp */,
@@ -160,6 +166,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C0D8B9D2089830700754F85 /* recipes.hpp in Headers */,
 				0C542A4E1F562ADC00CC1D8C /* Item.hpp in Headers */,
 				0C5DEA5E2074A6EC0095EA59 /* effects.hpp in Headers */,
 				0C0F9A551F45437C0049AD91 /* dancez.hpp in Headers */,
@@ -237,6 +244,7 @@
 				0CF1F4DA1F6CDA400056FBB1 /* tent.cpp in Sources */,
 				0C5BEAE01FC21D38003D61B1 /* story.cpp in Sources */,
 				0C0F9A541F45437C0049AD91 /* dancez.cpp in Sources */,
+				0C0D8B9C2089830700754F85 /* recipes.cpp in Sources */,
 				0C5DEA5D2074A6EC0095EA59 /* effects.cpp in Sources */,
 				0CE22F051EFF778800FC41F4 /* main.cpp in Sources */,
 				0CCDE8781FB29921005CDAD6 /* music.cpp in Sources */,

@@ -26,6 +26,7 @@
 #include "story.hpp"
 #include "image_gen.hpp"
 #include "building.hpp"
+#include "recipes.hpp"
 //#include <unistd.h>
 
 
@@ -1918,10 +1919,6 @@ int main( int argc, char* args[] ){
     Staff temp_staff = Staff(0,0,309); //a temp Item to be added to the cre's equip inventory
     cre1->staff = &temp_staff;
     
-    //test out walk_to_thread
-//    std::thread walkObj(walk_to_thread, lov1, 30,10);
-//    walkObj.detach();
-    
     //DEBUG AUDIOOOOOOOOOOOOOOOO
 //    // NOTE: Sound test
     int SamplesPerSecond = 48000;
@@ -1986,44 +1983,30 @@ int main( int argc, char* args[] ){
 //    }
 
 
-    //SDL_Delay(2000);
-    //SDL_PauseAudio(0);
-    
-    //test the name gen
-//    while(true){
-//        //printf("%s\n",genName());
-//        cout << genPrayer() << '\n';
-//    }
     
     //genPNG();
     //SDL_Texture* text1 = genTexture(gRenderer, gWindow);
     for(int j = 0; j <3; j++){
-        cout << "This is the potion, ";
-        cout << genPotionName();
-        cout << ". It is made of ";
-        cout << genOilName() << ".\n";
+
+        //Generate some new resource recipes
+        for(int w = 0; w < 5; w++){
+            //Generates a recipe and generatess a required item
+            Resource temp_resource_recipe1 = Resource(rand()%4);
+            cout << temp_resource_recipe1.name << "\n";
+            Item temp_item = Item(10+j, 5+w, temp_resource_recipe1.item_type, temp_resource_recipe1.colorPrim, temp_resource_recipe1.colorSeco);
+            map_items[(temp_item.y * map_width) + temp_item.x].push_back(temp_item);
+        }
+        
         
         addToConsoleLog("This is the potion, "+ genPotionName()+". It is made of "+ genOilName() +"."+" It's in a "+genGlassName()+" glass vial.");
         addToConsoleLog("This is the powder, "+ genPotionName()+". It is made of "+ genSaltName() +"."+" It's in a "+genClothName()+" cloth bag.");
         cout << "This is the potion, "+ genPotionName()+". It is made of "+ genOilName() +"."+" It's in a "+genGlassName()+" glass vial.";
-        cout << "This is the powder, "+ genPotionName()+". It is made of "+ genSaltName() +"."+" It's in a "+genClothName()+" cloth bag."; 
+        cout << "This is the powder, "+ genPotionName()+". It is made of "+ genSaltName() +"."+" It's in a "+genClothName()+" cloth bag.";
         
-        
-//        if(find_compatibility(1, 2)==0){
-//            addToConsoleLog("es compatible.");
-//        }else{
-//            addToConsoleLog("no compatible.");
-//        }
-        
-        cout << "This is the powder, ";
-        cout << genPotionName();
-        cout << ". It is made of ";
-        cout << genSaltName() << ".\n";
+
     }
     
-//    for(int j = 0;  j < 2314; j++){
-//        cout << genWine() << "\n";
-//    }
+
     
     //
     //DEBUG TEST : SPAWN SOME THREAD DAWGd

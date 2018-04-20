@@ -13,6 +13,9 @@
 #include <string>
 #include <vector>
 
+#include <SDL2/SDL.h>
+#include <SDL2_image/SDL_image.h>
+
 using namespace std;
 
 //GEN HISTORY ALGORITHMS
