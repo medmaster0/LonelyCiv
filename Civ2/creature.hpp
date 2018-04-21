@@ -13,6 +13,7 @@
 #include <SDL2/SDL.h>
 
 #include "creature.hpp"
+#include "recipes.hpp"
 
 //#ifndef item_hpp
 #include "Item.hpp"
@@ -78,9 +79,14 @@ private:
     SDL_Texture* secoTexture;//secondary texture of the sprite
     int r,g,b; //colors of the sprite
     //Some vars for movement timing
-
-    
 };
+
+class Shroom: public Sprite{
+public:
+    Shroom(int xp, int yp);//Initializes variables
+    vector<Resource> resource_list; //Shrooms keep track of a list of Resources
+};
+
 
 //MISC FUNCTIONS
 

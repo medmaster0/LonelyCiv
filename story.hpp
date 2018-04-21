@@ -73,5 +73,9 @@ int find_zodiac_element(int z); //returns the element of the entered zodiac sign
 
 //HOTEL
 string genWine(); //Generates a wine name with a saint, vintage year, sweetness level, and fruit/aroma taste
+string genWineName(); //Only generates the wine name (saint, vintage year)
+string genWineTaste(); //Generates the taste of the wine - sweetness level and fruit/aroma tastes
+
+string genBerryName(); //Gen name of berries //Ex. Lychee, fofroo
 
 #endif /* story_hpp */

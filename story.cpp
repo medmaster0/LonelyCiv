@@ -2563,7 +2563,7 @@ string genWine(){
     string wine_name = "";
     wine_name.append(saints[rand()%saints.size()]);
     wine_name.append("'s ");
-    wine_name.append("wine ");
+    wine_name.append("Wine ");
     wine_name.append(roman_numerals(rand()%2010));
     wine_name.append(". It's ");
     wine_name.append(wine_sweetness[rand()%wine_sweetness.size()]);
@@ -2583,6 +2583,70 @@ string genWine(){
     return wine_name;
     
 }
+
+//These functions are useful for breaking up the wine gernation process in pieces. 
+//Only generates the wine name (saint, vintage year)
+string genWineName(){
+    
+    string wine_name = "";
+    
+    wine_name.append(saints[rand()%saints.size()]);
+    wine_name.append("'s ");
+    wine_name.append("Wine ");
+    wine_name.append(roman_numerals(rand()%2010));
+
+    return wine_name;
+}
+
+//Generates the taste of the wine - sweetness level and fruit/aroma tastes
+string genWineTaste(){
+    
+    string wine_taste = "";
+    
+    wine_taste.append("It's ");
+    wine_taste.append(wine_sweetness[rand()%wine_sweetness.size()]);
+    wine_taste.append(" with hints of ");
+    wine_taste.append(wine_aromas[rand()%wine_aromas.size()]);
+    wine_taste.append(", ");
+    wine_taste.append(wine_aromas[rand()%wine_aromas.size()]);
+    wine_taste.append(", and ");
+    wine_taste.append(wine_aromas[rand()%wine_aromas.size()]);
+    wine_taste.append(".");
+    
+    return wine_taste;
+}
+
+// BERRY STUFF
+
+//some common english word blends
+vector<string> english_word_blends = {"ch", "sh", "gl","pr","fr","g", "pp","j"};
+//some common english long vowel sounds?
+vector<string> english_long_vowel = {"i","u","oo","ee","a"};
+
+//Gen name of berries
+//Ex. Lychee, fofroo
+string genBerryName(){
+    
+    string berryName = "";
+    
+    char consonants[] = "bcdfghjklmnpqrstvwxyz";
+    char vowels[] = "aeiou";
+    
+    berryName += consonants[rand()%21];
+    berryName += vowels[rand()%5];
+    berryName += english_word_blends[rand()%english_word_blends.size()];
+    berryName += english_long_vowel[rand()%english_long_vowel.size()];
+    berryName += " berry";
+    
+    return berryName;
+    
+}
+
+
+
+
+
+
 
 
 

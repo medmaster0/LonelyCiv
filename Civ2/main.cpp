@@ -35,7 +35,7 @@ using std::queue;
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_HEIGHT = 680;
 
 //TileMap Stuff
 int map_width;
@@ -56,7 +56,7 @@ vector<vector<Item>> map_scenery; //a list of list of scenery on a tile. Index c
 
 //Creatures Stuff
 vector<Sprite> map_creatures; //a list of all creatures on map
-vector<Sprite> map_shrooms; //a list of all shroom sprites on map
+vector<Shroom> map_shrooms; //a list of all shroom sprites on map
 
 //Effects Stuff
 vector<vector<Effect>> map_effects; //a list of list of effects on a tile. Index corresponds to [y*map_width + x]
@@ -405,10 +405,11 @@ void drawVectorMap(){
 
 }
 
-//////DEBUG OR SOMEHTING LIKE IT
-//generates the initial items on the map
+//////MAKE this the standard Initialization script
+//Initializes all items and creaures
+//generates the initial items on the map based on shroom recipe resources
 //This also initializes effects
-void init_items(){
+void init_environment(){
     
     //Calculate map (grid) dimensions
     map_width = SCREEN_WIDTH/16;
@@ -427,52 +428,7 @@ void init_items(){
     int tempx; //temporary x
     int tempy; //temporary y
     int temp_tile; //temporarily stores random tile index
-    
-//    //Create some random items!
-//    for(int i = 0; i < 450; i++){
-//        tempx = rand()%(map_width);
-//        tempy = rand()%(map_height);
-//        temp_tile = rand()%199;
-//        //Item temp_item = Item(tempx, tempy, temp_tile, world_colors[temp_tile],{255,255,255,0} ); //temporary item
-//        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(colorz[temp_tile][0]), static_cast<Uint8>(colorz[temp_tile][1]), static_cast<Uint8>(colorz[temp_tile][2]),255},{255,255,255,0} ); //temporary item
-//        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
-//        //printf("cc %d %d cc", tempx, tempy);
-//        //printf("cc %d %d cc", map_items[(tempy-1)*map_width+(tempx)].back().x, temp_item.x);
-//        
-//    }
-    
-//    //Create some random weedz with fruit!
-//    for(int i = 0; i < 450; i++){
-//        tempx = rand()%(map_width);
-//        tempy = rand()%(map_height);
-////        tempx = 3;
-////        tempy = 0;
-//        temp_tile = rand()%99;
-//
-//        //Create the weed
-//        Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(colorz[temp_tile][0]), static_cast<Uint8>(colorz[temp_tile][1]), static_cast<Uint8>(colorz[temp_tile][2]),255},{255,255,255,0} ); //temporary item
-//        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
-//
-//        //then the fruits
-//        temp_item = Item(tempx, tempy, temp_tile+200, {static_cast<Uint8>(colorz[temp_tile+200][0]), static_cast<Uint8>(colorz[temp_tile+200][1]), static_cast<Uint8>(colorz[temp_tile+200][2]),255},{255,255,255,0} ); //temporary item
-//        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
-//    }
-    
-    //Create some random weedz with fruit, (using generic tiles)
-    for(int i = 0; i < 50; i++){
-        tempx = rand()%(map_width);
-        tempy = rand()%(map_height);
 
-        //Create the weed
-        Item temp_item = Item(tempx, tempy, 310, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255), 255},{255,255,255,0} ); //temporary item
-        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
-
-//        //then the fruits
-//        temp_item = Item(tempx, tempy, 311, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)},{255,255,255,0} ); //temporary item
-//        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
-    }
-
-    
     //for dispersing random items on map
     for(int b = 0 ; b<125; b++){
         tempx = rand()%(map_width);
@@ -491,67 +447,6 @@ void init_items(){
         Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{255,255,255,0} ); //temporary item
         map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
     }
-    
-    //create random scenery (from the randomly generated assets)
-    for(int g = 0 ; g<125; g++){
-        tempx = rand()%(map_width);
-        tempy = rand()%(map_height);
-        temp_tile = rand()%199;
-        Item temp_item = Item(tempx, tempy, temp_tile,world_colors[temp_tile],{255,255,255,0} ); //temporary item (scenery)
-        map_scenery[(tempy*map_width)+tempx].push_back(temp_item);
-    }
-    
-//    //create random wine
-//    for(int g = 0 ; g<32; g++){
-//        tempx = rand()%(map_width);
-//        tempy = rand()%(map_height);
-//        temp_tile = 316;
-//        //Item temp_item = Item(tempx, tempy, temp_tile,generate_brown(),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-//        Item temp_item = Item(tempx, tempy, temp_tile,{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-////        Item temp_item = Item(tempx, tempy, temp_tile,color_to_pastel({static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255}),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-//        map_items[(tempy*map_width)+tempx].push_back(temp_item);
-//    }
-    
-//    //create random beer
-//    for(int g = 0 ; g<32; g++){
-//        tempx = rand()%(map_width);
-//        tempy = rand()%(map_height);
-//        temp_tile = 300;
-//        //Item temp_item = Item(tempx, tempy, temp_tile,generate_brown(),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-//        Item temp_item = Item(tempx, tempy, temp_tile,{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-//        //        Item temp_item = Item(tempx, tempy, temp_tile,color_to_pastel({static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255}),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-//        map_items[(tempy*map_width)+tempx].push_back(temp_item);
-//    }
-    
-//    //create random test assets
-//    for(int g = 0 ; g<64; g++){
-//        tempx = rand()%(map_width);
-//        tempy = rand()%(map_height);
-//        temp_tile = 314;
-//        //Item temp_item = Item(tempx, tempy, temp_tile,generate_brown(),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-//        Item temp_item = Item(tempx, tempy, temp_tile,{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-////        Item temp_item = Item(tempx, tempy, temp_tile,color_to_pastel({static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255}),{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255} ); //temporary item (scenery)
-//        map_items[(tempy*map_width)+tempx].push_back(temp_item);
-//    }
-    
-    
-//    //DEBUG, Create some effects
-//    for(int e = 0; e<5; e++){
-//        tempx = rand()%(map_width);
-//        tempy = rand()%(map_height);
-//        temp_tile = rand()%3;
-//        Effect temp_effect = Effect(tempx, tempy, temp_tile);
-//        map_effects[(tempy*map_width)+tempx].push_back(temp_effect);
-//    }
-    
-//    //DEBUG, Create some animations
-//    for(int e = 0; e<10; e++){
-//        tempx = rand()%(map_width);
-//        tempy = rand()%(map_height);
-//        int list[4] = {22, 23, 24, 25};
-//        Animation temp_animation = Animation(tempx, tempy, list);
-//        map_animations[(tempy*map_width)+tempx].push_back(temp_animation);
-//    }
     
     
     block_map = new bool[map_width*map_height](); //initialize a dynamically sized blocked map
@@ -640,6 +535,15 @@ void init_items(){
 //        }
 //    }
     
+    //create random scenery (from the randomly generated assets)
+    for(int g = 0 ; g<125; g++){
+        tempx = rand()%(map_width);
+        tempy = rand()%(map_height);
+        temp_tile = rand()%199;
+        Item temp_item = Item(tempx, tempy, temp_tile,world_colors[temp_tile],{255,255,255,0} ); //temporary item (scenery)
+        map_scenery[(tempy*map_width)+tempx].push_back(temp_item);
+    }
+    
     //Create some buildings
     
 //    build_box_NxN(&map_scenery, block_map, map_width, 55, 15, 7);
@@ -665,20 +569,14 @@ void init_items(){
 
     }
     
-    
-}
-
-//Initialize Creatures
-void init_creatures(){
-    
     //Creatures
-    int num_creatures = 15; //How many creatures are on the map
+    int num_creatures = 25; //How many creatures are on the map
     //int num_creatures = 1; //DEBUG How many creatures are on the map
     for(int i = 0 ; i < num_creatures; i++){
         Sprite temp_cre = Sprite(1+rand()%(map_width-2), 1+rand()%(map_height-2));
         temp_cre.loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
         map_creatures.push_back(temp_cre);
-
+        
         //randomly give hats
         if(rand()%2==1){
             Hat* temp_hat = new Hat(0, 0, 305+(rand()%2) ); //a temp Item to be added to cre's inventory
@@ -697,7 +595,7 @@ void init_creatures(){
     }
     
     //Shrooms
-    int num_shrooms = 5; //How man shrooms are on the map
+    int num_shrooms = 5; //How many shrooms are on the map
     //Sprite temp_shroom;
     for(int i = 0; i < num_shrooms; i++){
         int tx, ty;
@@ -705,7 +603,7 @@ void init_creatures(){
             tx = rand()%map_width;
             ty = rand()%map_height;
             if(block_map[(ty*map_width)+tx]==false){ //if adjacent is NOT blocked
-                Sprite temp_shroom = Sprite(tx,ty);
+                Shroom temp_shroom = Shroom(tx,ty); //create new shroom
                 temp_shroom.loadFromFile("Civ2/Civ2/tiles/shroomPrim.png","Civ2/Civ2/tiles/shroomSeco.png", 16, 16);
                 map_shrooms.push_back(temp_shroom);
                 break;
@@ -713,7 +611,55 @@ void init_creatures(){
         }
     }
     
+    
 }
+
+////Initialize Creatures
+//void init_creatures(){
+//
+//    //Creatures
+//    int num_creatures = 25; //How many creatures are on the map
+//    //int num_creatures = 1; //DEBUG How many creatures are on the map
+//    for(int i = 0 ; i < num_creatures; i++){
+//        Sprite temp_cre = Sprite(1+rand()%(map_width-2), 1+rand()%(map_height-2));
+//        temp_cre.loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
+//        map_creatures.push_back(temp_cre);
+//
+//        //randomly give hats
+//        if(rand()%2==1){
+//            Hat* temp_hat = new Hat(0, 0, 305+(rand()%2) ); //a temp Item to be added to cre's inventory
+//            map_creatures.back().hat = temp_hat;
+//        }
+//        //randomly give staffs (staves?)
+//        if(rand()%2==1){
+//            Staff* temp_staff = new Staff(0,0,307); //a temp Item to be added to the cre's equip inventory
+//            map_creatures.back().staff = temp_staff;
+//        }
+//        //randomly give lights
+//        if(rand()%2==1){
+//            Light* temp_light = new Light(0, 0, 308); //a temp Item to be added to the cre's equip inventory
+//            map_creatures.back().light = temp_light;
+//        }
+//    }
+//
+//    //Shrooms
+//    int num_shrooms = 5; //How many shrooms are on the map
+//    //Sprite temp_shroom;
+//    for(int i = 0; i < num_shrooms; i++){
+//        int tx, ty;
+//        while(true){
+//            tx = rand()%map_width;
+//            ty = rand()%map_height;
+//            if(block_map[(ty*map_width)+tx]==false){ //if adjacent is NOT blocked
+//                Shroom temp_shroom = Shroom(tx,ty); //create new shroom
+//                temp_shroom.loadFromFile("Civ2/Civ2/tiles/shroomPrim.png","Civ2/Civ2/tiles/shroomSeco.png", 16, 16);
+//                map_shrooms.push_back(temp_shroom);
+//                break;
+//            }
+//        }
+//    }
+//
+//}
 
 //Draws all the items
 void draw_items(){
@@ -742,7 +688,7 @@ void draw_creatures(){
         map_creatures[i].drawLight(gRenderer, item_tiles_p, item_tiles_s);
     }
     
-    //Cucle through all shrooms and draw
+    //Cycle through all shrooms and draw
     for(int i = 0; i < map_shrooms.size(); i++){
         map_shrooms[i].draw();
     }
@@ -1803,12 +1749,13 @@ void regen_weedz_thread(){
                 x = rand()%map_width;
                 y = rand()%map_height;
                 
-                //Create a basic single-tone item
-                //item_id = rand()%300; //pick a random item id
-                item_id = (310+rand()%3); //pick a random item id
-                //Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(colorz[item_id][0]), static_cast<Uint8>(colorz[item_id][1]), static_cast<Uint8>(colorz[item_id][2]),255},{255,255,255,0} ); //temporary item
-                //Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{255,255,255,0} ); //temporary item
-                Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{255, 255, 255,0} ); //temporary item
+                //Create a basic single-tone item based off shroom recipe resource list
+                Shroom temp_shroom = map_shrooms[rand()%map_shrooms.size()]; //pick a random shroom
+                Resource temp_recipe = temp_shroom.resource_list[rand()%temp_shroom.resource_list.size()]; //pick a random resource from list
+                //assign that item to be created
+                item_id = temp_recipe.item_type;
+                SDL_Color temp_col = temp_recipe.colorPrim;
+                Item temp_item = Item(x, y, item_id, temp_col,{255, 255, 255,0} ); //temporary item
                 map_items[y*map_width+x].push_back(temp_item);
                 SDL_Delay(5000);
                 
@@ -1908,8 +1855,7 @@ int main( int argc, char* args[] ){
     //genAdobe();
     //vector<vector<short>> maze = gen_maze_corridor();
     //printMaze(maze);
-    init_items();
-    init_creatures();
+    init_environment();
     Hat temp_accessory = Hat(0, 0, 305); //a temp Item to be added to cre's inventory
     Hat temp_accessory2 = Hat(0, 0, 306); //a temp Item to be added to cre's inventory
     cre1->hat = &temp_accessory; //give him a hat
@@ -1982,10 +1928,7 @@ int main( int argc, char* args[] ){
 //        
 //    }
 
-
-    
-    //genPNG();
-    //SDL_Texture* text1 = genTexture(gRenderer, gWindow);
+    //RECIPES
     for(int j = 0; j <3; j++){
 
         //Generate some new resource recipes
@@ -1997,15 +1940,49 @@ int main( int argc, char* args[] ){
             map_items[(temp_item.y * map_width) + temp_item.x].push_back(temp_item);
         }
         
-        
-        addToConsoleLog("This is the potion, "+ genPotionName()+". It is made of "+ genOilName() +"."+" It's in a "+genGlassName()+" glass vial.");
-        addToConsoleLog("This is the powder, "+ genPotionName()+". It is made of "+ genSaltName() +"."+" It's in a "+genClothName()+" cloth bag.");
-        cout << "This is the potion, "+ genPotionName()+". It is made of "+ genOilName() +"."+" It's in a "+genGlassName()+" glass vial.";
-        cout << "This is the powder, "+ genPotionName()+". It is made of "+ genSaltName() +"."+" It's in a "+genClothName()+" cloth bag.";
-        
-
     }
     
+    //Generate some new recipe types
+    for(int w = 0; w < 5; w++){
+        //Generates a recipe and generates an example item
+        Recipe temp_recipe1 = Recipe(0, Resource(2), Resource(0));
+        cout << temp_recipe1.name << "\n";
+        Item temp_item = Item(3, 5+w, temp_recipe1.item_type, temp_recipe1.ingredient1.colorPrim, temp_recipe1.ingredient2.colorPrim);
+        map_items[(temp_item.y * map_width) + temp_item.x].push_back(temp_item);
+        
+        //Generates a recipe and generates an example item
+        Recipe temp_recipe2 = Recipe(1, Resource(1), Resource(3));
+        cout << temp_recipe2.name << "\n";
+        temp_item = Item(4, 5+w, temp_recipe2.item_type, temp_recipe2.ingredient1.colorPrim, temp_recipe2.ingredient2.colorPrim);
+        map_items[(temp_item.y * map_width) + temp_item.x].push_back(temp_item);
+        
+        //Generates a recipe and generates an example item
+        Recipe temp_recipe3 = Recipe(2, Resource(4), Resource(2));
+        cout << temp_recipe3.name << "\n";
+        temp_item = Item(5, 5+w, temp_recipe3.item_type, temp_recipe3.ingredient1.colorPrim, temp_recipe3.ingredient2.colorPrim);
+        map_items[(temp_item.y * map_width) + temp_item.x].push_back(temp_item);
+        
+        cout << genBerryName() << "\n";
+        
+    }
+    
+    //DEBUG: Figure out wine colors. Will make a nice wine and herb display
+    //wine made of herb and berry
+    for(int r = 0 ; r < 5; r ++){
+        //Generate them
+        Resource berry = Resource(4); //generate a berry
+        Resource cloth = Resource(3); //generate a cloth (for label)
+        Recipe wine = Recipe(2, berry, cloth); //create a recipe from the generated resources.
+        
+        Item temp_berry = Item(16, 5+r, berry.item_type, berry.colorPrim, berry.colorSeco);
+        map_items[(temp_berry.y * map_width) + temp_berry.x].push_back(temp_berry);
+        Item temp_cloth = Item(17, 5+r, cloth.item_type, cloth.colorPrim, cloth.colorSeco);
+        map_items[(temp_cloth.y * map_width) + temp_cloth.x].push_back(temp_cloth);
+        Item temp_wine = Item(18, 5+r, wine.item_type, wine.ingredient1.colorPrim, wine.ingredient2.colorPrim);
+        map_items[(temp_wine.y * map_width) + temp_wine.x].push_back(temp_wine);
+        
+        
+    }
 
     
     //

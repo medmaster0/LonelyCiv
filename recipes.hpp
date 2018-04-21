@@ -31,16 +31,20 @@
 
 using namespace std;
 
-//Recipe Codes:
+//Resource Codes:
 //NOT ALL ARE IMPLEMENETED YET!!!
 // 0 - glasses
 // 1 - salts
 // 2 - oils
 // 3 - cloths
-// 4 - wines (Recipe)
-// 5 - potions (Recipe)
-// 6 - powders (Recipe)
-// 7 - berries
+// 4 - berries
+
+//Recipe Codes:
+//NOT ALL ARE IMPLEMENTED YET!!!
+// 0 - potions (Recipe) made of 2 and 0
+// 1 - powders (Recipe) made of 1 and 3
+// 2 - wines (Recipe) made of 4  and 3
+
 
 //Resources Class
 //These are for recipes made directly from raw resources
@@ -48,27 +52,30 @@ using namespace std;
 class Resource{
 public:
     Resource(int recipe_type); //construct new resource of type accordng to input Recipe Code
-    int recipe_type; //a code indicating the type of resource in the context of recipes (powder OR glass? one or the other, both made from stone)
+    int resource_type; //a code indicating the type of resource in the context of recipes (powder OR glass? one or the other, both made from stone)
     int item_type; //the underlying Item type this resource comes from. e.g. Powder and Glass both have the same item type (stone)
-    int sub_type; //a more detailed description code of item -> e.g. a love potion or a health potion? 
+    //int sub_type; //a more detailed description code of item -> e.g. a love potion or a health potion?
     SDL_Color colorPrim; //the Prim color of this resource
     SDL_Color colorSeco; //the Seco color of this resource (optional, defaults to {0,0,0,255})
     string name; //The magical name of this resource.
 };
 
-
-
-
-////Recipe class contains a collection of items, descriptions for products that can be made in rituals.
-////provides
-//class Recipe{
-//public:
-//    Recipe(int type); //construct new recipe
-//    int type; //a code indicating the product of recipe
-//    int sub_type; //more detailed type of item -> e.g. a love potion or a health potion?
+//Recipe class contains a collection of items and descriptions for products that can be made in rituals.
+//Recipes are made up of Resources,
+//The Recipe's properties derived from it's component Resources
+class Recipe{
+public:
+    Recipe(int in_recipe_type, Resource ing1, Resource ing2); //construct new recipe
+    int recipe_type; //a code indicating the product of recipe
+    int item_type; //the underlying Item type of this recipe's PRODUCT
+    int sub_type; //more detailed type of item -> e.g. a love potion or a health potion?
+    Resource ingredient1; //the first resource ingredient
+    Resource ingredient2; //the second resource ingredient (optional)
 //    vector<int> ingredients; //a list of ints (item type codes) indicating what kind of ingredients are needed to make
 //    vector<SDL_Color> colors; //a list of required (ideal) colors needed to make the recipe.
-//    string description; //a string describing the item (randomly generated).
-//};
+    string name; //the magical name of the recipe
+    string description; //a string describing the item. generated off of Resource properties
+    
+};
 
 #endif /* recipes_hpp */

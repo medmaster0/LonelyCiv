@@ -318,15 +318,12 @@ void build_box_NxN_door(vector<vector<Item>>* map_scenery, bool* block_map, int 
     
     //now remove that wall and update block map
     block_map[(tempy*map_width)+tempx] = false; //update the block_map
-    printf("size%d\n", map_scenery->at((tempy*map_width)+tempx).size());
     map_scenery->at((tempy*map_width)+tempx).pop_back(); //remove elemement from map array
-    printf("size%d\n", map_scenery->at((tempy*map_width)+tempx).size());
     
     //Now create a new doorway Item and add to scenery
     SDL_Color col3 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255 };
     Item temp_door = Item(tempx, tempy, 317, col3, {0,0,0,255}); //create a DOORWAY (Curtains) Item
     map_scenery->at((tempy*map_width)+tempx).push_back(temp_door);
-    printf("size after door%d\n\n\n", map_scenery->at((tempy*map_width)+tempx).size());
     
 }
 

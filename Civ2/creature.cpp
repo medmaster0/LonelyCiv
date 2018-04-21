@@ -279,6 +279,17 @@ void Sprite::drawLight(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_
 //END OF SPRITE CLASS
 ///////////////////////////
 
+//SHROOM CLASS
+Shroom::Shroom(int tx, int ty) : Sprite(tx, ty){
+    //Also, assign Shroom some random recipe resources
+    resource_list.push_back(Resource(0));
+    resource_list.push_back(Resource(1));
+    resource_list.push_back(Resource(2));
+    resource_list.push_back(Resource(3));
+    
+}
+
+
 //Create a display window that prints out the status of a creature
 SDL_Surface* status_display_surface;
 SDL_Texture* status_display_texture;
