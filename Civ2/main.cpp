@@ -535,6 +535,7 @@ void init_environment(){
 //        }
 //    }
     
+    
     //create random scenery (from the randomly generated assets)
     for(int g = 0 ; g<125; g++){
         tempx = rand()%(map_width);
@@ -544,30 +545,37 @@ void init_environment(){
         map_scenery[(tempy*map_width)+tempx].push_back(temp_item);
     }
     
-    //Create some buildings
+//    //Create some buildings
+//
+//    build_maze(&map_scenery, block_map, map_width, map_height, 30, 1);
+//    build_maze(&map_scenery, block_map, map_width, map_height, 60, 1);
+//    build_maze(&map_scenery, block_map, map_width, map_height, 30, 20);
+//
+////    build_box_NxN(&map_scenery, block_map, map_width, 55, 15, 7);
+//
+//    int build_x, build_y; //temporary locations for building
+//    int build_dim; //dimensinos of building
+//    for(int b = 0; b < 6; b++){ //we're going to build 6 buildings
+//
+//        //keep trying random locations until we can build there
+//        while(true){
+//            build_dim = 5 + rand()%4;
+//            build_x = rand()%(map_width-build_dim-1);
+//            build_y = rand()%(map_height-build_dim-1);
+//
+//            if(is_square_clear(block_map, map_width, build_x-1, build_y-1, build_dim+2)){ //If we are all clear, start building... keep a 1 tile wide perimeter
+//                build_box_NxN_door(&map_scenery, block_map, map_width, build_x, build_y, build_dim);
+//                break; //break out of while loop and move on to next iteration in for loop
+//            }
+//
+//        }
+//
+//    }
     
-//    build_box_NxN(&map_scenery, block_map, map_width, 55, 15, 7);
+    build_two_house_path(&map_scenery, block_map, map_width, map_height);
+    build_two_house_path(&map_scenery, block_map, map_width, map_height);
+    build_two_house_path(&map_scenery, block_map, map_width, map_height);
     
-    int build_x, build_y; //temporary locations for building
-    int build_dim; //dimensinos of building
-    for(int b = 0; b < 12; b++){ //we're going to build 6 buildings
-
-        //keep trying random locations until we can build there
-        while(true){
-            build_dim = 5 + rand()%4;
-            build_x = rand()%(map_width-build_dim-1);
-            build_y = rand()%(map_height-build_dim-1);
-
-            if(is_square_clear(block_map, map_width, build_x-1, build_y-1, build_dim+2)){ //If we are all clear, start building... keep a 1 tile wide perimeter
-                build_box_NxN_door(&map_scenery, block_map, map_width, build_x, build_y, build_dim);
-                break; //break out of while loop and move on to next iteration in for loop
-            }
-
-
-        }
-        
-
-    }
     
     //Creatures
     int num_creatures = 25; //How many creatures are on the map
@@ -613,53 +621,6 @@ void init_environment(){
     
     
 }
-
-////Initialize Creatures
-//void init_creatures(){
-//
-//    //Creatures
-//    int num_creatures = 25; //How many creatures are on the map
-//    //int num_creatures = 1; //DEBUG How many creatures are on the map
-//    for(int i = 0 ; i < num_creatures; i++){
-//        Sprite temp_cre = Sprite(1+rand()%(map_width-2), 1+rand()%(map_height-2));
-//        temp_cre.loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
-//        map_creatures.push_back(temp_cre);
-//
-//        //randomly give hats
-//        if(rand()%2==1){
-//            Hat* temp_hat = new Hat(0, 0, 305+(rand()%2) ); //a temp Item to be added to cre's inventory
-//            map_creatures.back().hat = temp_hat;
-//        }
-//        //randomly give staffs (staves?)
-//        if(rand()%2==1){
-//            Staff* temp_staff = new Staff(0,0,307); //a temp Item to be added to the cre's equip inventory
-//            map_creatures.back().staff = temp_staff;
-//        }
-//        //randomly give lights
-//        if(rand()%2==1){
-//            Light* temp_light = new Light(0, 0, 308); //a temp Item to be added to the cre's equip inventory
-//            map_creatures.back().light = temp_light;
-//        }
-//    }
-//
-//    //Shrooms
-//    int num_shrooms = 5; //How many shrooms are on the map
-//    //Sprite temp_shroom;
-//    for(int i = 0; i < num_shrooms; i++){
-//        int tx, ty;
-//        while(true){
-//            tx = rand()%map_width;
-//            ty = rand()%map_height;
-//            if(block_map[(ty*map_width)+tx]==false){ //if adjacent is NOT blocked
-//                Shroom temp_shroom = Shroom(tx,ty); //create new shroom
-//                temp_shroom.loadFromFile("Civ2/Civ2/tiles/shroomPrim.png","Civ2/Civ2/tiles/shroomSeco.png", 16, 16);
-//                map_shrooms.push_back(temp_shroom);
-//                break;
-//            }
-//        }
-//    }
-//
-//}
 
 //Draws all the items
 void draw_items(){
@@ -1842,10 +1803,6 @@ int main( int argc, char* args[] ){
     //...Sprites
     Sprite* cre1 = new Sprite(10,10);
     cre1->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
-    Sprite* cre2 = new Sprite(10,11);
-    cre2->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
-    Sprite* cre3 = new Sprite(10,10);
-    cre3->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
     Sprite* shroom1 = new Sprite(3,3);
     shroom1->loadFromFile("Civ2/Civ2/tiles/shroomPrim.png","Civ2/Civ2/tiles/shroomSeco.png", 16, 16);
     Sprite* lov1 = new Sprite(5,5);
@@ -1859,7 +1816,6 @@ int main( int argc, char* args[] ){
     Hat temp_accessory = Hat(0, 0, 305); //a temp Item to be added to cre's inventory
     Hat temp_accessory2 = Hat(0, 0, 306); //a temp Item to be added to cre's inventory
     cre1->hat = &temp_accessory; //give him a hat
-    cre3->hat = &temp_accessory2; //give him a hat
     
     //Give cre1 a flag
     Staff temp_staff = Staff(0,0,309); //a temp Item to be added to the cre's equip inventory
@@ -1946,19 +1902,22 @@ int main( int argc, char* args[] ){
     for(int w = 0; w < 5; w++){
         //Generates a recipe and generates an example item
         Recipe temp_recipe1 = Recipe(0, Resource(2), Resource(0));
-        cout << temp_recipe1.name << "\n";
+//        cout << temp_recipe1.name << "\n";
+        cout << temp_recipe1.description << "\n";
         Item temp_item = Item(3, 5+w, temp_recipe1.item_type, temp_recipe1.ingredient1.colorPrim, temp_recipe1.ingredient2.colorPrim);
         map_items[(temp_item.y * map_width) + temp_item.x].push_back(temp_item);
         
         //Generates a recipe and generates an example item
         Recipe temp_recipe2 = Recipe(1, Resource(1), Resource(3));
-        cout << temp_recipe2.name << "\n";
+//        cout << temp_recipe2.name << "\n";
+        cout << temp_recipe2.description << "\n";
         temp_item = Item(4, 5+w, temp_recipe2.item_type, temp_recipe2.ingredient1.colorPrim, temp_recipe2.ingredient2.colorPrim);
         map_items[(temp_item.y * map_width) + temp_item.x].push_back(temp_item);
         
         //Generates a recipe and generates an example item
         Recipe temp_recipe3 = Recipe(2, Resource(4), Resource(2));
-        cout << temp_recipe3.name << "\n";
+//        cout << temp_recipe3.name << "\n";
+        cout << temp_recipe3.description << "\n";
         temp_item = Item(5, 5+w, temp_recipe3.item_type, temp_recipe3.ingredient1.colorPrim, temp_recipe3.ingredient2.colorPrim);
         map_items[(temp_item.y * map_width) + temp_item.x].push_back(temp_item);
         
@@ -1981,6 +1940,8 @@ int main( int argc, char* args[] ){
         Item temp_wine = Item(18, 5+r, wine.item_type, wine.ingredient1.colorPrim, wine.ingredient2.colorPrim);
         map_items[(temp_wine.y * map_width) + temp_wine.x].push_back(temp_wine);
         
+        cout << wine.name << "\n";
+        cout << wine.description << "\n";
         
     }
 
@@ -2205,14 +2166,14 @@ int main( int argc, char* args[] ){
         //cre2->randomDance();
         
         drawVectorMap();
+        
+        draw_items();
+        
         //Draw all the sprites
         cre1->draw();
-        cre2->draw();
-        cre3->draw();
         shroom1->draw();
         lov1->draw();
         
-        draw_items();
         draw_creatures();
         
         //drawTexture(gRenderer, text1, 5, 5);
@@ -2220,7 +2181,6 @@ int main( int argc, char* args[] ){
         cre1->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         cre1->drawStaff(gRenderer, item_tiles_p, item_tiles_s);
         cre1->drawLight(gRenderer, item_tiles_p, item_tiles_s);
-        cre3->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         
         draw_animations();
         draw_effects();
@@ -2250,8 +2210,6 @@ int main( int argc, char* args[] ){
     
     //Free up sprites and everything else
     cre1->free();
-    cre2->free();
-    cre3->free();
     shroom1->free();
     lov1->free();
     close();
