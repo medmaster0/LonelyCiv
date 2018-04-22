@@ -28,14 +28,14 @@
 //Input: also need to innput map_width as a sort of key to index the array elements. SORRY
 //Input the x,y coordinates of the upper left corner of the building
 //Input N, the dimensions of square building
-void build_box_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int x, int y, int n){
+void build_box_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_width,int map_height, int x, int y, int n, SDL_Color col1_in, SDL_Color col2_in){
  
     int tempx, tempy; //stores the cuurent positing we are working on building
     int tile = 304; //304 is the Item code for (bricks)
     
     //Generate random colors to use for these buildings
-    SDL_Color col1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255 };
-    SDL_Color col2 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255 };
+    SDL_Color col1 = col1_in;
+    SDL_Color col2 = col2_in;
     
     //create top row
     for(int i = 0; i < n; i++){ //cycle through 5
@@ -90,17 +90,17 @@ void build_box_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_w
 //Input the x,y coordinates of the upper left corner of the building
 //Input N, the dimensions of square building
 //Deletes one of the bricks along the wall to create a doorway (currently the center brick)
-void build_box_NxN_door(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int x, int y, int n){
+void build_box_NxN_door(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int x, int y, int n, SDL_Color col1_in, SDL_Color col2_in){
     
     int tempx, tempy; //stores the cuurent positing we are working on building
     int tile = 304; //304 is the Item code for (bricks)
     
     //Generate random colors to use for these buildings
-    SDL_Color col1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255 };
-    SDL_Color col2 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255 };
+    SDL_Color col1 = col1_in;
+    SDL_Color col2 = col2_in;
     
     //Use the exisiting build box routine
-    build_box_NxN(map_scenery, block_map, map_width, x, y, n);
+    build_box_NxN(map_scenery, block_map, map_width,map_height, x, y, n, col1, col2);
     
     //Delete one of the bricks to form a doorway
     int choice = rand()%4; //pick one of the four walls
@@ -214,7 +214,7 @@ bool is_square_clear(bool* block_map, int map_width, int map_height, int x, int 
 }
 
 //builds two houses and puts a path between them
-void build_two_house_path(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height){
+void build_two_house_path(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color floor_p_col_in, SDL_Color floor_s_col_in, SDL_Color brick_p_col_in, SDL_Color brick_s_col_in){
     
     int x1,y1,x2,y2; //stores the coords of two points in the buildings for path finding
     
@@ -226,10 +226,11 @@ void build_two_house_path(vector<vector<Item>>* map_scenery, bool* block_map, in
         build_y = rand()%map_height;
         build_dim = 5+rand()%3;
         if(is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, build_dim+2)){ //If we are all clear, start building... keep a 1 tile wide perimeter
-            build_box_NxN_door(map_scenery, block_map, map_width, build_x, build_y, build_dim); //call building routine
+            
+            build_box_NxN_door(map_scenery_top, block_map, map_width, map_height, build_x, build_y, build_dim, brick_p_col_in, brick_s_col_in); //call building routine
         
             //Build a floor in building
-            build_floor_NxN(map_scenery, block_map, map_width, map_height, build_x+1, build_y+1, build_dim - 2);
+            build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, build_x+1, build_y+1, build_dim - 2, floor_p_col_in, floor_s_col_in);
             
             //Also find a spot inside building
             x1 = build_x + 1 + rand()%(build_dim - 2);
@@ -244,10 +245,11 @@ void build_two_house_path(vector<vector<Item>>* map_scenery, bool* block_map, in
         build_y = rand()%map_height;
         build_dim = 5+rand()%3;
         if(is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, build_dim+2)){ //If we are all clear, start building... keep a 1 tile wide perimeter
-            build_box_NxN_door(map_scenery, block_map, map_width, build_x, build_y, build_dim); //call building routine
+            
+            build_box_NxN_door(map_scenery_top, block_map, map_width, map_height, build_x, build_y, build_dim, brick_p_col_in, brick_s_col_in); //call building routine
             
             //Build a floor in building
-            build_floor_NxN(map_scenery, block_map, map_width, map_height, build_x+1, build_y+1, build_dim - 2);
+            build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, build_x+1, build_y+1, build_dim - 2, floor_p_col_in, floor_s_col_in);
             
             //Also find a spot inside building
             x2 = build_x + 1 + rand()%(build_dim - 2);
@@ -262,8 +264,8 @@ void build_two_house_path(vector<vector<Item>>* map_scenery, bool* block_map, in
     int FLOOR_TILE_INDEX = 301;
     
     //Now cycle through the Entire Path
-    SDL_Color p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
-    SDL_Color s_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    SDL_Color floor_p_col = floor_p_col_in;
+    SDL_Color floor_s_col = floor_s_col_in;
     bool has_tile = false; //flag used to indicate the path has a tile
     while(path.size()>0){
         
@@ -273,8 +275,8 @@ void build_two_house_path(vector<vector<Item>>* map_scenery, bool* block_map, in
         
         //make sure a tile isn't already there.
         has_tile = false;
-        for(int z = 0; z < map_scenery->at((temp_step[1]*map_width) + temp_step[0]).size() ; z++){
-            if(map_scenery->at( (temp_step[1]*map_width) + temp_step[0] ).at(z).type == FLOOR_TILE_INDEX){
+        for(int z = 0; z < map_scenery_bottom->at((temp_step[1]*map_width) + temp_step[0]).size() ; z++){
+            if(map_scenery_bottom->at( (temp_step[1]*map_width) + temp_step[0] ).at(z).type == FLOOR_TILE_INDEX){
                 printf("skip tile\n");
                 has_tile = true; //set flag to prevent creation of new tile
             }
@@ -282,8 +284,8 @@ void build_two_house_path(vector<vector<Item>>* map_scenery, bool* block_map, in
         if(has_tile == true){continue;} //move on to next step
         
         //Create a floortile tile at each step
-        Item temp_floor = Item(temp_step[0], temp_step[1], FLOOR_TILE_INDEX, p_col, s_col );
-        map_scenery->at((temp_step[1]*map_width)+temp_step[0]).push_back(temp_floor);
+        Item temp_floor = Item(temp_step[0], temp_step[1], FLOOR_TILE_INDEX, floor_p_col, floor_s_col );
+        map_scenery_bottom->at((temp_step[1]*map_width)+temp_step[0]).push_back(temp_floor);
     }
     
 }

@@ -51,8 +51,12 @@ SDL_Texture** item_tiles_s; //seco item tiles
 SDL_Texture** item_tiles_t; //terto item tiles
 vector<SDL_Color> world_colors; //array of sdl_colors
 vector<vector<Item>> map_items; //a list of list of items on a tile. Index corresponds to [y*map_width + x]
-vector<vector<Item>> map_scenery; //a list of list of scenery on a tile. Index correspongs to [y*map_width + x]
+vector<vector<Item>> map_scenery_top; //a list of list of scenery on a tile. Index correspongs to [y*map_width + x]
                                   //THis is separate from the map_items list so creatures won't pick these items up
+                                  //This version will be the last to be drawn on screen
+vector<vector<Item>> map_scenery_bottom; //a list of list of scenery on a tile. Index correspongs to [y*map_width + x]
+                                    //THis is separate from the map_items list so creatures won't pick these items up
+                                    //This version will be the first to be drawn on screen
 
 //Creatures Stuff
 vector<Sprite> map_creatures; //a list of all creatures on map
@@ -417,7 +421,8 @@ void init_environment(){
 
     //Initialize our dimension-indexed arrays based on map dimensions
     map_items.resize(map_width*map_height);
-    map_scenery.resize(map_width*map_height);
+    map_scenery_top.resize(map_width*map_height);
+    map_scenery_bottom.resize(map_width*map_height);
     map_tents.resize(map_width*map_height);
     map_workshops.resize(map_width*map_height);
     map_effects.resize(map_width*map_height);
@@ -542,7 +547,7 @@ void init_environment(){
         tempy = rand()%(map_height);
         temp_tile = rand()%199;
         Item temp_item = Item(tempx, tempy, temp_tile,world_colors[temp_tile],{255,255,255,0} ); //temporary item (scenery)
-        map_scenery[(tempy*map_width)+tempx].push_back(temp_item);
+        map_scenery_bottom[(tempy*map_width)+tempx].push_back(temp_item);
     }
     
 //    //Create some buildings
@@ -572,9 +577,15 @@ void init_environment(){
 //
 //    }
     
-    build_two_house_path(&map_scenery, block_map, map_width, map_height);
-    build_two_house_path(&map_scenery, block_map, map_width, map_height);
-    build_two_house_path(&map_scenery, block_map, map_width, map_height);
+    //Generate colors for neighboorhood/market/bazaar
+    SDL_Color build_col_p = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    SDL_Color build_col_s = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    SDL_Color floor_col_p = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    SDL_Color floor_col_s = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    //Now build some houses
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s);
     
     
     //Creatures
@@ -624,6 +635,14 @@ void init_environment(){
 
 //Draws all the items
 void draw_items(){
+    
+    //also draw the  bottom scenery items
+    for(int i = 0 ; i < map_scenery_bottom.size(); i++){
+        for(int j = 0 ; j < map_scenery_bottom[i].size(); j++){
+            map_scenery_bottom[i][j].draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
+        }
+    }
+    
     //Cycle through all items on map
     for(int i = 0; i < map_items.size(); i++){
         for(int j = 0 ; j < map_items[i].size(); j++){
@@ -631,12 +650,14 @@ void draw_items(){
         }
     }
     
-    //also draw the scenery items
-    for(int i = 0 ; i < map_scenery.size(); i++){
-        for(int j = 0 ; j < map_scenery[i].size(); j++){
-            map_scenery[i][j].draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
+    //also draw the top scenery items
+    for(int i = 0 ; i < map_scenery_top.size(); i++){
+        for(int j = 0 ; j < map_scenery_top[i].size(); j++){
+            map_scenery_top[i][j].draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
         }
     }
+    
+    
 }
 
 //Draws all the creatures
