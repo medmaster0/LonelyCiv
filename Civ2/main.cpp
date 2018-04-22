@@ -584,7 +584,10 @@ void init_environment(){
     SDL_Color floor_col_s = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
     SDL_Color door_col_s = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
     //Now build some houses
-    build_circle_radius(&map_scenery_top, block_map, map_width, 5, 10, 10, build_col_p, build_col_s);
+    build_circle_radius_door(&map_scenery_top, block_map, map_width,9, 13, 10, build_col_p, build_col_s);
+    build_floor_radius(&map_scenery_bottom, block_map, map_width, map_height, 13, 10, 8, floor_col_p, floor_col_s); //notice how it is one less than wall build radius
+    build_floor_path(&map_scenery_bottom, block_map, map_width, map_height, 13, 10, 30, 30, floor_col_p, floor_col_s);
+    
     build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
     build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
     build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);

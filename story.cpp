@@ -106,16 +106,94 @@ vector<string> written_by_syns = {"written by", "according to", "as proclaimed b
 // L, C
 // D, M
 //New Extended System: J, W, Y, K, B, E, N (letter afterwards (unless taken, then you go backwards (L->M->K instead) )
+// W, Y
+// K, B
+// E, N
+//
 string roman_numerals(int number){
     string roman_numerals = "";
     
+    //MAGNITUDE: 100,000's
+    //DETERMINE B's and E's (maybe BN/BE)
+    int num_B = number / 100000;
+    number = number - (num_B * 100000);
+    //If 9, put BN
+    if(num_B == 9){
+        roman_numerals.append("BN");
+        num_B = 0; //set to 0, so we don't add any more in this 10's magnitude
+    }
+    //Determine if need E ( > 5 )
+    if(num_B >= 5){
+        roman_numerals.append("E");
+        num_B = num_B - 5;
+    }
+    //If 4, put BE
+    if(num_B == 4){
+        roman_numerals.append("BE");
+        num_B = 0;
+    }
+    //Put remaining B's
+    for(int i = 0; i<num_B; i++){
+        roman_numerals.append("B");
+    }
+    
+    //MAGNITUDE: 10000's
+    //DETERMINE Y's and K's (maybe YB/YK)
+    int num_Y = number / 10000;
+    number = number - (num_Y * 10000);
+    //If 9, put YB
+    if(num_Y == 9){
+        roman_numerals.append("YB");
+        num_Y = 0; //set to 0, so we don't add any more in this 10's magnitude
+    }
+    //Determine if need K ( > 5 )
+    if(num_Y >= 5){
+        roman_numerals.append("K");
+        num_Y = num_Y - 5;
+    }
+    //If 4, put YK
+    if(num_Y == 4){
+        roman_numerals.append("YK");
+        num_Y = 0;
+    }
+    //Put remaining Y's
+    for(int i = 0; i<num_Y; i++){
+        roman_numerals.append("Y");
+    }
+    
     //MAGNITUDE: 1000's
-    //DETERMINE M's (Simple, Inelegant... TODO: Come up with further ROMAN NUMERALS)
+    //DETERMINE M's and W's (maybe MY/MW)
     int num_M = number / 1000;
     number = number - (num_M * 1000);
+    //If 9, put MY
+    if(num_M == 9){
+        roman_numerals.append("MY");
+        num_M = 0; //set to 0, so we don't add any more in this 10's magnitude
+    }
+    //Determine if need W ( > 5 )
+    if(num_M >= 5){
+        roman_numerals.append("W");
+        num_M = num_M - 5;
+    }
+    //If 4, put MW
+    if(num_M == 4){
+        roman_numerals.append("MW");
+        num_M = 0;
+    }
+    //Put remaining M's
     for(int i = 0; i<num_M; i++){
         roman_numerals.append("M");
     }
+    
+    // MADE UP ABOVE ^^
+    //
+    //    //MAGNITUDE: 1000's
+    //    //DETERMINE M's (Simple, Inelegant... TODO: Come up with further ROMAN NUMERALS)
+    //    int num_M = number / 1000;
+    //    number = number - (num_M * 1000);
+    //    for(int i = 0; i<num_M; i++){
+    //        roman_numerals.append("M");
+    //    }
     
     //MAGNITUDE: 100's
     //DETERMINE C's and D's (maybe CM/CD)
@@ -2564,7 +2642,7 @@ string genWine(){
     wine_name.append(saints[rand()%saints.size()]);
     wine_name.append("'s ");
     wine_name.append("Wine ");
-    wine_name.append(roman_numerals(rand()%2010));
+    wine_name.append(roman_numerals(rand()%999010));
     wine_name.append(". It's ");
     wine_name.append(wine_sweetness[rand()%wine_sweetness.size()]);
     wine_name.append(" with hints of ");
@@ -2593,7 +2671,7 @@ string genWineName(){
     wine_name.append(saints[rand()%saints.size()]);
     wine_name.append("'s ");
     wine_name.append("Wine ");
-    wine_name.append(roman_numerals(rand()%2010));
+    wine_name.append(roman_numerals(rand()%999010));
 
     return wine_name;
 }

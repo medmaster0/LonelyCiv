@@ -185,8 +185,63 @@ void build_floor_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map
             map_scenery->at( (temp_floor.y*map_width) + temp_floor.x ).push_back(temp_floor);
         }
     }
+}
+
+//Builds an circular floor of radius radius out of floortile tiles
+void build_floor_radius(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int cent_x, int cent_y, int radius, SDL_Color p_col, SDL_Color s_col){
     
+    //NEED TO CHECK IF SPACE IS CLEAR!!! :0
+    if(is_circle_clear(block_map, map_width, map_height, cent_x, cent_y, radius)){
+        return;
+    }
     
+    //Cycle through flor space
+    for(int y = -radius; y<=radius; y++){ //cycle through all possible points
+        for(int x = -radius; x<=radius; x++){ //cycle though all possible points
+            if(x*x + y*y <= radius*radius){ //if point within cricle...
+                
+                //Build Floor
+                Item temp_floor = Item(x+cent_x, y+cent_y, 301, p_col, s_col);
+                map_scenery->at( (temp_floor.y*map_width) + temp_floor.x ).push_back(temp_floor);
+                
+            }
+        }
+    }
+    
+}
+
+//finds and builds a pathway between the two points - won't build over existing floor tiles
+void build_floor_path(vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x1, int y1, int x2, int y2, SDL_Color floor_p_col_in, SDL_Color floor_s_col_in){
+    
+    //Find path between two buildings
+    vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps to get between the two buildings
+    
+    int FLOOR_TILE_INDEX = 301;
+    
+    //Now cycle through the Entire Path
+    SDL_Color floor_p_col = floor_p_col_in;
+    SDL_Color floor_s_col = floor_s_col_in;
+    bool has_tile = false; //flag used to indicate the path has a tile
+    while(path.size()>0){
+        
+        //get next step from list
+        vector<int> temp_step = path.back();
+        path.pop_back();
+        
+        //make sure a tile isn't already there.
+        has_tile = false;
+        for(int z = 0; z < map_scenery_bottom->at((temp_step[1]*map_width) + temp_step[0]).size() ; z++){
+            if(map_scenery_bottom->at( (temp_step[1]*map_width) + temp_step[0] ).at(z).type == FLOOR_TILE_INDEX){
+                printf("skip tile\n");
+                has_tile = true; //set flag to prevent creation of new tile
+            }
+        }
+        if(has_tile == true){continue;} //move on to next step
+        
+        //Create a floortile tile at each step
+        Item temp_floor = Item(temp_step[0], temp_step[1], FLOOR_TILE_INDEX, floor_p_col, floor_s_col );
+        map_scenery_bottom->at((temp_step[1]*map_width)+temp_step[0]).push_back(temp_floor);
+    }
 }
 
 
@@ -267,10 +322,68 @@ void build_circle_radius(vector<vector<Item>>* map_scenery, bool* block_map, int
         
     }
     
+    //QUICK FIX!!!! AFter algorithm finishes, four extra corner blocks are seen... Need to remove each
+    int tempx, tempy;
+    tempx = cent_x + radius;
+    tempy = cent_y + 0;
+    map_scenery->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
+    tempx = cent_x - radius;
+    tempy = cent_y + 0;
+    map_scenery->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
+    tempx = cent_x + 0;
+    tempy = cent_y + radius;
+    map_scenery->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
+    tempx = cent_x + 0;
+    tempy = cent_y - radius;
+    map_scenery->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
+    
 }
 
-
-
+////Builds a circular structure of bricks
+//Uses previous build_circle_radius algorithm, then removes one of the points on the circle
+void build_circle_radius_door(vector<vector<Item>>* map_scenery_top, bool* block_map, int map_width, int radius_in, int cent_x, int cent_y, SDL_Color p_col_in, SDL_Color s_col_in, SDL_Color door_col1){
+    
+    int radius = radius_in - 1; //don't count center point
+    
+    build_circle_radius(map_scenery_top, block_map, map_width, radius, cent_x, cent_y, p_col_in, s_col_in);
+    
+    //Delete one of the bricks to form a doorway
+    int choice = rand()%4; //pick one of the four walls
+    int tempx, tempy = 0; //temp vars used to store removed door coords
+    switch (choice) {
+        case 0: //from right wall
+            tempx = cent_x + radius;
+            tempy = cent_y + 0;
+            break;
+        case 1: //from top wall
+            tempx = cent_x + 0;
+            tempy = cent_y - radius;
+            break;
+        case 2: //from left wall
+            tempx = cent_x - radius;
+            tempy = cent_y + 0;
+            break;
+        case 3: //from bottom wall
+            tempx = cent_x + 0;
+            tempy = cent_y + radius;
+            break;
+        default:
+            break;
+    }
+//    tempx = cent_x + radius - 1;
+//    tempy = cent_y - 1;
+    
+    //now remove that wall and update block map
+    block_map[(tempy*map_width)+tempx] = false; //update the block_map
+    map_scenery_top->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
+    //map_scenery_top->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
+    
+//    //Now create a new doorway Item and add to scenery
+//    SDL_Color col3 = door_col1;
+//    Item temp_door = Item(tempx, tempy, 317, col3, {0,0,0,255}); //create a DOORWAY (Curtains) Item
+//    map_scenery_top->at((tempy*map_width)+tempx).push_back(temp_door);
+    
+}
 
 //checks the block map to make sure nothing is blocking the current location
 //Returns a true if clear, false if not
@@ -295,6 +408,31 @@ bool is_square_clear(bool* block_map, int map_width, int map_height, int x, int 
     return true;
     
 }
+
+//checks the block map to make sure nothing is blocking the circle
+//NOT COMPLETELY COMPATIBLE WITH CIRCLE DRAW MIDPOINT ALGORITHM
+//BUT WILL MATCH FLOOD FILE CIRCLE ALGORITHM IN build_floor_radius algorithm
+bool is_circle_clear(bool* block_map, int map_width, int map_height, int cent_x, int cent_y, int radius){
+    
+    //Cycle through flor space
+    for(int y = -radius; y<=radius; y++){ //cycle through all possible points
+        for(int x = -radius; x<=radius; x++){ //cycle though all possible points
+            if(x*x + y*y <= radius*radius){ //if point within cricle...
+                
+                //Now check that location
+                if(block_map[(y*map_width) + x] == true){ //if point is blocked
+                    return false;
+                }
+                
+            }
+        }
+    }
+    
+    //If it makes it here, than return all clear signal
+    return true;
+    
+}
+
 
 //builds two houses and puts a path between them
 void build_two_house_path(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color floor_p_col_in, SDL_Color floor_s_col_in, SDL_Color brick_p_col_in, SDL_Color brick_s_col_in, SDL_Color door_col1 ){
