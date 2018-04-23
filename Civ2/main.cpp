@@ -103,6 +103,9 @@ int shroom_inventory_index = 0; //which shroom in map_shrooms to display invonto
 bool consoleDisplayOn = false;
 queue<string> consoleLog; //a queue of strings to keep track of console messages
 
+//UI SETTINGS
+double PLAYER_CREATURE_SPEED = 7.0; 
+
 /////////////////////////////////////////////////////////
 ////FUNCTIONS BEGIN////////////////////////////////////////
 ////////////////////////////////////////////////////////
@@ -453,94 +456,9 @@ void init_environment(){
         map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
     }
     
-    
+    //Here is where we first initilize block_map...
     block_map = new bool[map_width*map_height](); //initialize a dynamically sized blocked map
-//    //Make a brick maze
-//    vector<vector<short>> gmap = gen_maze_corridor(30,30);
-//    int con_x = 01;//the starting point of construction
-//    int con_y = 0;//the starting point of construction
-//    //redefine color
-//    p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
-//    s1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
-//    //BASIC RECIPE FOR MAKING A MAZE OUT OF PHYSICAL ITEMS
-//    for(int j = 0 ; j < gmap.size(); j++){ //the ROWS of
-//        for(int i = 0; i<gmap[j].size();i++){ //the COLS of
-//
-//            tempx = i + con_x;
-//            if(tempx >= map_width){continue;}
-//            tempy = j + con_y;
-//            if( tempy >= map_height){continue;}
-//            //Now check if the space is empty or wall
-//            //(Switch i and j for rotation)
-//            if(gmap[i][j] == 1){
-//            //if(gmap[j][i] == 1){
-//
-//                //then we need a wall here
-//                Item con_item = Item(tempx, tempy, 304, p1, s1);
-//                map_items[(tempy*map_width)+tempx].push_back(con_item);
-//                block_map[(tempy*map_width)+tempx] = true;
-//            }
-//
-//        }
-//    }
-    
-//    //Make anotha brick maze
-//    gmap = gen_maze_corridor(30,30);
-//    con_x = 30;//the starting point of construction
-//    con_y = 00;//the starting point of construction
-//    //redefine color
-//    p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
-//    s1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
-//    //BASIC RECIPE FOR MAKING A MAZE OUT OF PHYSICAL ITEMS
-//    for(int j = 0 ; j < gmap.size(); j++){ //the ROWS of
-//        for(int i = 0; i<gmap[j].size();i++){ //the COLS of
-//
-//            tempx = i + con_x;
-//            if(tempx >= map_width){continue;}
-//            tempy = j + con_y;
-//            if( tempy >= map_height){continue;}
-//            //Now check if the space is empty or wall
-//            //(Switch i and j for rotation)
-//            //if(gmap[i][j] == 1){
-//            if(gmap[j][i] == 1){
-//                //then we need a wall here
-//                Item con_item = Item(tempx, tempy, 304, p1, s1);
-//                map_items[(tempy*map_width)+tempx].push_back(con_item);
-//                block_map[(tempy*map_width)+tempx] = true;
-//            }
-//
-//        }
-//    }
 
-//    //And anotha maze, trick
-//    gmap = gen_maze_corridor(30,30);
-//    con_x = 60;//the starting point of construction
-//    con_y = 10;//the starting point of construction
-//    //redefine color
-//    p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
-//    s1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
-//    //BASIC RECIPE FOR MAKING A MAZE OUT OF PHYSICAL ITEMS
-//    for(int j = 0 ; j < gmap.size(); j++){ //the ROWS of
-//        for(int i = 0; i<gmap[j].size();i++){ //the COLS of
-//
-//            tempx = i + con_x;
-//            if(tempx >= map_width){continue;}
-//            tempy = j + con_y;
-//            if( tempy >= map_height){continue;}
-//            //Now check if the space is empty or wall
-//            //(Switch i and j for rotation)
-//            //if(gmap[i][j] == 1){
-//            if(gmap[j][i] == 1){
-//                //then we need a wall here
-//                Item con_item = Item(tempx, tempy, 304, p1, s1);
-//                map_items[(tempy*map_width)+tempx].push_back(con_item);
-//                block_map[(tempy*map_width)+tempx] = true;
-//            }
-//
-//        }
-//    }
-    
-    
     //create random scenery (from the randomly generated assets)
     for(int g = 0 ; g<125; g++){
         tempx = rand()%(map_width);
@@ -550,33 +468,6 @@ void init_environment(){
         map_scenery_bottom[(tempy*map_width)+tempx].push_back(temp_item);
     }
     
-//    //Create some buildings
-//
-//    build_maze(&map_scenery, block_map, map_width, map_height, 30, 1);
-//    build_maze(&map_scenery, block_map, map_width, map_height, 60, 1);
-//    build_maze(&map_scenery, block_map, map_width, map_height, 30, 20);
-//
-////    build_box_NxN(&map_scenery, block_map, map_width, 55, 15, 7);
-//
-//    int build_x, build_y; //temporary locations for building
-//    int build_dim; //dimensinos of building
-//    for(int b = 0; b < 6; b++){ //we're going to build 6 buildings
-//
-//        //keep trying random locations until we can build there
-//        while(true){
-//            build_dim = 5 + rand()%4;
-//            build_x = rand()%(map_width-build_dim-1);
-//            build_y = rand()%(map_height-build_dim-1);
-//
-//            if(is_square_clear(block_map, map_width, build_x-1, build_y-1, build_dim+2)){ //If we are all clear, start building... keep a 1 tile wide perimeter
-//                build_box_NxN_door(&map_scenery, block_map, map_width, build_x, build_y, build_dim);
-//                break; //break out of while loop and move on to next iteration in for loop
-//            }
-//
-//        }
-//
-//    }
-    
     //Generate colors for neighboorhood/market/bazaar
     SDL_Color build_col_p = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
     SDL_Color build_col_s = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
@@ -584,7 +475,7 @@ void init_environment(){
     SDL_Color floor_col_s = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
     SDL_Color door_col_s = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
     //Now build some houses
-    build_circle_radius_door(&map_scenery_top, block_map, map_width,9, 13, 10, build_col_p, build_col_s);
+    build_circle_radius_door(&map_scenery_top, block_map, map_width,9, 13, 10, build_col_p, build_col_s, door_col_s);
     build_floor_radius(&map_scenery_bottom, block_map, map_width, map_height, 13, 10, 8, floor_col_p, floor_col_s); //notice how it is one less than wall build radius
     build_floor_path(&map_scenery_bottom, block_map, map_width, map_height, 13, 10, 30, 30, floor_col_p, floor_col_s);
     
@@ -638,9 +529,9 @@ void init_environment(){
     
 }
 
-//Draws all the items
-void draw_items(){
-    
+//Draws all the items and creatures on map
+void draw_environment(){
+
     //also draw the  bottom scenery items
     for(int i = 0 ; i < map_scenery_bottom.size(); i++){
         for(int j = 0 ; j < map_scenery_bottom[i].size(); j++){
@@ -655,18 +546,11 @@ void draw_items(){
         }
     }
     
-    //also draw the top scenery items
-    for(int i = 0 ; i < map_scenery_top.size(); i++){
-        for(int j = 0 ; j < map_scenery_top[i].size(); j++){
-            map_scenery_top[i][j].draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
-        }
+    //Cycle through all shrooms and draw
+    for(int i = 0; i < map_shrooms.size(); i++){
+        map_shrooms[i].draw();
     }
     
-    
-}
-
-//Draws all the creatures
-void draw_creatures(){
     //Cycle through all creatures and draw
     for(int i = 0; i < map_creatures.size(); i++){
         map_creatures[i].draw();
@@ -675,14 +559,21 @@ void draw_creatures(){
         map_creatures[i].drawLight(gRenderer, item_tiles_p, item_tiles_s);
     }
     
-    //Cycle through all shrooms and draw
-    for(int i = 0; i < map_shrooms.size(); i++){
-        map_shrooms[i].draw();
+    //also draw the top scenery items
+    for(int i = 0 ; i < map_scenery_top.size(); i++){
+        for(int j = 0 ; j < map_scenery_top[i].size(); j++){
+            map_scenery_top[i][j].draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
+        }
     }
-}
-
-//Draws all of the effects
-void draw_effects(){
+    
+    //Cycle through all animations on map
+    for(int i = 0; i < map_animations.size(); i++){
+        for(int j = 0 ; j < map_animations[i].size(); j++){;
+            //printf("drawing anme");
+            map_animations[i][j].draw(gRenderer, misc_tiles);
+        }
+    }
+    
     //Cycle through all effects on amp
     for(int i = 0; i < map_effects.size(); i++){
         for(int j = 0 ; j < map_effects[i].size(); j++){
@@ -690,17 +581,8 @@ void draw_effects(){
             map_effects[i][j].drawScroll(gRenderer, misc_tiles);
         }
     }
-}
 
-//Draws all of the animations
-void draw_animations(){
-    //Cycle through all effects on map
-    for(int i = 0; i < map_animations.size(); i++){
-        for(int j = 0 ; j < map_animations[i].size(); j++){;
-            //printf("drawing anme");
-            map_animations[i][j].draw(gRenderer, misc_tiles);
-        }
-    }
+
 }
 
 //////////////////////
@@ -1119,8 +1001,8 @@ void free_path(Sprite cre){
     }
 }
 
-////////////////////////////
-//THREADS - ACTIONS
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+//THREADS - ACTIONS ////////////////////////////////////////////////////////////////////////////////////
 
 //a thread for wandering to a random place
 void wander_thread(Sprite* spr1){
@@ -1607,22 +1489,17 @@ void task_creatures_thread(){
     }
 }
 
-//void music_thread(int ToneHz){
-//    playToneOnce(ToneHz, 2000);
-//    SDL_Delay(2000);
-//    
-//}
-
-//a thread for changing the background periodically
 void background_color_thread(){
     
-    int change_color_timer; //used as a timer for when to change the color bounds
+    //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
+    int steps_to_pop = 0; //how many steps need to be ticked on the colors
+    int carry_over = 0; //how many ticks were rounded off
+    int BACKGROUND_CHANGE_SPEED = 500; //constant used to throttle how oftern background color changes
+    int animate_timer = SDL_GetTicks();
     
-    int change = 1; //for grey scale / even changing across rgb components
     //How much we change the colors
     int r_inc = 1;
     int g_inc = 1;
-    //int g_inc = 0; 
     int b_inc = 1;
     
     //THESE COLORS SHOULD RANGE FROM 1 to 254 (NO 0 or 255!!!!)
@@ -1631,69 +1508,73 @@ void background_color_thread(){
     int g1 = 1;
     int b1 = 1;
     //stop color
-//    int r2 = 143;
-//    int g2 = 133;
-//    int b2 = 254;
-//    int r2 = (rand()%154) + 1;
-//    int g2 = (rand()%154) + 1;
-//    int b2 = (rand()%154) + 1;
-    int r2 = (rand()%253) + 1;
-    int g2 = (rand()%253) + 1;
-    int b2 = (rand()%253) + 1;
+    int r2 = (rand()%223) + 30;
+    int g2 = (rand()%223) + 30;
+    int b2 = (rand()%223) + 30;
     //BOUNCES BACK AND FORTH BETWEeN THE VALUES
-
     
     //initialize background color (global)
     back_col = {static_cast<Uint8>(rand()%(r2-5)), static_cast<Uint8>(rand()%(g2-5)), static_cast<Uint8>(rand()%(b2-5))};
     
-    vector<int> fave_color;
+    //THE ACTUAL DRAW LOOP ////////////////////////////////////
+    //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    int new_r, new_g, new_b; //temporary variables used t check rgb values before writing them
     while(true){
         
-        //change is an opportunity for growth
-//        back_col.r=back_col.r+change;
-//        back_col.g=back_col.g+change;
-//        back_col.b=back_col.b+change;
-//
-//        //bounds checking
-//        if(back_col.r>254){
-//            change = -1;
-//        }
-//        if(back_col.r==0){
-//            change = +1;
-//        }
-//
-
-
-        //oscilates between the two
-
-        //change is an opportunity for growth
-        //let's only change one color - nice effect :)
-        back_col.r=back_col.r+r_inc;
-        back_col.g=back_col.g+g_inc;
-        back_col.b=back_col.b+b_inc;
-
-        //bounds checking
-        if( (back_col.r>r2) || (back_col.r<r1) ){
+        //////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////
+        ///// FIRST PART: Update background color
+        
+        //Determine how many steps have to be moved while time has passed
+        steps_to_pop = ( SDL_GetTicks() - animate_timer ) / BACKGROUND_CHANGE_SPEED; //ONe tick every 100 ms
+        
+        //NOW apply that many
+        new_r = back_col.r + (steps_to_pop*r_inc);
+        new_g = back_col.g + (steps_to_pop*g_inc);
+        new_b = back_col.b + (steps_to_pop*b_inc);
+        //bounds checkings
+        if(new_r > r2){
             r_inc = r_inc * -1;
+            new_r = r2;
         }
-        if( (back_col.g>g2) || (back_col.g<g1) ){
+        if(new_r < r1){
+            r_inc = r_inc * -1;
+            new_r = r1;
+        }
+        
+        if(new_g > g2){
             g_inc = g_inc * -1;
+            new_g = g2;
         }
-        if( (back_col.b>b2) || (back_col.b<b1) ){
+        if(new_g < g1){
+            g_inc = g_inc * -1;
+            new_g = g1;
+        }
+        
+        if(new_b > b2){
             b_inc = b_inc * -1;
+            new_b = b2;
         }
+        if(new_b < b1){
+            b_inc = b_inc * -1;
+            new_b = b1;
+        }
+        //Now that values have been checked, we can write them
+        back_col.r = new_r;
+        back_col.g = new_g;
+        back_col.b = new_b;
         
-//        //set background color - remember, back_col is GLOBAL!!!
-//        fave_color = return_fave_rgb();
-//        back_col.r = fave_color[0];
-//        back_col.g = fave_color[1];
-//        back_col.b = fave_color[2];
-//        SDL_Delay(10000);
         
-//        back_col = redNoise(back_col); //slowly shift around a red color
+        //Update animate timer
+        //Figure out how much time not accounted for
+        carry_over = SDL_GetTicks() - animate_timer; //How much time has elapsed since last timing
+        carry_over = carry_over - (steps_to_pop * BACKGROUND_CHANGE_SPEED); //don't count the time we *have* accounted for
+        //Now check new timer but also remember the time we haven't accounted for
+        animate_timer = SDL_GetTicks() - carry_over; //Now update the timer, but set it back for unaccounted time
+        //////////////////////////
+        //DONE TAKING CARE OF BACKGROUND UPDATES
         
-        SDL_Delay(100); //Debug Quick
-        //SDL_Delay(500); //Nice looking
+        
     }
     
 }
@@ -1829,15 +1710,10 @@ int main( int argc, char* args[] ){
     //...Sprites
     Sprite* cre1 = new Sprite(10,10);
     cre1->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
-    Sprite* shroom1 = new Sprite(3,3);
-    shroom1->loadFromFile("Civ2/Civ2/tiles/shroomPrim.png","Civ2/Civ2/tiles/shroomSeco.png", 16, 16);
     Sprite* lov1 = new Sprite(5,5);
     lov1->loadFromFile("Civ2/Civ2/tiles/lovPrim.png", "Civ2/Civ2/tiles/lovSeco.png", 16, 16);
 
     //TEST SHIT
-    //genAdobe();
-    //vector<vector<short>> maze = gen_maze_corridor();
-    //printMaze(maze);
     init_environment();
     Hat temp_accessory = Hat(0, 0, 305); //a temp Item to be added to cre's inventory
     cre1->hat = &temp_accessory; //give him a hat
@@ -1845,69 +1721,6 @@ int main( int argc, char* args[] ){
     //Give cre1 a flag
     Staff temp_staff = Staff(0,0,309); //a temp Item to be added to the cre's equip inventory
     cre1->staff = &temp_staff;
-    
-    //DEBUG AUDIOOOOOOOOOOOOOOOO
-//    // NOTE: Sound test
-    int SamplesPerSecond = 48000;
-//    int ToneHz = 240;
-//    int ToneVolume = 3000;
-//    uint RunningSampleIndex = 0;
-//    int SquareWavePeriod = SamplesPerSecond / ToneHz;
-//    int HalfSquareWavePeriod = SquareWavePeriod / 2;
-    int BytesPerSample = sizeof(int) * 2;
-//    // Open our audio device:
-    initAudio(48000, SamplesPerSecond * BytesPerSample / 60);
-    //playToneCont(440);
-    //playToneOnce(110, 2000);
-    //playSquare(116.6, 2000);
-    //playToneOnce(116, 2000);
-//    playToneOnce(117, 2000);
-    
-    
-//    playToneOnce(220, 2000);
-    //while(true){
-//        playTwoChord(200, 300, 2000);
-    
-//    while(true){
-//        playTwoChord(200, 300, 2000);
-//        playToneOnce(200, 2000);
-//    }
-    SDL_PauseAudio(0);
-    
-//    time_t timev = time(nullptr);
-//    cout << asctime(localtime( &timev )) << timev;
-//    vector<vector<int>> test_path = faveColorSearch(cre5);
-//    for(int i = 0; i < test_path.size(); i++){
-//        printf("\n(%d,%d,%d)", test_path[i][0],test_path[i][1]);
-//    }
-//    
-//    timev = time(nullptr);
-//    cout << asctime(localtime( &timev )) << timev;
-    
-    //playToneList_Phase({440,880,3*440, 4*440, 5*440, 550, 2*550, 3*550, 4*550, 5*550}, 2000);
-//    while(true){
-//        printf("\n");
-//        printScale(genIonian(0));
-//        printf("\n");
-//    }
-    
-//    for(int i = 0; i < 10 ; i++){
-//        playScaleOnce(genMinorChord(0));
-//        playSquare(116.6, 2000);
-//    }
-    
-//    while(true){
-//        //cout << giveMonickerPost( genName() ) << '\n';
-//        //cout << genPrayer() << '\n';
-//        //cout << genLatinSentence() << '\n';
-//        //cout << genCuss() << '\n';
-//        Law* law1 = new Law(genName());
-//        for(int y = 0; y < 77; y++){
-//           law1->addRandArticle( giveMonicker( genName() ) );
-//        }
-//        law1->printLaw();
-//        
-//    }
 
     //RECIPES
     for(int j = 0; j <3; j++){
@@ -1976,9 +1789,7 @@ int main( int argc, char* args[] ){
     //This thread updates the background color
     std::thread backObj(background_color_thread);
     backObj.detach();
-    //This thread updates the audio
-//    std::thread audioObj(compose_music_thread);
-//    audioObj.detach();
+    
     //This thread regenerates weeds
     std::thread regenObj(regen_weedz_thread);
     regenObj.detach();
@@ -1986,18 +1797,16 @@ int main( int argc, char* args[] ){
     std::thread taskObj(task_creatures_thread);
     taskObj.detach();
     
-    //std::thread audioObj1(music_thread, std::ref(440));
-    //wanderObj.join();
-    
-//    int diff_test = color_diff({255,255,255}, {0,0,0});
-//    printf("DEBUGCOLOR DIFF: %d", diff_test);
-    //vector<int> fight_test = color_fight({255,0,255}, {0,255,0} );
-    //printf("DEBUGFIGHT:%d, %d",fight_test[0], fight_test[1]);
-    
-    /////////END DEBUG AREA
-    
     //Variables
     bool shiftDown = false; //a flag holding state of shift key
+    bool sKeyDown = false; //a flag holding the state of the s key
+    int sKeyTimer = SDL_GetTicks();
+    bool dKeyDown = false; //a flag holding the state of the d key
+    int dKeyTimer = SDL_GetTicks();
+    bool aKeyDown = false; //a flag holding the state of the a key
+    int aKeyTimer = SDL_GetTicks();
+    bool wKeyDown = false; //a flag holding the state of the w key
+    int wKeyTimer = SDL_GetTicks();
     vector<int> clr; //a temporary holder for colors used multiple times below
     
     //MAIN GAME LOOP
@@ -2019,67 +1828,75 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_w:
-                        if(cre1->y<1){ //bounds check
-                            break;
+                        if(wKeyDown == false){ //when you first press down the w key
+                            wKeyDown = true;
+                            wKeyTimer = SDL_GetTicks(); //start timer for w_key down
+                            //Also move one step to seem more responsive upon first down
+                            //First, do bounds checking
+                            if(cre1->y < 1){
+                                break;
+                            }
+                            //blocked_check
+                            if(block_map[(cre1->y-1)*map_width+(cre1->x)]==true){
+                                break;
+                            }
+                            //If we made it here, then it's okay to move
+                            cre1->moveUp();
                         }
-                        //blocked check
-                        if(block_map[(cre1->y-1)*map_width+cre1->x]==true){
-                            break;
-                        }
-                        if(shiftDown){ //pick up above tile
-                            pickUpItem(cre1, cre1->x, (cre1->y)-1); //pick up item above
-                            break;
-                        }
-                        cre1->moveUp();
                         break;
                         
                     case SDLK_a:
-                        if(cre1->x<1){ //bounds check
-                            break;
+                        if(aKeyDown == false){ //when you first press down the a key
+                            aKeyDown = true;
+                            aKeyTimer = SDL_GetTicks(); //start timer for a_key down
+                            //Also move one step to seem more responsive upon first down
+                            //First, do bounds checking
+                            if(cre1->x < 1){
+                                break;
+                            }
+                            //blocked_check
+                            if(block_map[(cre1->y)*map_width+(cre1->x-1)]==true){
+                                break;
+                            }
+                            //If we made it here, then it's okay to move
+                            cre1->moveLeft();
                         }
-                        //blocked check
-                        if(block_map[(cre1->y)*map_width+cre1->x-1]==true){
-                            break;
-                        }
-                        if(shiftDown){ //get info of left tile
-                            pickUpItem(cre1, (cre1->x)-1, (cre1->y)); //pick up item left
-                            break;
-                        }
-                        cre1->moveLeft();
                         break;
                         
                     case SDLK_s:
-                        if(cre1->y>map_height-2){ //bounds check
-                            break;
+                        if(sKeyDown == false){ //when you first press down the s key
+                            sKeyDown = true;
+                            sKeyTimer = SDL_GetTicks(); //start timer for s_key down
+                            //Also move one step to seem more responsive upon first down
+                            //First, do bounds checking
+                            if(cre1->y >= map_height-1){
+                                break;
+                            }
+                            //blocked_check
+                            if(block_map[(cre1->y+1)*map_width+(cre1->x)]==true){
+                                break;
+                            }
+                            //If we made it here, then it's okay to move
+                            cre1->moveDown();
                         }
-                        //blocked check
-                        if(block_map[(cre1->y+1)*map_width+cre1->x]==true){
-                            break;
-                        }
-                        if(shiftDown){ //get info of above tile
-                            pickUpItem(cre1, (cre1->x), (cre1->y)+1); //pick up item down
-                            break;
-                        }
-                        cre1->moveDown();
                         break;
                         
                     case SDLK_d:
-                        //bool willMove = true; //if the cre will move this turn
-                        //bounds check
-                        if(cre1->x >= map_width-1){
-                            //willMove = false;
-                            break;
+                        if(dKeyDown == false){ //when you first press down the d key
+                            dKeyDown = true;
+                            dKeyTimer = SDL_GetTicks(); //start timer for d_key down
+                            //Also move one step to seem more responsive upon first down
+                            //First, do bounds checking
+                            if(cre1->x >= map_width-1){
+                                break;
+                            }
+                            //blocked_check
+                            if(block_map[(cre1->y)*map_width+(cre1->x+1)]==true){
+                                break;
+                            }
+                            //If we made it here, then it's okay to move
+                            cre1->moveRight();
                         }
-                        //blocked check
-                        if(block_map[(cre1->y)*map_width+cre1->x+1]==true){
-                            break;
-                        }
-        
-                        if(shiftDown){ //get info of above tile
-                            pickUpItem(cre1, (cre1->x)+1, (cre1->y)); //pick up item right
-                            break;
-                        }
-                        cre1->moveRight();
                         break;
                         
                     case SDLK_SPACE:{
@@ -2127,11 +1944,24 @@ int main( int argc, char* args[] ){
 
                         
                 }
+            //These key press events only happen when a key goes from being down to up (single not continuous)
             }else if(e.type == SDL_KEYUP){
                 switch(e.key.keysym.sym){
                     case SDLK_LSHIFT:
                     case SDLK_RSHIFT:
                         shiftDown = false;
+                        break;
+                    case SDLK_s:
+                        sKeyDown = false;
+                        break;
+                    case SDLK_d:
+                        dKeyDown = false;
+                        break;
+                    case SDLK_a:
+                        aKeyDown = false;
+                        break;
+                    case SDLK_w:
+                        wKeyDown = false;
                         break;
                 }
             }
@@ -2182,33 +2012,148 @@ int main( int argc, char* args[] ){
                 }
             }
             
+            //Process Movement Buttons Here (They need timers for seamless motion)
+            //S-KEY TIMER
+            if(sKeyDown){ //process down key movement
+                //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
+                int steps_to_pop = 0; //how many steps need to be popped off path
+                int carry_over = 0; //how many ticks were rounded off
+                
+                //Determine how many steps have to be moved while time has passed
+                steps_to_pop = ( (SDL_GetTicks() - sKeyTimer)*(PLAYER_CREATURE_SPEED/1000.0) ); // (elapsed time * movement speed) / 1000 ms
+                //NOW MOVE THOSE STEPS
+                for(int j = 0 ; j < steps_to_pop; j++){ //process each step, one, by one
+                    
+                    //First, do bounds checking
+                    if(cre1->y >= map_height-1){
+                        break;
+                    }
+                    //blocked_check
+                    if(block_map[(cre1->y+1)*map_width+cre1->x]==true){
+                        break;
+                    }
+                    //If we made it here, then it's okay to move
+                    cre1->moveDown();
+                    
+                    
+                }//DONE moving steps
+                //update timer
+                //First, determine how much carry-over we need to keep (time we haven't accounted for due to rounding
+                carry_over = (SDL_GetTicks() - sKeyTimer); //How much time we have on timer, total
+                carry_over = carry_over - (steps_to_pop*1000.0/PLAYER_CREATURE_SPEED); //now subtract how much time we've accounted for
+                //carry_over now has how many ticks we haven't updated for
+                sKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+            }//end s key processing
+            //D-KEY TIMER
+            if(dKeyDown){ //process down key movement
+                //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
+                int steps_to_pop = 0; //how many steps need to be popped off path
+                int carry_over = 0; //how many ticks were rounded off
+                
+                //Determine how many steps have to be moved while time has passed
+                steps_to_pop = ( (SDL_GetTicks() - dKeyTimer)*(PLAYER_CREATURE_SPEED/1000.0) ); // (elapsed time * movement speed) / 1000 ms
+                
+                //NOW MOVE THOSE STEPS
+                for(int j = 0 ; j < steps_to_pop; j++){ //process each step, one, by one
+
+                    //First, do bounds checking
+                    if(cre1->x >= map_width-1){
+                        break;
+                    }
+                    //blocked_check
+                    if(block_map[(cre1->y)*map_width+(cre1->x+1)]==true){
+                        break;
+                    }
+                    //If we made it here, then it's okay to move
+                    cre1->moveRight();
+
+
+                }//DONE moving steps
+               
+                //update timer
+                //First, determine how much carry-over we need to keep (time we haven't accounted for due to rounding
+                carry_over = (SDL_GetTicks() - dKeyTimer); //How much time we have on timer, total
+                carry_over = carry_over - (steps_to_pop*1000.0/PLAYER_CREATURE_SPEED); //now subtract how much time we've accounted for
+                //carry_over now has how many ticks we haven't updated for
+                dKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+            }//end d key processing
+            
+            //A-KEY TIMER
+            if(aKeyDown){ //process left key movement
+                //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
+                int steps_to_pop = 0; //how many steps need to be popped off path
+                int carry_over = 0; //how many ticks were rounded off
+                
+                //Determine how many steps have to be moved while time has passed
+                steps_to_pop = ( (SDL_GetTicks() - aKeyTimer)*(PLAYER_CREATURE_SPEED/1000.0) ); // (elapsed time * movement speed) / 1000 ms
+                
+                //NOW MOVE THOSE STEPS
+                for(int j = 0 ; j < steps_to_pop; j++){ //process each step, one, by one
+                    
+                    //First, do bounds checking
+                    if(cre1->x < 1){
+                        break;
+                    }
+                    //blocked_check
+                    if(block_map[(cre1->y)*map_width+(cre1->x-1)]==true){
+                        break;
+                    }
+                    //If we made it here, then it's okay to move
+                    cre1->moveLeft();
+                }//DONE moving steps
+                //update timer
+                //First, determine how much carry-over we need to keep (time we haven't accounted for due to rounding
+                carry_over = (SDL_GetTicks() - aKeyTimer); //How much time we have on timer, total
+                carry_over = carry_over - (steps_to_pop*1000.0/PLAYER_CREATURE_SPEED); //now subtract how much time we've accounted for
+                //carry_over now has how many ticks we haven't updated for
+                aKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+            }//end a key processing
+            
+            //W-KEY TIMER
+            if(wKeyDown){ //process up key movement
+                //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
+                int steps_to_pop = 0; //how many steps need to be popped off path
+                int carry_over = 0; //how many ticks were rounded off
+                
+                //Determine how many steps have to be moved while time has passed
+                steps_to_pop = ( (SDL_GetTicks() - wKeyTimer)*(PLAYER_CREATURE_SPEED/1000.0) ); // (elapsed time * movement speed) / 1000 ms
+                
+                //NOW MOVE THOSE STEPS
+                for(int j = 0 ; j < steps_to_pop; j++){ //process each step, one, by one
+                    
+                    //First, do bounds checking
+                    if(cre1->y < 1){
+                        break;
+                    }
+                    //blocked_check
+                    if(block_map[(cre1->y-1)*map_width+(cre1->x)]==true){
+                        break;
+                    }
+                    //If we made it here, then it's okay to move
+                    cre1->moveUp();
+                }//DONE moving steps
+                //update timer
+                //First, determine how much carry-over we need to keep (time we haven't accounted for due to rounding
+                carry_over = (SDL_GetTicks() - wKeyTimer); //How much time we have on timer, total
+                carry_over = carry_over - (steps_to_pop*1000.0/PLAYER_CREATURE_SPEED); //now subtract how much time we've accounted for
+                //carry_over now has how many ticks we haven't updated for
+                wKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+            }//end a key processing
+            
             
         }//End event while loop
         
         //Update Positions...
-        //lov1->randomDance();
-        //cre3->randomDance();
-        //cre2->randomDance();
         
         drawVectorMap();
-        
-        draw_items();
-        
+        draw_environment();
         //Draw all the sprites
-        cre1->draw();
-        shroom1->draw();
         lov1->draw();
-        
-        draw_creatures();
-        
-        //drawTexture(gRenderer, text1, 5, 5);
-        
+        //#
+        cre1->draw();
         cre1->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         cre1->drawStaff(gRenderer, item_tiles_p, item_tiles_s);
         cre1->drawLight(gRenderer, item_tiles_p, item_tiles_s);
-        
-        draw_animations();
-        draw_effects();
         
         //Draw Display windows
         if(inventoryDisplayOn){
@@ -2228,14 +2173,13 @@ int main( int argc, char* args[] ){
             displayConsole(gRenderer,consoleLog);
         }
         
-        SDL_RenderPresent( gRenderer ); //Update screen        
+        SDL_RenderPresent( gRenderer ); //Update screen
         
         
     }//END MAIN GAME LOOP
     
     //Free up sprites and everything else
     cre1->free();
-    shroom1->free();
     lov1->free();
     close();
     

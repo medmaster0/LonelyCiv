@@ -370,13 +370,40 @@ void build_circle_radius_door(vector<vector<Item>>* map_scenery_top, bool* block
         default:
             break;
     }
-//    tempx = cent_x + radius - 1;
-//    tempy = cent_y - 1;
     
     //now remove that wall and update block map
     block_map[(tempy*map_width)+tempx] = false; //update the block_map
     map_scenery_top->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
     //map_scenery_top->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
+
+    //Draw the doors in the correct spots
+    //(another switch statement for readability)
+    int door_x, door_y = 0; //temp vars for door coords
+    switch (choice) {
+        case 0: //right wall
+            door_x = tempx - 1;
+            door_y = tempy;
+            break;
+        case 1: //top wall
+            door_x = tempx;
+            door_y = tempy + 1;
+            break;
+        case 2: //left wall
+            door_x = tempx + 1;
+            door_y = tempy;
+            break;
+        case 3: //bottom wall
+            door_x = tempx;
+            door_y = tempy - 1;
+            break;
+            
+        default:
+            break;
+    }
+    //Now create a new doorway Item and add to scenery
+    SDL_Color col3 = door_col1;
+    Item temp_door = Item(door_x, door_y, 317, col3, {0,0,0,255}); //create a DOORWAY (Curtains) Item
+    map_scenery_top->at((door_y*map_width)+door_x).push_back(temp_door);
     
 //    //Now create a new doorway Item and add to scenery
 //    SDL_Color col3 = door_col1;
@@ -421,6 +448,7 @@ bool is_circle_clear(bool* block_map, int map_width, int map_height, int cent_x,
                 
                 //Now check that location
                 if(block_map[(y*map_width) + x] == true){ //if point is blocked
+                    printf("floor not clear...\n");
                     return false;
                 }
                 
