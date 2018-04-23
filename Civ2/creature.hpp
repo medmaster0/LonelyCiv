@@ -85,6 +85,7 @@ class Shroom: public Sprite{
 public:
     Shroom(int xp, int yp);//Initializes variables
     vector<Resource> resource_list; //Shrooms keep track of a list of Resources
+    vector<Recipe> recipe_list; //Shrooms keep track of a list of Recipes
 };
 
 

@@ -281,11 +281,18 @@ void Sprite::drawLight(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_
 
 //SHROOM CLASS
 Shroom::Shroom(int tx, int ty) : Sprite(tx, ty){
+    
     //Also, assign Shroom some random recipe resources
     resource_list.push_back(Resource(0));
     resource_list.push_back(Resource(1));
     resource_list.push_back(Resource(2));
     resource_list.push_back(Resource(3));
+    resource_list.push_back(Resource(4));
+    
+    //Also, assign Shroom some random recipes (made out of resources??)
+    recipe_list.push_back(Recipe(0, resource_list[2], resource_list[0]));  //create a recipe, with the proper resources
+    recipe_list.push_back(Recipe(1, resource_list[1], resource_list[3]));  //create a recipe, with the proper resources
+    recipe_list.push_back(Recipe(2, resource_list[4], resource_list[3]));  //create a recipe, with the proper resources
     
 }
 

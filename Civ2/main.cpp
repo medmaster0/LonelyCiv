@@ -1404,11 +1404,19 @@ void perform_ritual_thread(Sprite* spr1){
     
     //at this point, spr1 is elegible for new tasks and Animation is deleted
     //We now want to create a new item in it's place
-    int new_item_ids[5] = {300, 313, 314, 315, 316}; //a list of possible items we can create
-    int new_item = new_item_ids[rand()%5]; //the actual item we'll be creating
+    //Pick random item from shroom recipe list
+    //Create a basic dual-tone item based off shroom recipe resource list
+    Shroom temp_shroom = map_shrooms[rand()%map_shrooms.size()]; //pick a random shroom
+    Recipe temp_recipe = temp_shroom.recipe_list[rand()%temp_shroom.recipe_list.size()]; //pick a random resource from list
+    
     //Create an dual-tone item
-    Item temp_item = Item(loc_x, loc_y, new_item, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
+    Item temp_item = Item(loc_x, loc_y, temp_recipe.item_type, temp_recipe.ingredient1.colorPrim,temp_recipe.ingredient2.colorPrim ); //create temporary item from recipe's fields
     map_items[loc_y*map_width+loc_x].push_back(temp_item);
+    
+    //Let's announce the items's creation
+    cout << "\n" << temp_recipe.name << "\n";
+    cout << temp_recipe.description << "\n";
+    
     
     //we also wanna add some effects to spruce things up for a bit
     Effect temp_effect = Effect(loc_x, loc_y - 1, 1); //create the effect above the newly created item. Effect code for sparkles is 1 (last argument)
@@ -1763,23 +1771,63 @@ int main( int argc, char* args[] ){
         
     }
     
-    //DEBUG: Figure out wine colors. Will make a nice wine and herb display
-    //wine made of herb and berry
+//    //DEBUG: Figure out wine colors. Will make a nice wine and herb display
+//    //wine made of herb and berry
+//    for(int r = 0 ; r < 5; r ++){
+//        //Generate them
+//        Resource berry = Resource(4); //generate a berry
+//        Resource cloth = Resource(3); //generate a cloth (for label)
+//        Recipe wine = Recipe(2, berry, cloth); //create a recipe from the generated resources.
+//
+//        Item temp_berry = Item(16, 5+r, berry.item_type, berry.colorPrim, berry.colorSeco);
+//        map_items[(temp_berry.y * map_width) + temp_berry.x].push_back(temp_berry);
+//        Item temp_cloth = Item(17, 5+r, cloth.item_type, cloth.colorPrim, cloth.colorSeco);
+//        map_items[(temp_cloth.y * map_width) + temp_cloth.x].push_back(temp_cloth);
+//        Item temp_wine = Item(18, 5+r, wine.item_type, wine.ingredient1.colorPrim, wine.ingredient2.colorPrim);
+//        map_items[(temp_wine.y * map_width) + temp_wine.x].push_back(temp_wine);
+//
+//        cout << wine.name << "\n";
+//        cout << wine.description << "\n";
+//
+//    }
+
+//    //DEBUG: Figure out potion colors. Will make a nice potion and herb display
+//    //potion made out of oil and glass
+//    for(int r = 0 ; r < 5; r ++){
+//        //Generate them
+//        Resource oil = Resource(2); //generate a berry
+//        Resource glass = Resource(0); //generate a cloth (for label)
+//        Recipe potion = Recipe(0, oil, glass); //create a recipe from the generated resources.
+//
+//        Item temp_oil = Item(16, 5+r, oil.item_type, oil.colorPrim, oil.colorSeco);
+//        map_items[(temp_oil.y * map_width) + temp_oil.x].push_back(temp_oil);
+//        Item temp_glass = Item(17, 5+r, glass.item_type, glass.colorPrim, glass.colorSeco);
+//        map_items[(temp_glass.y * map_width) + temp_glass.x].push_back(temp_glass);
+//        Item temp_potion = Item(18, 5+r, potion.item_type, potion.ingredient1.colorPrim, potion.ingredient2.colorPrim);
+//        map_items[(temp_potion.y * map_width) + temp_potion.x].push_back(temp_potion);
+//
+//        cout << potion.name << "\n";
+//        cout << potion.description << "\n";
+//
+//    }
+    
+    //DEBUG: Figure out powder colors. Will make a nice powder and stone display
+    //powder made out of stone and cloth
     for(int r = 0 ; r < 5; r ++){
         //Generate them
-        Resource berry = Resource(4); //generate a berry
+        Resource salt = Resource(1); //generate a salt
         Resource cloth = Resource(3); //generate a cloth (for label)
-        Recipe wine = Recipe(2, berry, cloth); //create a recipe from the generated resources.
+        Recipe powder = Recipe(1, salt, cloth); //create a recipe from the generated resources.
         
-        Item temp_berry = Item(16, 5+r, berry.item_type, berry.colorPrim, berry.colorSeco);
-        map_items[(temp_berry.y * map_width) + temp_berry.x].push_back(temp_berry);
+        Item temp_salt = Item(16, 5+r, salt.item_type, salt.colorPrim, salt.colorSeco);
+        map_items[(temp_salt.y * map_width) + temp_salt.x].push_back(temp_salt);
         Item temp_cloth = Item(17, 5+r, cloth.item_type, cloth.colorPrim, cloth.colorSeco);
         map_items[(temp_cloth.y * map_width) + temp_cloth.x].push_back(temp_cloth);
-        Item temp_wine = Item(18, 5+r, wine.item_type, wine.ingredient1.colorPrim, wine.ingredient2.colorPrim);
-        map_items[(temp_wine.y * map_width) + temp_wine.x].push_back(temp_wine);
+        Item temp_powder = Item(18, 5+r, powder.item_type, powder.ingredient1.colorPrim, powder.ingredient2.colorPrim);
+        map_items[(temp_powder.y * map_width) + temp_powder.x].push_back(temp_powder);
         
-        cout << wine.name << "\n";
-        cout << wine.description << "\n";
+        cout << powder.name << "\n";
+        cout << powder.description << "\n";
         
     }
 
