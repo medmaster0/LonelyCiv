@@ -69,16 +69,6 @@ vector<vector<Animation>> map_animations; //a list of list of animations on a ti
 
 SDL_Texture** misc_tiles; //Symbols and Effects Tile Stuff misc. (tiles (symbols, effects, etc.)
 
-//Tent Stuff
-SDL_Texture** tent_tiles_p; //primo tent tiles
-SDL_Texture** tent_tiles_s; //seco tent tiles
-vector<vector<Tent>> map_tents; //a list of list of tents on a tile. Index correspons to [y*map_width + x]
-
-//Workshop Stuff
-SDL_Texture** workshop_tiles_p; //primo tent tiles
-SDL_Texture** workshop_tiles_s; //seco tent tiles
-vector<vector<Workshop>> map_workshops; //a list of list of tents on a tile. Index correspons to [y*map_width + x]
-
 //SDL Stuff
 SDL_Window* gWindow = NULL;//The window we'll be rendering to
 SDL_Renderer* gRenderer = NULL;//The window renderer
@@ -211,10 +201,6 @@ void loadTiles(){
     item_tiles_p = new SDL_Texture* [307];
     item_tiles_s = new SDL_Texture* [307];
     item_tiles_t = new SDL_Texture* [307];
-    tent_tiles_p = new SDL_Texture* [100];
-    tent_tiles_s = new SDL_Texture* [100];
-    workshop_tiles_p = new SDL_Texture* [100];
-    workshop_tiles_s = new SDL_Texture* [100];
     misc_tiles = new SDL_Texture* [20];
     //world_colors = new SDL_Color [200];
     SDL_Color temp_col;
@@ -344,18 +330,6 @@ void loadTiles(){
     item_tiles_s[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
-    
-    //TENT TILES
-    tent_tiles_p[0] = loadTexture("Civ2/Civ2/tiles/tent0Prim.png");
-    tent_tiles_s[0] = loadTexture("Civ2/Civ2/tiles/tent0Seco.png");
-    
-    //WORKSHOP TILES
-    workshop_tiles_p[0] = loadTexture("Civ2/Civ2/doodadz/spinwhelPrim.png");
-    workshop_tiles_s[0] = loadTexture("Civ2/Civ2/doodadz/spinwhelSeco.png");
-
-    workshop_tiles_p[1] = loadTexture("Civ2/Civ2/doodadz/screwpressPrim.png");
-    workshop_tiles_s[1] = loadTexture("Civ2/Civ2/doodadz/screwpressSeco.png");
-    
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
     misc_tiles[1] = loadTexture("Civ2/Civ2/tiles/zodiac/taurus.png");
@@ -426,8 +400,6 @@ void init_environment(){
     map_items.resize(map_width*map_height);
     map_scenery_top.resize(map_width*map_height);
     map_scenery_bottom.resize(map_width*map_height);
-    map_tents.resize(map_width*map_height);
-    map_workshops.resize(map_width*map_height);
     map_effects.resize(map_width*map_height);
     map_animations.resize(map_width*map_height);
     
@@ -1876,7 +1848,8 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_w:
-                        if(wKeyDown == false){ //when you first press down the w key
+                        if(wKeyDown == false //when you first press down the w key
+                           && ~sKeyDown && ~dKeyDown && ~aKeyDown ){
                             wKeyDown = true;
                             wKeyTimer = SDL_GetTicks(); //start timer for w_key down
                             //Also move one step to seem more responsive upon first down
@@ -1894,7 +1867,8 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_a:
-                        if(aKeyDown == false){ //when you first press down the a key
+                        if(aKeyDown == false //when you first press down the a key
+                           && ~sKeyDown && ~dKeyDown && ~wKeyDown){
                             aKeyDown = true;
                             aKeyTimer = SDL_GetTicks(); //start timer for a_key down
                             //Also move one step to seem more responsive upon first down
@@ -1912,7 +1886,8 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_s:
-                        if(sKeyDown == false){ //when you first press down the s key
+                        if(sKeyDown == false //when you first press down the s key
+                           && ~aKeyDown && ~dKeyDown && ~wKeyDown ){ //make sure only one movement key pressed at a time
                             sKeyDown = true;
                             sKeyTimer = SDL_GetTicks(); //start timer for s_key down
                             //Also move one step to seem more responsive upon first down
@@ -1930,7 +1905,8 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_d:
-                        if(dKeyDown == false){ //when you first press down the d key
+                        if(dKeyDown == false //when you first press down the d key
+                           && ~aKeyDown && ~sKeyDown && ~wKeyDown){
                             dKeyDown = true;
                             dKeyTimer = SDL_GetTicks(); //start timer for d_key down
                             //Also move one step to seem more responsive upon first down

@@ -58,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Civ2/main.cpp"
-            timestampString = "546149591.775079"
+            timestampString = "546221581.74929"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2205"
-            endingLineNumber = "2205"
+            startingLineNumber = "2181"
+            endingLineNumber = "2181"
             landmarkName = "main( int argc, char* args[] )"
             landmarkType = "9">
          </BreakpointContent>
