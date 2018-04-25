@@ -89,6 +89,20 @@ void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture*
     
 }
 
+//draw method at specific location
+void Item::draw(int in_x, int in_y, SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s){
+    //Set rendering space and render to screen
+    SDL_Rect renderQuad = { in_x*16, in_y*16, 16, 16 };
+    SDL_Rect* clip = NULL;
+    SDL_SetTextureColorMod( item_tiles_p[type], primColor.r, primColor.g, primColor.b); //modulate color, update to match the new one
+    SDL_RenderCopy( gRenderer, item_tiles_p[type], clip, &renderQuad );//Render to screen
+    if(item_tiles_s[type] != (SDL_Texture*) 0x9999 ){
+        SDL_SetTextureColorMod( item_tiles_s[type], secoColor.r, secoColor.g, secoColor.b); //modulate color, update to match the new one
+        SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
+    }
+    
+}
+
 
 //Overloaded draw method
 void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s,SDL_Texture** item_tiles_t){

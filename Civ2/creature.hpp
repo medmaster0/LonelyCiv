@@ -38,9 +38,10 @@ public:
     Sprite(int xp, int yp);//Initializes variables
     void free(); //For clearing texture memory
     bool loadFromFile(std::string path1,std::string path2, int w, int h);//Load a texture from file for the sprite
-    void draw(); //Draws the sprite to screen using stored MAP COORDS
-    void draw(int in_x, int in_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //Draws the sprite to the screen at a specific MAP COORDS
+    void draw(int in_x, int in_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //Draws the sprite to the screen at a specific MAP COORDS. Also draws items in "pose form"
+    void draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draws the sprite to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
     void drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //Draw's the sprite's inventory
+    //These functions position the Creature's Items after movement
     void drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the creature's hat (just moved up 8 px)
     void drawStaff(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the creatures' staff (just moved  right 16 px)
     void drawLight(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the creature' light (just moved opposite staff 16 px)

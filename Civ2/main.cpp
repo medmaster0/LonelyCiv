@@ -45,6 +45,14 @@ vector<vector<int>> colorz; //every randomly gen. resource (stone, weed) has it'
 //int blockable[2] = {301,304};
 bool* block_map; //this is the map indicating whether a tile is blocked
 
+//Draw Map Stuff
+//These keep track of what parts of the map to draw
+//The dimensinos of the draw map. These indices "swim" through the main map
+//int draw_map_x, draw_map_y = 60;
+int draw_map_x = 50;
+int draw_map_y = 50;
+int draw_map_width, draw_map_height;
+
 //ItemTile Stuff
 SDL_Texture** item_tiles_p; //primo item tiles
 SDL_Texture** item_tiles_s; //seco item tiles
@@ -383,6 +391,33 @@ void drawVectorMap(){
     //Clear screen
     SDL_SetRenderDrawColor( gRenderer,back_col.r, back_col.g, back_col.b, back_col.a );
     SDL_RenderClear( gRenderer );
+    
+    //We also want to draw black boxes at boundaries...
+    if(draw_map_x < 0){ //for left boundary
+        SDL_SetRenderDrawColor( gRenderer,0,0,0,255 );
+        SDL_Rect rect1 = { 0, 0, (-1*draw_map_x)*16, SCREEN_HEIGHT };
+        SDL_RenderFillRect(gRenderer, &rect1 ); //calculate by how much draw_map is out of bounds and draw a rectangle over it
+    }
+    if(draw_map_x + draw_map_width >= map_width){ //for right boundary
+        SDL_SetRenderDrawColor( gRenderer,0,0,0,255 );
+        int difference = ((draw_map_x + draw_map_width) - map_width) * 16; //how much the right side of screen (draw_map) overlaps the end of main map (IN PIXELS)
+        SDL_Rect rect1 = { SCREEN_WIDTH - difference, 0, SCREEN_WIDTH , SCREEN_HEIGHT };
+        SDL_RenderFillRect(gRenderer, &rect1 ); //calculate by how much draw_map is out of bounds and draw a rectangle over it
+    }
+    
+    if(draw_map_y < 0){ //for upper boundary
+        SDL_SetRenderDrawColor( gRenderer,0,0,0,255 );
+        //SDL_Rect rect1 = { 0, 0, (-1*draw_map_x)*16, SCREEN_HEIGHT };
+        SDL_Rect rect1 = { 0, 0, SCREEN_WIDTH, (-1*draw_map_y)*16};
+        SDL_RenderFillRect(gRenderer, &rect1 ); //calculate by how much draw_map is out of bounds and draw a rectangle over it
+    }
+    if(draw_map_y + draw_map_height > map_height){ //for BOTTOM boundary
+        SDL_SetRenderDrawColor( gRenderer,0,0,0,255 );
+        int difference = ((draw_map_y + draw_map_height) - map_height) * 16; //how much the bottom side of screen (draw_map) overlaps the end of main map (IN PIXELS)
+        //SDL_Rect rect1 = { SCREEN_WIDTH - difference, 0, SCREEN_WIDTH , SCREEN_HEIGHT };
+        SDL_Rect rect1 = { 0, SCREEN_HEIGHT- difference, SCREEN_WIDTH, SCREEN_HEIGHT };
+        SDL_RenderFillRect(gRenderer, &rect1 ); //calculate by how much draw_map is out of bounds and draw a rectangle over it
+    }
 
 }
 
@@ -392,9 +427,13 @@ void drawVectorMap(){
 //This also initializes effects
 void init_environment(){
     
-    //Calculate map (grid) dimensions
-    map_width = SCREEN_WIDTH/16;
-    map_height = SCREEN_HEIGHT/16;
+    //Set map (grid) dimensions
+    map_width = 200;
+    map_height = 200;
+    
+    //draw_map DOES depend on screen dimension
+    draw_map_width = SCREEN_WIDTH/16;
+    draw_map_height = SCREEN_HEIGHT/16 + 1; //add one for that last extra bit
 
     //Initialize our dimension-indexed arrays based on map dimensions
     map_items.resize(map_width*map_height);
@@ -432,7 +471,7 @@ void init_environment(){
     block_map = new bool[map_width*map_height](); //initialize a dynamically sized blocked map
 
     //create random scenery (from the randomly generated assets)
-    for(int g = 0 ; g<125; g++){
+    for(int g = 0 ; g<225; g++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
         temp_tile = rand()%199;
@@ -455,12 +494,20 @@ void init_environment(){
     build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
     build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
     
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
     
     //Creatures
     int num_creatures = 25; //How many creatures are on the map
     //int num_creatures = 1; //DEBUG How many creatures are on the map
     for(int i = 0 ; i < num_creatures; i++){
-        Sprite temp_cre = Sprite(1+rand()%(map_width-2), 1+rand()%(map_height-2));
+        //Sprite temp_cre = Sprite(1+rand()%(map_width-2), 1+rand()%(map_height-2));
+        Sprite temp_cre = Sprite(60 + rand()%4, 60 + rand()%5); //set them up in a specific spot
         temp_cre.loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
         map_creatures.push_back(temp_cre);
         
@@ -502,58 +549,81 @@ void init_environment(){
 }
 
 //Draws all the items and creatures on map
+//This function uses the indices:
+//  draw_map_width, draw_map_height, draw_map_x, and draw_map_y
+//
+//It only cycles through though specific indices in the map lists
+//HOWEVER,
+//when it calls the draw function. It needs to call it in a certain way so as to draw it in the correct (translated) location...
+
+//This method is not the most efficient (I imagine?) but will do for now.
 void draw_environment(){
 
-    //also draw the  bottom scenery items
-    for(int i = 0 ; i < map_scenery_bottom.size(); i++){
-        for(int j = 0 ; j < map_scenery_bottom[i].size(); j++){
-            map_scenery_bottom[i][j].draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
+    //Draw all bottom items
+    for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
+        if(i >= map_width || i <= 0){continue;} //bounds checking
+        for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
+            if(j >= map_height || j < 0){continue;} //bounds checking
+            
+            int map_index = (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
+            
+            //Cycle through all the items in the map_scenery_bottom list at that location
+            for(int k = 0; k < map_scenery_bottom[ map_index ].size(); k++ ){
+                map_scenery_bottom[map_index][k].draw( (map_scenery_bottom[map_index][k].x - draw_map_x) , (map_scenery_bottom[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s); //call the draw function. We draw the item at a location translated from the current draw_map
+            }
+            
+            //Cycle through all the items on the map
+            for(int k = 0; k < map_items[ map_index ].size(); k++ ){
+                map_items[map_index][k].draw( (map_items[map_index][k].x - draw_map_x) , (map_items[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s); //call the draw function. We draw the item at a location translated from the current draw_map
+            }
+            
+        }
+    } //End drawing bottom items, can draw creatures in a separate loop
+    
+    //Cycle through all shrooms and draw...
+    for(int c = 0 ; c < map_shrooms.size(); c++){
+        if (map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
+            map_shrooms[c].y > draw_map_y && map_shrooms[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+            map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, map_shrooms[c].y - draw_map_y, item_tiles_p, item_tiles_s);
         }
     }
     
-    //Cycle through all items on map
-    for(int i = 0; i < map_items.size(); i++){
-        for(int j = 0 ; j < map_items[i].size(); j++){
-            map_items[i][j].draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
+    //Cycle through all creatures and draw...
+    for(int c = 0 ; c < map_creatures.size(); c++){
+        if (map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
+            map_creatures[c].y > draw_map_y && map_creatures[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+            map_creatures[c].draw_movement(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s);
         }
     }
     
-    //Cycle through all shrooms and draw
-    for(int i = 0; i < map_shrooms.size(); i++){
-        map_shrooms[i].draw();
-    }
-    
-    //Cycle through all creatures and draw
-    for(int i = 0; i < map_creatures.size(); i++){
-        map_creatures[i].draw();
-        map_creatures[i].drawHat(gRenderer, item_tiles_p, item_tiles_s);
-        map_creatures[i].drawStaff(gRenderer, item_tiles_p, item_tiles_s);
-        map_creatures[i].drawLight(gRenderer, item_tiles_p, item_tiles_s);
-    }
-    
-    //also draw the top scenery items
-    for(int i = 0 ; i < map_scenery_top.size(); i++){
-        for(int j = 0 ; j < map_scenery_top[i].size(); j++){
-            map_scenery_top[i][j].draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
+    //Draw all top items
+    for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
+        if(i >= map_width || i <= 0){continue;} //bounds checking
+        for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
+            if(j >= map_height || j < 0){continue;} //bounds checking
+            
+            int map_index = (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
+            
+            //Cycle through all the items in the map_scenery_top list at that location
+            for(int k = 0; k < map_scenery_top[ map_index ].size(); k++ ){
+                map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x) , (map_scenery_top[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s); //call the draw function. We draw the item at a location translated from the current draw_map
+            }
+            
+            //Cycle through all animations on map
+            for(int k = 0; k < map_animations[ map_index ].size(); k++ ){
+                map_animations[map_index][k].draw( (map_animations[map_index][k].x - draw_map_x) , (map_animations[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
+            }
+            
+            //Cycle through all effects on map
+            for(int k = 0; k < map_effects[ map_index ].size(); k++ ){
+                map_effects[map_index][k].drawScroll( (map_effects[map_index][k].x - draw_map_x) , (map_effects[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
+            }
+            
         }
-    }
+    } //End drawing top items
     
-    //Cycle through all animations on map
-    for(int i = 0; i < map_animations.size(); i++){
-        for(int j = 0 ; j < map_animations[i].size(); j++){;
-            //printf("drawing anme");
-            map_animations[i][j].draw(gRenderer, misc_tiles);
-        }
-    }
     
-    //Cycle through all effects on amp
-    for(int i = 0; i < map_effects.size(); i++){
-        for(int j = 0 ; j < map_effects[i].size(); j++){
-            //map_effects[i][j].draw(gRenderer);
-            map_effects[i][j].drawScroll(gRenderer, misc_tiles);
-        }
-    }
-
+    
 
 }
 
@@ -1687,14 +1757,13 @@ int main( int argc, char* args[] ){
     //...Map
     generateTilez(); //call this before loadTiles()
     loadTiles();
-    //...Sprites
-    Sprite* cre1 = new Sprite(10,10);
-    cre1->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
-    Sprite* lov1 = new Sprite(5,5);
-    lov1->loadFromFile("Civ2/Civ2/tiles/lovPrim.png", "Civ2/Civ2/tiles/lovSeco.png", 16, 16);
-
-    //TEST SHIT
     init_environment();
+    
+    //...Sprites
+    Sprite* cre1 = new Sprite(draw_map_x + (int)(draw_map_width/2.0),draw_map_y + (int)(draw_map_height/2.0) ); //start creaturein the middle of the screen
+    printf("%d,%d\n",(int)(draw_map_width), (int)(draw_map_height/2.0));
+    cre1->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
+    
     Hat temp_accessory = Hat(0, 0, 305); //a temp Item to be added to cre's inventory
     cre1->hat = &temp_accessory; //give him a hat
     
@@ -2067,6 +2136,10 @@ int main( int argc, char* args[] ){
                 carry_over = carry_over - (steps_to_pop*1000.0/PLAYER_CREATURE_SPEED); //now subtract how much time we've accounted for
                 //carry_over now has how many ticks we haven't updated for
                 sKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+                
+                //Finally, update draw_map indices
+                draw_map_y = cre1->y - draw_map_height/2;
+                
             }//end s key processing
             //D-KEY TIMER
             if(dKeyDown){ //process down key movement
@@ -2100,6 +2173,10 @@ int main( int argc, char* args[] ){
                 carry_over = carry_over - (steps_to_pop*1000.0/PLAYER_CREATURE_SPEED); //now subtract how much time we've accounted for
                 //carry_over now has how many ticks we haven't updated for
                 dKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+                
+                //Finally, update draw_map indices
+                draw_map_x = cre1->x - draw_map_width/2;
+                
             }//end d key processing
             
             //A-KEY TIMER
@@ -2131,6 +2208,10 @@ int main( int argc, char* args[] ){
                 carry_over = carry_over - (steps_to_pop*1000.0/PLAYER_CREATURE_SPEED); //now subtract how much time we've accounted for
                 //carry_over now has how many ticks we haven't updated for
                 aKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+                
+                //Finally, update draw_map indices
+                draw_map_x = cre1->x - draw_map_width/2;
+                
             }//end a key processing
             
             //W-KEY TIMER
@@ -2162,19 +2243,22 @@ int main( int argc, char* args[] ){
                 carry_over = carry_over - (steps_to_pop*1000.0/PLAYER_CREATURE_SPEED); //now subtract how much time we've accounted for
                 //carry_over now has how many ticks we haven't updated for
                 wKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+                
+                //Finally, update draw_map indices
+                draw_map_y = cre1->y - draw_map_height/2;
+                
             }//end a key processing
             
             
         }//End event while loop
         
-        //Update Positions...
+        //BEGIN DRAW ROUTINES
         
         drawVectorMap();
         draw_environment();
         //Draw all the sprites
-        lov1->draw();
         //#
-        cre1->draw();
+        cre1->draw_movement(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s);
         cre1->drawHat(gRenderer, item_tiles_p, item_tiles_s);
         cre1->drawStaff(gRenderer, item_tiles_p, item_tiles_s);
         cre1->drawLight(gRenderer, item_tiles_p, item_tiles_s);
@@ -2196,7 +2280,7 @@ int main( int argc, char* args[] ){
         if(consoleDisplayOn){
             displayConsole(gRenderer,consoleLog);
         }
-        
+
         SDL_RenderPresent( gRenderer ); //Update screen
         
         
@@ -2204,7 +2288,6 @@ int main( int argc, char* args[] ){
     
     //Free up sprites and everything else
     cre1->free();
-    lov1->free();
     close();
     
     return 0;

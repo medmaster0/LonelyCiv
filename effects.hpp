@@ -27,6 +27,7 @@ public:
     bool loadFromFile(std::string path); //load's the object's image from the specified path
     void draw(SDL_Renderer* gRenderer); //Draws the sprite to screen using stored MAP COORDS
     void drawScroll(SDL_Renderer* gRenderer, SDL_Texture** misc_tiles); //Draws the sprite effect but also scrolls
+    void drawScroll(int at_x, int at_y, SDL_Renderer* gRenderer, SDL_Texture** misc_tiles); //Draws the sprite effect but also scrolls. Draws at specified location
     int x,y,z; //the location of effect
     SDL_Color color1; //the color of the effect
     //FOr Animation
@@ -48,6 +49,7 @@ class Animation{
 public:
     Animation(int xp, int yp, int tile_list_in[]); //Constructor: input xy-pos and a list of tiles to follow
     void draw(SDL_Renderer* gRenderer, SDL_Texture** misc_tiles); //Draws the sprite to the screen using stored MAP COORDS, changes the tile periodically
+    void draw(int at_x, int at_y, SDL_Renderer* gRenderer, SDL_Texture** misc_tiles); //Draws the sprite to the screen at specified map coords, changes the tile periodically
     int x,y,z; //the location of the animation
     //SDL_Color color1; //the color of the effect
     
