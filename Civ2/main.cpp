@@ -102,7 +102,8 @@ bool consoleDisplayOn = false;
 queue<string> consoleLog; //a queue of strings to keep track of console messages
 
 //UI SETTINGS
-double PLAYER_CREATURE_SPEED = 7.0; 
+double PLAYER_CREATURE_SPEED = 7.0;
+bool is_player_wandering = false; //global flag to enable "player wander" thread
 
 /////////////////////////////////////////////////////////
 ////FUNCTIONS BEGIN////////////////////////////////////////
@@ -1684,6 +1685,90 @@ void regen_weedz_thread(){
     
 }
 
+//A thread that randomly moves chracter around map
+void wander_player_thread(Sprite* cre1){
+    
+    int choice = rand() % 4; ; //holds a randome choice
+    while(true){
+        
+        //Don't do anything if wander isn't enabled.
+        if(is_player_wandering == false){
+            continue;
+        }
+        
+        switch (choice) {
+            case 0:
+                //move up
+                //bounds checking
+                if(cre1->y < 1){
+                    break;
+                }
+                //blocked_check
+                if(block_map[(cre1->y-1)*map_width+(cre1->x)]==true){
+                    break;
+                }
+                //If we made it here, then it's okay to move
+                cre1->moveUp();
+                break;
+            case 1:
+                //move left
+                //First, do bounds checking
+                if(cre1->x < 1){
+                    break;
+                }
+                //blocked_check
+                if(block_map[(cre1->y)*map_width+(cre1->x-1)]==true){
+                    break;
+                }
+                //If we made it here, then it's okay to move
+                cre1->moveLeft();
+                break;
+            case 2:
+                //Move down
+                //Also move one step to seem more responsive upon first down
+                //First, do bounds checking
+                if(cre1->y >= map_height-1){
+                    break;
+                }
+                //blocked_check
+                if(block_map[(cre1->y+1)*map_width+(cre1->x)]==true){
+                    break;
+                }
+                //If we made it here, then it's okay to move
+                cre1->moveDown();
+                break;
+            case 3:
+                //Move right
+                //Also move one step to seem more responsive upon first down
+                //First, do bounds checking
+                if(cre1->x >= map_width-1){
+                    break;
+                }
+                //blocked_check
+                if(block_map[(cre1->y)*map_width+(cre1->x+1)]==true){
+                    break;
+                }
+                //If we made it here, then it's okay to move
+                cre1->moveRight();
+                break;
+                
+            default:
+                break;
+        }
+        
+        //update choice for next iteration
+        choice = rand()%4;
+        
+        //Finally, update draw_map indices
+        draw_map_y = cre1->y - draw_map_height/2;
+        draw_map_x = cre1->x - draw_map_width/2;
+        
+        SDL_Delay(500);
+        
+    }
+    
+}
+
 //////////////////////////
 //Display/Interface Functions
 
@@ -1885,6 +1970,9 @@ int main( int argc, char* args[] ){
     //This thread schedules new threads for halted creatures!
     std::thread taskObj(task_creatures_thread);
     taskObj.detach();
+    //This thread wanders the player character around the map
+    std::thread playerWanderObj(wander_player_thread, cre1);
+    playerWanderObj.detach();
     
     //Variables
     bool shiftDown = false; //a flag holding state of shift key
@@ -2008,6 +2096,11 @@ int main( int argc, char* args[] ){
                         
                     case SDLK_c:{
                         consoleDisplayOn = !consoleDisplayOn;
+                        break;
+                    }
+                        
+                    case SDLK_g:{
+                        is_player_wandering = !is_player_wandering;
                         break;
                     }
                         
@@ -2259,9 +2352,6 @@ int main( int argc, char* args[] ){
         //Draw all the sprites
         //#
         cre1->draw_movement(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s);
-        cre1->drawHat(gRenderer, item_tiles_p, item_tiles_s);
-        cre1->drawStaff(gRenderer, item_tiles_p, item_tiles_s);
-        cre1->drawLight(gRenderer, item_tiles_p, item_tiles_s);
         
         //Draw Display windows
         if(inventoryDisplayOn){

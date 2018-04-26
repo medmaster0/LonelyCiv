@@ -232,7 +232,6 @@ void build_floor_path(vector<vector<Item>>* map_scenery_bottom, bool* block_map,
         has_tile = false;
         for(int z = 0; z < map_scenery_bottom->at((temp_step[1]*map_width) + temp_step[0]).size() ; z++){
             if(map_scenery_bottom->at( (temp_step[1]*map_width) + temp_step[0] ).at(z).type == FLOOR_TILE_INDEX){
-                printf("skip tile\n");
                 has_tile = true; //set flag to prevent creation of new tile
             }
         }
@@ -526,7 +525,6 @@ void build_two_house_path(vector<vector<Item>>* map_scenery_top,vector<vector<It
         has_tile = false;
         for(int z = 0; z < map_scenery_bottom->at((temp_step[1]*map_width) + temp_step[0]).size() ; z++){
             if(map_scenery_bottom->at( (temp_step[1]*map_width) + temp_step[0] ).at(z).type == FLOOR_TILE_INDEX){
-                printf("skip tile\n");
                 has_tile = true; //set flag to prevent creation of new tile
             }
         }

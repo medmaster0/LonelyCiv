@@ -84,6 +84,66 @@ string genLatinSentence(int punctuation){
 
 vector<string> cuss_symbols = {"!","@","#","$","%","^","&","*","z","x","0"};
 
+//generates an anagram of the input word
+//We need to index the string (map out where the vowels/consonants are)
+//(While indexing), lets pull out the letters and throw them in a list
+//After done indexing, recreate the word by putting random letter into each spot
+string genAnagram(string in_word){
+    
+    //in_word = tolower(in_word);
+    
+    char consonants[] = "bcdfghjklmnpqrstvwxyz";
+    char vowels[] = "aeiou";
+    
+    string anagram = ""; //the string we'll be adding to to form anagram
+    string index_string = ""; //this string will ENCODE where the consonants/vowels are: e.g. dog -> cvc, catch -> cvccc , gr8 j0b -> ccx cxc (x's are undefined, not space)
+    string word_cons = ""; //this string will keep track of all the consonants in the string
+    string word_vowels = ""; //this string will keep track of all the vowels in the string
+    char* char_position; //used to keep track of where the chars are located at
+    int rand_pos; //the random position (letter) in a string to use
+    
+    //First, read in word, letter by letter:
+    for(int i = 0 ; i < in_word.length(); i++){
+        
+        //first, make sure letter is lower cased.
+        in_word.at(i) = tolower(in_word.at(i));
+        
+        //Now decide if we should put a vowel or not
+        if( strchr(consonants, in_word.at(i)) ){
+            index_string += "c"; //note that we have a consonant at this spot
+            word_cons += in_word.at(i); //take note of what the letter actually was
+        }else if(strchr(vowels, in_word.at(i))){
+            index_string += "v"; //note that we have a vowel at this spot
+            word_vowels += in_word.at(i); //take note of what the letter actually was
+        }else if(strchr(" ", in_word.at(i))){
+            index_string += " "; //note that we have a space at this point
+        }
+        
+    }
+    
+    //Now that we have the letters and cons/vowels positions (according to index_string), let's reconstruct the word!
+    //letter by letter
+    for(int i = 0; i < index_string.length(); i++){
+        
+        //Check if it's a consonant, vowel, or space
+        if( strchr( "c", index_string.at(i))  ) {
+            rand_pos = rand() % word_cons.length(); //pick a random position in word_cons string
+            anagram += word_cons[rand_pos]; //add letter to anagram
+            word_cons.erase(word_cons.begin()+rand_pos); //but also delete it from list
+        }else if(strchr( "v", index_string.at(i))){
+            rand_pos = rand() % word_vowels.length(); //pick a random position in word_vowels string
+            anagram += word_vowels[rand_pos]; //add letter to anagram
+            word_vowels.erase(word_vowels.begin()+rand_pos); //but also delete it from list
+        }else if(strchr( " ", index_string.at(i))){
+            anagram += " ";
+        }
+        
+    }
+    
+    
+    return anagram;
+}
+
 //generates a radom cuss
 string genCuss(){
     int letters = (rand()%10)+1;
@@ -493,6 +553,50 @@ string genPrayer(){
     prayer.append("petition! ");
     
     return prayer;
+    
+}
+
+//generates a saint's name (simply picks one off the list)
+string genSaintName(){
+    return saints[rand()%saints.size()];
+}
+
+//generates a demon name by taking anagram of a Saint's name
+string genDemonName(){
+    
+    string name = ""; //the name we'll be returning
+    string saint = saints[rand()%saints.size()]; //the name of the saint we'll be defiling... I'm sorry, not trying to be sacriligious
+    
+    name = genAnagram(saint);
+    
+    //capitalize first letter of each word
+    int space_pos = 0;
+    while(space_pos >= 0){ //while we have more spaces to go
+        space_pos = name.find(" ",space_pos+1); //actually record where the space is
+        name.at(space_pos + 1) = toupper(name.at(space_pos + 1)); //make the letter after it capaitalized
+        
+    }
+    
+    return name;
+    
+}
+
+//generates a demon name by taking anagram of n input name (more practical)
+string genDemonName(string in_name){
+    
+    string name = ""; //the name we'll be returning
+    
+    name = genAnagram(in_name);
+    
+    //capitalize first letter of each word
+    int space_pos = 0;
+    while(space_pos >= 0){ //while we have more spaces to go
+        space_pos = name.find(" ",space_pos+1); //actually record where the space is
+        name.at(space_pos + 1) = toupper(name.at(space_pos + 1)); //make the letter after it capaitalized
+        
+    }
+    
+    return name;
     
 }
 
