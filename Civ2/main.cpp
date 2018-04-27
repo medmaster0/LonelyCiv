@@ -40,6 +40,7 @@ const int SCREEN_HEIGHT = 680;
 //TileMap Stuff
 int map_width;
 int map_height;
+int map_floors; //the number of floors on map (the z dimension)
 SDL_Color back_col = {0,0,0}; //The background color
 vector<vector<int>> colorz; //every randomly gen. resource (stone, weed) has it's own unique color
 //int blockable[2] = {301,304};
@@ -51,6 +52,7 @@ bool* block_map; //this is the map indicating whether a tile is blocked
 //int draw_map_x, draw_map_y = 60;
 int draw_map_x = 50;
 int draw_map_y = 50;
+int draw_map_z = 0;
 int draw_map_width, draw_map_height;
 
 //ItemTile Stuff
@@ -481,6 +483,7 @@ void init_environment(){
     }
     
     //Generate colors for neighboorhood/market/bazaar
+    printf("Begin build sequence\n");
     SDL_Color build_col_p = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
     SDL_Color build_col_s = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
     SDL_Color floor_col_p = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
@@ -502,6 +505,32 @@ void init_environment(){
     build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
     build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
     build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    
+    printf("Done with build aye\\\n");
     
     //Creatures
     int num_creatures = 25; //How many creatures are on the map
