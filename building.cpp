@@ -28,7 +28,7 @@
 //Input: also need to innput map_width as a sort of key to index the array elements. SORRY
 //Input the x,y coordinates of the upper left corner of the building
 //Input N, the dimensions of square building
-void build_box_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_width,int map_height, int x, int y, int n, SDL_Color col1_in, SDL_Color col2_in){
+void build_box_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_width,int map_height, int x, int y, int z, int n, SDL_Color col1_in, SDL_Color col2_in){
  
     int tempx, tempy; //stores the cuurent positing we are working on building
     int tile = 304; //304 is the Item code for (bricks)
@@ -43,8 +43,8 @@ void build_box_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_w
         tempx = x + i;
         tempy = y;
         Item temp_item = Item(tempx, tempy, tile, col1, col2 ); //create the temporary item
-        map_scenery->at((tempy*map_width)+tempx).push_back(temp_item);
-        block_map[(tempy*map_width)+tempx] = true; //update the block_map
+        map_scenery->at( (z*map_height*map_width) + (tempy*map_width)+tempx).push_back(temp_item);
+        block_map[ (z*map_height*map_width) + (tempy*map_width)+tempx] = true; //update the block_map
             
         
     }
@@ -55,8 +55,8 @@ void build_box_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_w
         tempx = x;
         tempy = y + 1 + i;
         Item temp_item = Item(tempx, tempy, tile, col1, col2 ); //create the temporary item
-        map_scenery->at((tempy*map_width)+tempx).push_back(temp_item);
-        block_map[(tempy*map_width)+tempx] = true; //update the block_map
+        map_scenery->at( (z*map_height*map_width) + (tempy*map_width)+tempx).push_back(temp_item);
+        block_map[ (z*map_height*map_width) + (tempy*map_width)+tempx] = true; //update the block_map
         
     }
     
@@ -66,8 +66,8 @@ void build_box_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_w
         tempx = x + n-1;
         tempy = y + 1 + i;
         Item temp_item = Item(tempx, tempy, tile, col1, col2 ); //create the temporary item
-        map_scenery->at((tempy*map_width)+tempx).push_back(temp_item);
-        block_map[(tempy*map_width)+tempx] = true; //update the block_map
+        map_scenery->at( (z*map_height*map_width) + (tempy*map_width)+tempx).push_back(temp_item);
+        block_map[ (z*map_height*map_width) + (tempy*map_width)+tempx] = true; //update the block_map
         
     }
     
@@ -77,8 +77,8 @@ void build_box_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_w
         tempx = x + i + 1;
         tempy = y + n-1;
         Item temp_item = Item(tempx, tempy, tile, col1, col2 ); //create the temporary item
-        map_scenery->at((tempy*map_width)+tempx).push_back(temp_item);
-        block_map[(tempy*map_width)+tempx] = true; //update the block_map
+        map_scenery->at( (z*map_height*map_width) + (tempy*map_width)+tempx).push_back(temp_item);
+        block_map[ (z*map_height*map_width) + (tempy*map_width)+tempx] = true; //update the block_map
 
     }
     
@@ -90,7 +90,7 @@ void build_box_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_w
 //Input the x,y coordinates of the upper left corner of the building
 //Input N, the dimensions of square building
 //Deletes one of the bricks along the wall to create a doorway (currently the center brick)
-void build_box_NxN_door(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int x, int y, int n, SDL_Color col1_in, SDL_Color col2_in, SDL_Color door_col1_in){
+void build_box_NxN_door(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int x, int y, int z, int n, SDL_Color col1_in, SDL_Color col2_in, SDL_Color door_col1_in){
     
     int tempx, tempy; //stores the cuurent positing we are working on building
     int tile = 304; //304 is the Item code for (bricks)
@@ -100,7 +100,7 @@ void build_box_NxN_door(vector<vector<Item>>* map_scenery, bool* block_map, int 
     SDL_Color col2 = col2_in;
     
     //Use the exisiting build box routine
-    build_box_NxN(map_scenery, block_map, map_width,map_height, x, y, n, col1, col2);
+    build_box_NxN(map_scenery, block_map, map_width,map_height, x, y, z, n, col1, col2);
     
     //Delete one of the bricks to form a doorway
     int choice = rand()%4; //pick one of the four walls
@@ -127,19 +127,19 @@ void build_box_NxN_door(vector<vector<Item>>* map_scenery, bool* block_map, int 
     }
     
     //now remove that wall and update block map
-    block_map[(tempy*map_width)+tempx] = false; //update the block_map
-    map_scenery->at((tempy*map_width)+tempx).pop_back(); //remove elemement from map array
+    block_map[  (z*map_height*map_width) + (tempy*map_width)+tempx] = false; //update the block_map
+    map_scenery->at( (z*map_height*map_width) + (tempy*map_width)+tempx).pop_back(); //remove elemement from map array
     
     //Now create a new doorway Item and add to scenery
     SDL_Color col3 = door_col1_in;
     Item temp_door = Item(tempx, tempy, 317, col3, {0,0,0,255}); //create a DOORWAY (Curtains) Item
-    map_scenery->at((tempy*map_width)+tempx).push_back(temp_door);
+    map_scenery->at( (z*map_height*map_width) + (tempy*map_width)+tempx).push_back(temp_door);
     
 }
 
 
 //Builds a maze on the map
-void build_maze(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int x, int y){
+void build_maze(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int x, int y, int z){
 
     //Make a brick maze
     vector<vector<short>> gmap = gen_maze_corridor(20,30);
@@ -162,8 +162,8 @@ void build_maze(vector<vector<Item>>* map_scenery, bool* block_map, int map_widt
             if(gmap[j][i] == 1){
                 //then we need a wall here
                 Item con_item = Item(tempx, tempy, 304, p1, s1);
-                map_scenery->at((tempy*map_width)+tempx).push_back(con_item);
-                block_map[(tempy*map_width)+tempx] = true;
+                map_scenery->at( (z*map_height*map_width) + (tempy*map_width)+tempx).push_back(con_item);
+                block_map[ (z*map_height*map_width) + (tempy*map_width)+tempx] = true;
             }
 
         }
@@ -171,9 +171,9 @@ void build_maze(vector<vector<Item>>* map_scenery, bool* block_map, int map_widt
 }
 
 //Builds an NxN box of floor tiles on the map
-void build_floor_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int x, int y, int n, SDL_Color p_col , SDL_Color s_col ){
+void build_floor_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int x, int y, int z, int n, SDL_Color p_col , SDL_Color s_col ){
     
-    if( !is_square_clear(block_map, map_width, map_height, x, y, n)){
+    if( !is_square_clear(block_map, map_width, map_height, x, y, z, n)){
         printf("floor space not clear... not building\n"); 
         return; //do nothing
     }
@@ -182,18 +182,18 @@ void build_floor_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map
     for(int i = 0; i < n; i++){
         for(int j = 0 ; j < n; j++){
             Item temp_floor = Item(x+i, y+j, 301, p_col, s_col);
-            map_scenery->at( (temp_floor.y*map_width) + temp_floor.x ).push_back(temp_floor);
+            map_scenery->at( (z*map_width*map_height) + (temp_floor.y*map_width) + temp_floor.x ).push_back(temp_floor);
         }
     }
 }
 
 //Builds an circular floor of radius radius out of floortile tiles
-void build_floor_radius(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int cent_x, int cent_y, int radius, SDL_Color p_col, SDL_Color s_col){
+void build_floor_radius(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int cent_x, int cent_y, int cent_z, int radius, SDL_Color p_col, SDL_Color s_col){
     
-    //NEED TO CHECK IF SPACE IS CLEAR!!! :0
-    if(is_circle_clear(block_map, map_width, map_height, cent_x, cent_y, radius)){
-        return;
-    }
+//    //NEED TO CHECK IF SPACE IS CLEAR!!! :0
+//    if(is_circle_clear(block_map, map_width, map_height, cent_x, cent_y, radius)){
+//        return;
+//    }
     
     //Cycle through flor space
     for(int y = -radius; y<=radius; y++){ //cycle through all possible points
@@ -202,7 +202,7 @@ void build_floor_radius(vector<vector<Item>>* map_scenery, bool* block_map, int 
                 
                 //Build Floor
                 Item temp_floor = Item(x+cent_x, y+cent_y, 301, p_col, s_col);
-                map_scenery->at( (temp_floor.y*map_width) + temp_floor.x ).push_back(temp_floor);
+                map_scenery->at( (cent_z*map_height*map_width) + (temp_floor.y*map_width) + temp_floor.x ).push_back(temp_floor);
                 
             }
         }
@@ -243,6 +243,51 @@ void build_floor_path(vector<vector<Item>>* map_scenery_bottom, bool* block_map,
     }
 }
 
+//Builds an NxN enclosed box on the map out of standrad bricks, adds a door to one of the walls
+void build_tower_NxN(vector<vector<Item>>* map_scenery_top, vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int build_x, int build_y, int n, int num_floors, SDL_Color brick_col1 , SDL_Color brick_col2, SDL_Color floor_col1, SDL_Color floor_col2, SDL_Color door_col1,SDL_Color ladder_col1){
+    
+    int ladder_x, ladder_y; //will keep track of where to put the ladder(s)
+    
+    //check to make sure we're clear...
+    if( ! is_square_clear(block_map, map_width, map_height, build_x, build_y, 0, n)){ //check the first floor
+        return; //do nothing since it's blockedtrick.
+    }
+    
+    //Also find a random spot inside building
+    ladder_x = build_x + 1 + rand()%(n - 2);
+    ladder_y = build_y + 1 + rand()%(n - 2);
+    
+    //GROUND FLOOR
+    //Build the first box walls/doors
+    build_box_NxN_door(map_scenery_top, block_map, map_width, map_height, build_x, build_y, 0, n, brick_col1, brick_col2, door_col1);
+    //Build the floors within the box
+    build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, build_x+1, build_y+1, 0, n-2, floor_col1, floor_col2);
+    //Put the ladder
+    Item temp_ladder = Item(ladder_x, ladder_y, 318, ladder_col1, {0,0,0,255});
+    map_scenery_top->at( (ladder_y*map_width) + ladder_x ).push_back(temp_ladder);
+    
+    //ALL OF THE OTHER FLOORS
+    for(int i = 0; i < num_floors; i++){
+        //Build the box walls/doors
+        build_box_NxN_door(map_scenery_top, block_map, map_width, map_height, build_x, build_y, i+1, n, brick_col1, brick_col2, door_col1);
+        
+        //Also need to unblock that region (of floor area)
+        set_square_clear(block_map, map_width, map_height, build_x+1, build_y+1, i+1, n-2);
+        
+        //Build the floors within the box
+        build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, build_x+1, build_y+1, i+1, n-2, floor_col1, floor_col2);
+        //Put the ladder
+        Item temp_ladder = Item(ladder_x, ladder_y, 318, ladder_col1, {0,0,0,255});
+        map_scenery_top->at( ((i+1)*map_height*map_width) + (ladder_y*map_width) + ladder_x ).push_back(temp_ladder);
+        
+    }
+
+    return;
+    
+}
+
+
+
 
 //Builds a circular structure of bricks
 //Uses Midpoint Circl Drawing Algorithm
@@ -263,7 +308,7 @@ void build_floor_path(vector<vector<Item>>* map_scenery_bottom, bool* block_map,
 //So now you only have to calculate RE once
 
 //
-void build_circle_radius(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int radius, int cent_x, int cent_y, SDL_Color p_col_in, SDL_Color s_col_in){
+void build_circle_radius(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int radius, int cent_x, int cent_y, int cent_z, SDL_Color p_col_in, SDL_Color s_col_in){
     
     //Initialize, (start at first step_
     int x = radius;
@@ -274,36 +319,36 @@ void build_circle_radius(vector<vector<Item>>* map_scenery, bool* block_map, int
         //CREATE ITEMS
         //Create item in first sector
         Item temp_brick = Item(cent_x+x, cent_y+y, 304, p_col_in, s_col_in);
-        map_scenery->at( (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
-        block_map[(temp_brick.y*map_width)+temp_brick.x] = true;
+        map_scenery->at( (cent_z*map_height*map_width) + (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
+        block_map[ (cent_z*map_height*map_width) + (temp_brick.y*map_width)+temp_brick.x] = true;
         //Next sector CCW
         temp_brick = Item(cent_x+y, cent_y+x, 304, p_col_in, s_col_in);
-        map_scenery->at( (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
-        block_map[(temp_brick.y*map_width)+temp_brick.x] = true;
+        map_scenery->at( (cent_z*map_height*map_width) + (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
+        block_map[ (cent_z*map_height*map_width) + (temp_brick.y*map_width)+temp_brick.x] = true;
         //Next sector CCW
         temp_brick = Item(cent_x-y, cent_y+x, 304, p_col_in, s_col_in);
-        map_scenery->at( (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
-        block_map[(temp_brick.y*map_width)+temp_brick.x] = true;
+        map_scenery->at( (cent_z*map_height*map_width) + (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
+        block_map[ (cent_z*map_height*map_width) + (temp_brick.y*map_width)+temp_brick.x] = true;
         //Next sector CCW
         temp_brick = Item(cent_x-x, cent_y+y, 304, p_col_in, s_col_in);
-        map_scenery->at( (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
-        block_map[(temp_brick.y*map_width)+temp_brick.x] = true;
+        map_scenery->at( (cent_z*map_height*map_width) + (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
+        block_map[ (cent_z*map_height*map_width) + (temp_brick.y*map_width)+temp_brick.x] = true;
         //Next sector CCW
         temp_brick = Item(cent_x-x, cent_y-y, 304, p_col_in, s_col_in);
-        map_scenery->at( (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
-        block_map[(temp_brick.y*map_width)+temp_brick.x] = true;
+        map_scenery->at( (cent_z*map_height*map_width) + (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
+        block_map[ (cent_z*map_height*map_width) + (temp_brick.y*map_width)+temp_brick.x] = true;
         //Next sector CCW
         temp_brick = Item(cent_x-y, cent_y-x, 304, p_col_in, s_col_in);
-        map_scenery->at( (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
-        block_map[(temp_brick.y*map_width)+temp_brick.x] = true;
+        map_scenery->at( (cent_z*map_height*map_width) + (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
+        block_map[ (cent_z*map_height*map_width) + (temp_brick.y*map_width)+temp_brick.x] = true;
         //Next sector CCW
         temp_brick = Item(cent_x+y, cent_y-x, 304, p_col_in, s_col_in);
-        map_scenery->at( (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
-        block_map[(temp_brick.y*map_width)+temp_brick.x] = true;
+        map_scenery->at( (cent_z*map_height*map_width) + (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
+        block_map[ (cent_z*map_height*map_width) + (temp_brick.y*map_width)+temp_brick.x] = true;
         //Next sector CCW
         temp_brick = Item(cent_x+x, cent_y-y, 304, p_col_in, s_col_in);
-        map_scenery->at( (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
-        block_map[(temp_brick.y*map_width)+temp_brick.x] = true;
+        map_scenery->at( (cent_z*map_height*map_width) + (temp_brick.y*map_width) + temp_brick.x ).push_back(temp_brick);
+        block_map[ (cent_z*map_height*map_width) + (temp_brick.y*map_width)+temp_brick.x] = true;
         
         //Determine which pixel to use next.
         //We know we'll use y-1
@@ -325,26 +370,26 @@ void build_circle_radius(vector<vector<Item>>* map_scenery, bool* block_map, int
     int tempx, tempy;
     tempx = cent_x + radius;
     tempy = cent_y + 0;
-    map_scenery->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
+    map_scenery->at( (cent_z*map_height*map_width) + (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
     tempx = cent_x - radius;
     tempy = cent_y + 0;
-    map_scenery->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
+    map_scenery->at( (cent_z*map_height*map_width) + (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
     tempx = cent_x + 0;
     tempy = cent_y + radius;
-    map_scenery->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
+    map_scenery->at( (cent_z*map_height*map_width) + (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
     tempx = cent_x + 0;
     tempy = cent_y - radius;
-    map_scenery->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
+    map_scenery->at( (cent_z*map_height*map_width) + (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
     
 }
 
 ////Builds a circular structure of bricks
 //Uses previous build_circle_radius algorithm, then removes one of the points on the circle
-void build_circle_radius_door(vector<vector<Item>>* map_scenery_top, bool* block_map, int map_width, int radius_in, int cent_x, int cent_y, SDL_Color p_col_in, SDL_Color s_col_in, SDL_Color door_col1){
+void build_circle_radius_door(vector<vector<Item>>* map_scenery_top, bool* block_map, int map_width, int map_height, int radius_in, int cent_x, int cent_y, int cent_z, SDL_Color p_col_in, SDL_Color s_col_in, SDL_Color door_col1){
     
     int radius = radius_in - 1; //don't count center point
     
-    build_circle_radius(map_scenery_top, block_map, map_width, radius, cent_x, cent_y, p_col_in, s_col_in);
+    build_circle_radius(map_scenery_top, block_map, map_width, map_height, radius, cent_x, cent_y, cent_z, p_col_in, s_col_in);
     
     //Delete one of the bricks to form a doorway
     int choice = rand()%4; //pick one of the four walls
@@ -371,8 +416,8 @@ void build_circle_radius_door(vector<vector<Item>>* map_scenery_top, bool* block
     }
     
     //now remove that wall and update block map
-    block_map[(tempy*map_width)+tempx] = false; //update the block_map
-    map_scenery_top->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
+    block_map[ (cent_z*map_height*map_width) + (tempy*map_width)+tempx] = false; //update the block_map
+    map_scenery_top->at( (cent_z*map_height*map_width) + (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
     //map_scenery_top->at( (tempy*map_width) + tempx ).pop_back(); //remove elemement from map array
 
     //Draw the doors in the correct spots
@@ -402,7 +447,7 @@ void build_circle_radius_door(vector<vector<Item>>* map_scenery_top, bool* block
     //Now create a new doorway Item and add to scenery
     SDL_Color col3 = door_col1;
     Item temp_door = Item(door_x, door_y, 317, col3, {0,0,0,255}); //create a DOORWAY (Curtains) Item
-    map_scenery_top->at((door_y*map_width)+door_x).push_back(temp_door);
+    map_scenery_top->at( (cent_z*map_height*map_width) + (door_y*map_width) + door_x).push_back(temp_door);
     
 //    //Now create a new doorway Item and add to scenery
 //    SDL_Color col3 = door_col1;
@@ -413,7 +458,7 @@ void build_circle_radius_door(vector<vector<Item>>* map_scenery_top, bool* block
 
 //checks the block map to make sure nothing is blocking the current location
 //Returns a true if clear, false if not
-bool is_square_clear(bool* block_map, int map_width, int map_height, int x, int y, int n){
+bool is_square_clear(bool* block_map, int map_width, int map_height, int x, int y, int z, int n){
     
     //if out of bounds, return false
     if(x < 0 || y < 0 || x + n > map_width ||  y + n > map_height ){ //last line needs to calculate height
@@ -423,7 +468,7 @@ bool is_square_clear(bool* block_map, int map_width, int map_height, int x, int 
     for(int i = 0; i < n; i++){ //for cycle x values
         for(int j = 0 ; j < n; j++){ //for cycle y values
             
-            if(block_map[ ( (y+j) * map_width ) + (x+i) ] == true){ //if blocked
+            if(block_map[ (z*map_height*map_width) + ( (y+j) * map_width ) + (x+i) ] == true){ //if blocked
                 return false; //return false
             }
             
@@ -438,7 +483,7 @@ bool is_square_clear(bool* block_map, int map_width, int map_height, int x, int 
 //checks the block map to make sure nothing is blocking the circle
 //NOT COMPLETELY COMPATIBLE WITH CIRCLE DRAW MIDPOINT ALGORITHM
 //BUT WILL MATCH FLOOD FILE CIRCLE ALGORITHM IN build_floor_radius algorithm
-bool is_circle_clear(bool* block_map, int map_width, int map_height, int cent_x, int cent_y, int radius){
+bool is_circle_clear(bool* block_map, int map_width, int map_height, int cent_x, int cent_y, int cent_z, int radius){
     
     //Cycle through flor space
     for(int y = -radius; y<=radius; y++){ //cycle through all possible points
@@ -446,7 +491,7 @@ bool is_circle_clear(bool* block_map, int map_width, int map_height, int cent_x,
             if(x*x + y*y <= radius*radius){ //if point within cricle...
                 
                 //Now check that location
-                if(block_map[(y*map_width) + x] == true){ //if point is blocked
+                if(block_map[ (cent_z*map_height*map_width) + (y*map_width) + x] == true){ //if point is blocked
                     printf("floor not clear...\n");
                     return false;
                 }
@@ -460,6 +505,26 @@ bool is_circle_clear(bool* block_map, int map_width, int map_height, int cent_x,
     
 }
 
+//makes the specified square's block_map FALSE
+void set_square_clear(bool* block_map, int map_width, int map_height, int x, int y, int z, int n){
+    
+//    //if out of bounds, return false
+//    if(x < 0 || y < 0 || x + n > map_width ||  y + n > map_height ){ //last line needs to calculate height
+//        return;
+//    }
+    
+    for(int i = 0; i < n; i++){ //for cycle x values
+        for(int j = 0 ; j < n; j++){ //for cycle y values
+            
+            block_map[ (z*map_width*map_height) + ( (y+j) * map_width ) + (x+i) ] = false;
+
+        }
+    }
+    
+    //if done cycling, we're all clear
+    return;
+    
+}
 
 //builds two houses and puts a path between them
 void build_two_house_path(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color floor_p_col_in, SDL_Color floor_s_col_in, SDL_Color brick_p_col_in, SDL_Color brick_s_col_in, SDL_Color door_col1 ){
@@ -473,12 +538,12 @@ void build_two_house_path(vector<vector<Item>>* map_scenery_top,vector<vector<It
         build_x = rand()%map_width;
         build_y = rand()%map_height;
         build_dim = 5+rand()%3;
-        if(is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, build_dim+2)){ //If we are all clear, start building... keep a 1 tile wide perimeter
+        if(is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, 0, build_dim+2)){ //If we are all clear, start building... keep a 1 tile wide perimeter
             
-            build_box_NxN_door(map_scenery_top, block_map, map_width, map_height, build_x, build_y, build_dim, brick_p_col_in, brick_s_col_in, door_col1); //call building routine
+            build_box_NxN_door(map_scenery_top, block_map, map_width, map_height, build_x, build_y, 0, build_dim, brick_p_col_in, brick_s_col_in, door_col1); //call building routine
         
             //Build a floor in building
-            build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, build_x+1, build_y+1, build_dim - 2, floor_p_col_in, floor_s_col_in);
+            build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, build_x+1, build_y+1, 0, build_dim - 2, floor_p_col_in, floor_s_col_in);
             
             //Also find a spot inside building
             x1 = build_x + 1 + rand()%(build_dim - 2);
@@ -492,12 +557,12 @@ void build_two_house_path(vector<vector<Item>>* map_scenery_top,vector<vector<It
         build_x = rand()%map_width;
         build_y = rand()%map_height;
         build_dim = 5+rand()%3;
-        if(is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, build_dim+2)){ //If we are all clear, start building... keep a 1 tile wide perimeter
+        if(is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, 0, build_dim+2)){ //If we are all clear, start building... keep a 1 tile wide perimeter
             
-            build_box_NxN_door(map_scenery_top, block_map, map_width, map_height, build_x, build_y, build_dim, brick_p_col_in, brick_s_col_in, door_col1); //call building routine
+            build_box_NxN_door(map_scenery_top, block_map, map_width, map_height, build_x, build_y, 0, build_dim, brick_p_col_in, brick_s_col_in, door_col1); //call building routine
             
             //Build a floor in building
-            build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, build_x+1, build_y+1, build_dim - 2, floor_p_col_in, floor_s_col_in);
+            build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, build_x+1, build_y+1, 0, build_dim - 2, floor_p_col_in, floor_s_col_in);
             
             //Also find a spot inside building
             x2 = build_x + 1 + rand()%(build_dim - 2);

@@ -600,20 +600,40 @@ SDL_Color generate_pink(){
     
 }
 
+////given n input color, convert it to a pastel version (increase the lightness)
+////This can be used to simulate metallic shiny color (think rose gold, silver gold, etc.)
+////This new color is above 180 in all components.
+////The original color is mapped onto the last 55 values.
+//SDL_Color color_to_pastel(SDL_Color in_col){
+//    
+//    Uint8 r = 180;
+//    Uint8 g = 180;
+//    Uint8 b = 180;
+//    
+//    //mapping on to last 55 of the color value
+//    r = r + ((75.0/255)*in_col.r);
+//    g = g + ((75.0/255)*in_col.g);
+//    b = b + ((75.0/255)*in_col.b);
+//    
+//    SDL_Color pastel = {r,g,b,255};
+//    return pastel;
+//}
+
 //given n input color, convert it to a pastel version (increase the lightness)
 //This can be used to simulate metallic shiny color (think rose gold, silver gold, etc.)
-//This new color is above 200 in all components.
-//The original color is mapped onto the last 55 values.
-SDL_Color color_to_pastel(SDL_Color in_col){
+//This new color is above whatever the input low_gray is.
+//The original color is mapped onto the last values leading up to 255
+SDL_Color color_to_pastel(SDL_Color in_col, SDL_Color low_gray){
     
-    Uint8 r = 180;
-    Uint8 g = 180;
-    Uint8 b = 180;
+    //Think, "It's at the very least, these values."
+    Uint8 r = low_gray.r;
+    Uint8 g = low_gray.g;
+    Uint8 b = low_gray.b;
     
-    //mapping on to last 55 of the color value
-    r = r + ((75.0/255)*in_col.r);
-    g = g + ((75.0/255)*in_col.g);
-    b = b + ((75.0/255)*in_col.b);
+    //mapping on to the last values of the 255 scale
+    r = r + ( ( (255.0-low_gray.r) / 255) * in_col.r );
+    g = g + ( ( (255.0-low_gray.g) / 255) * in_col.g );
+    b = b + ( ( (255.0-low_gray.b) / 255) * in_col.b );
     
     SDL_Color pastel = {r,g,b,255};
     return pastel;
@@ -670,6 +690,20 @@ SDL_Color redNoise(SDL_Color redHue){
     return temp_red;
     
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

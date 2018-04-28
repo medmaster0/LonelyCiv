@@ -258,6 +258,25 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
     }
 }
 
+//MISC ITEM functions
+
+//determines if item of input type is in the list
+bool isItemInList(vector<Item> item_list, int in_type){
+    
+    for(int i = 0; i < item_list.size(); i++){
+        if(item_list[i].type == in_type ){
+            return true; //return true
+        }
+    }
+    
+    return false; //if still havene't found it
+    
+}
+
+
+
+
+
 //////////////////
 //Hat CLASS
 
@@ -343,3 +362,10 @@ void Light::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Textur
         SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
     }
 }
+
+
+
+
+
+
+

@@ -57,4 +57,7 @@ public:
 //display list of items
 void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN_HEIGHT);
 
+//MISC ITEM functions
+bool isItemInList(vector<Item> item_list, int type); //determines if item of input type is in the list
+
 #endif //item_hpp

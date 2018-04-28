@@ -40,10 +40,9 @@ const int SCREEN_HEIGHT = 680;
 //TileMap Stuff
 int map_width;
 int map_height;
+int map_area; //the xy-area
 int map_floors; //the number of floors on map (the z dimension)
 SDL_Color back_col = {0,0,0}; //The background color
-vector<vector<int>> colorz; //every randomly gen. resource (stone, weed) has it's own unique color
-//int blockable[2] = {301,304};
 bool* block_map; //this is the map indicating whether a tile is blocked
 
 //Draw Map Stuff
@@ -52,7 +51,7 @@ bool* block_map; //this is the map indicating whether a tile is blocked
 //int draw_map_x, draw_map_y = 60;
 int draw_map_x = 50;
 int draw_map_y = 50;
-int draw_map_z = 0;
+int draw_map_z = 0; //which floor, we're drawing
 int draw_map_width, draw_map_height;
 
 //ItemTile Stuff
@@ -227,7 +226,6 @@ void loadTiles(){
 //        g = 0;
 //        b = 0;
         a = 255;
-        colorz.push_back({r,g,b,a});
 
         item_tiles_p[i] = loadTexture("Civ2/Civ2/weedz/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
@@ -242,7 +240,6 @@ void loadTiles(){
         g = rand()%255;
         b = rand()%255;
         a = 255;
-        colorz.push_back({r,g,b,a});
 
         item_tiles_p[i] = loadTexture("Civ2/Civ2/stonez/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
@@ -258,7 +255,6 @@ void loadTiles(){
         g = rand()%255;
         b = rand()%255;
         a = 255;
-        colorz.push_back({r,g,b,a});
 
         item_tiles_p[i] = loadTexture("Civ2/Civ2/fruitz/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
@@ -340,6 +336,10 @@ void loadTiles(){
     item_tiles_p[317] = loadTexture("Civ2/Civ2/tiles/curtainsPrim.png");
     item_tiles_s[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[318] = loadTexture("Civ2/Civ2/tiles/ladderPrim.png");
+    item_tiles_s[318] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[318] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
@@ -433,22 +433,25 @@ void init_environment(){
     //Set map (grid) dimensions
     map_width = 200;
     map_height = 200;
+    map_area = map_width*map_height;
+    map_floors = 18;
     
     //draw_map DOES depend on screen dimension
     draw_map_width = SCREEN_WIDTH/16;
     draw_map_height = SCREEN_HEIGHT/16 + 1; //add one for that last extra bit
 
     //Initialize our dimension-indexed arrays based on map dimensions
-    map_items.resize(map_width*map_height);
-    map_scenery_top.resize(map_width*map_height);
-    map_scenery_bottom.resize(map_width*map_height);
-    map_effects.resize(map_width*map_height);
-    map_animations.resize(map_width*map_height);
+    map_items.resize(map_width*map_height*map_floors);
+    map_scenery_top.resize(map_width*map_height*map_floors);
+    map_scenery_bottom.resize(map_width*map_height*map_floors);
+    map_effects.resize(map_width*map_height*map_floors);
+    map_animations.resize(map_width*map_height*map_floors);
     
     //we're going to create 300 random items (basic first kind)
     //we have to generate items, and also add them to the correct element in the array
     int tempx; //temporary x
     int tempy; //temporary y
+    int tempz = 0; //only generate on first floor
     int temp_tile; //temporarily stores random tile index
 
     //for dispersing random items on map
@@ -467,11 +470,15 @@ void init_environment(){
         //temp_tile = rand()%7 + 300;
         //if(temp_tile == 301 || temp_tile == 304){temp_tile = 305;}
         Item temp_item = Item(tempx, tempy, temp_tile, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 255},{255,255,255,0} ); //temporary item
-        map_items[(tempy)*map_width+(tempx)].push_back(temp_item);
+        map_items[ (tempz)*(map_area) + (tempy)*map_width + (tempx) ].push_back(temp_item);
     }
     
     //Here is where we first initilize block_map...
-    block_map = new bool[map_width*map_height](); //initialize a dynamically sized blocked map
+    block_map = new bool[map_width*map_height*map_floors](); //initialize a dynamically sized blocked map... they all start of false (not blocked)
+    //But we're going to make everything above ground floor, blocked
+    for(int i = map_area; i<map_floors*map_area; i++){
+        block_map[i] = true; //make it blocked
+    }
 
     //create random scenery (from the randomly generated assets)
     for(int g = 0 ; g<225; g++){
@@ -479,7 +486,7 @@ void init_environment(){
         tempy = rand()%(map_height);
         temp_tile = rand()%199;
         Item temp_item = Item(tempx, tempy, temp_tile,world_colors[temp_tile],{255,255,255,0} ); //temporary item (scenery)
-        map_scenery_bottom[(tempy*map_width)+tempx].push_back(temp_item);
+        map_scenery_bottom[ (tempz*map_area) + (tempy*map_width)+tempx].push_back(temp_item);
     }
     
     //Generate colors for neighboorhood/market/bazaar
@@ -488,47 +495,52 @@ void init_environment(){
     SDL_Color build_col_s = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
     SDL_Color floor_col_p = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
     SDL_Color floor_col_s = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
-    SDL_Color door_col_s = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    SDL_Color door_col_p = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    SDL_Color ladder_col_p = generate_brown();
+    
+    //I guess you could say houses are all built on first floor anyway...
     //Now build some houses
-    build_circle_radius_door(&map_scenery_top, block_map, map_width,9, 13, 10, build_col_p, build_col_s, door_col_s);
-    build_floor_radius(&map_scenery_bottom, block_map, map_width, map_height, 13, 10, 8, floor_col_p, floor_col_s); //notice how it is one less than wall build radius
+    build_floor_radius(&map_scenery_bottom, block_map, map_width, map_height, 13, 10, 0, 8, floor_col_p, floor_col_s); //notice how it is one less than wall build radius
+    build_circle_radius_door(&map_scenery_top, block_map, map_width, map_height, 9, 13, 10, 0, build_col_p, build_col_s, door_col_p);
     build_floor_path(&map_scenery_bottom, block_map, map_width, map_height, 13, 10, 30, 30, floor_col_p, floor_col_s);
     
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_tower_NxN(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, 60, 60, 7, 3, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
     
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
     
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+//
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
     
     printf("Done with build aye\\\n");
     
@@ -537,7 +549,7 @@ void init_environment(){
     //int num_creatures = 1; //DEBUG How many creatures are on the map
     for(int i = 0 ; i < num_creatures; i++){
         //Sprite temp_cre = Sprite(1+rand()%(map_width-2), 1+rand()%(map_height-2));
-        Sprite temp_cre = Sprite(60 + rand()%4, 60 + rand()%5); //set them up in a specific spot
+        Sprite temp_cre = Sprite(61 + rand()%4, 61 + rand()%4); //set them up in a specific spot
         temp_cre.loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
         map_creatures.push_back(temp_cre);
         
@@ -587,7 +599,7 @@ void init_environment(){
 //when it calls the draw function. It needs to call it in a certain way so as to draw it in the correct (translated) location...
 
 //This method is not the most efficient (I imagine?) but will do for now.
-void draw_environment(){
+void draw_environment(Sprite* cre1){
 
     //Draw all bottom items
     for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
@@ -595,7 +607,7 @@ void draw_environment(){
         for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
             if(j >= map_height || j < 0){continue;} //bounds checking
             
-            int map_index = (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
+            int map_index = (draw_map_z*map_area) + (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
             
             //Cycle through all the items in the map_scenery_bottom list at that location
             for(int k = 0; k < map_scenery_bottom[ map_index ].size(); k++ ){
@@ -609,30 +621,14 @@ void draw_environment(){
             
         }
     } //End drawing bottom items, can draw creatures in a separate loop
-    
-    //Cycle through all shrooms and draw...
-    for(int c = 0 ; c < map_shrooms.size(); c++){
-        if (map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
-            map_shrooms[c].y > draw_map_y && map_shrooms[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
-            map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, map_shrooms[c].y - draw_map_y, item_tiles_p, item_tiles_s);
-        }
-    }
-    
-    //Cycle through all creatures and draw...
-    for(int c = 0 ; c < map_creatures.size(); c++){
-        if (map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
-            map_creatures[c].y > draw_map_y && map_creatures[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
-            map_creatures[c].draw_movement(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s);
-        }
-    }
-    
+        
     //Draw all top items
     for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
         if(i >= map_width || i <= 0){continue;} //bounds checking
         for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
             if(j >= map_height || j < 0){continue;} //bounds checking
             
-            int map_index = (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
+            int map_index = (draw_map_z*map_area) + (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
             
             //Cycle through all the items in the map_scenery_top list at that location
             for(int k = 0; k < map_scenery_top[ map_index ].size(); k++ ){
@@ -652,7 +648,35 @@ void draw_environment(){
         }
     } //End drawing top items
     
+    //Cycle through all shrooms and draw...
+    for(int c = 0 ; c < map_shrooms.size(); c++){
+        
+        if(map_shrooms[c].z != draw_map_z){ //if not on currently drawn floor
+            continue; //skip to next one
+        }
+        
+        if (map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
+            map_shrooms[c].y > draw_map_y && map_shrooms[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+            map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, map_shrooms[c].y - draw_map_y, item_tiles_p, item_tiles_s);
+        }
+    }
     
+    //Cycle through all creatures and draw...
+    for(int c = 0 ; c < map_creatures.size(); c++){
+        
+        if(map_creatures[c].z != draw_map_z){ //if not on currently drawn floor
+            continue; //skip to next one
+        }
+        
+        if (map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
+            map_creatures[c].y > draw_map_y && map_creatures[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+            map_creatures[c].draw_movement(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s);
+        }
+    }
+    
+    if(cre1->z == draw_map_z){
+        cre1->draw_movement(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s); //DRAW MAIN CREATURE
+    }
     
 
 }
@@ -1569,6 +1593,10 @@ void task_creatures_thread(){
     }
 }
 
+//This thread updates global var back_col , which is called by drawVector for background color
+//back_col is the actual color that gets drawn
+//update_col is the color that gets updated/manipulated, and written to back_col.
+//update_col currently becomes a pastel, depending on current drawn floor
 void background_color_thread(){
     
     //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
@@ -1594,7 +1622,8 @@ void background_color_thread(){
     //BOUNCES BACK AND FORTH BETWEeN THE VALUES
     
     //initialize background color (global)
-    back_col = {static_cast<Uint8>(rand()%(r2-5)), static_cast<Uint8>(rand()%(g2-5)), static_cast<Uint8>(rand()%(b2-5))};
+    SDL_Color update_col = {static_cast<Uint8>(rand()%(r2-5)), static_cast<Uint8>(rand()%(g2-5)), static_cast<Uint8>(rand()%(b2-5))}; //update col only needs to live in this (forever-running) thread
+    back_col = {0,0,0,255}; //just a temporary initializization (might flash on the screen while things are loading so pick black, will be overwritten soon)
     
     //THE ACTUAL DRAW LOOP ////////////////////////////////////
     //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -1609,9 +1638,9 @@ void background_color_thread(){
         steps_to_pop = ( SDL_GetTicks() - animate_timer ) / BACKGROUND_CHANGE_SPEED; //ONe tick every 100 ms
         
         //NOW apply that many
-        new_r = back_col.r + (steps_to_pop*r_inc);
-        new_g = back_col.g + (steps_to_pop*g_inc);
-        new_b = back_col.b + (steps_to_pop*b_inc);
+        new_r = update_col.r + (steps_to_pop*r_inc);
+        new_g = update_col.g + (steps_to_pop*g_inc);
+        new_b = update_col.b + (steps_to_pop*b_inc);
         //bounds checkings
         if(new_r > r2){
             r_inc = r_inc * -1;
@@ -1639,10 +1668,26 @@ void background_color_thread(){
             b_inc = b_inc * -1;
             new_b = b1;
         }
+        
+        //Now apply those changes to update_col to keep track of it for next iteration
+        update_col.r = new_r;
+        update_col.g = new_g;
+        update_col.b = new_b;
+        
+        
+        
         //Now that values have been checked, we can write them
-        back_col.r = new_r;
-        back_col.g = new_g;
-        back_col.b = new_b;
+//        back_col.r = new_r;
+//        back_col.g = new_g;
+//        back_col.b = new_b;
+        
+//        back_col.r = 255;
+//        back_col.g=180;
+//        back_col.b = 18;
+        
+        
+        //back_col (already initialized, becomes a pastel color)
+        back_col = color_to_pastel({static_cast<Uint8>(new_r),static_cast<Uint8>(new_g),static_cast<Uint8>(new_b),255},{static_cast<Uint8>(draw_map_z*10),static_cast<Uint8>(draw_map_z*10),static_cast<Uint8>(draw_map_z*10),255});
         
         
         //Update animate timer
@@ -1688,8 +1733,6 @@ void regen_weedz_thread(){
 //                //item_id = rand()%300; //pick a random item id
 //                item_id = (313+rand()%3); //pick a random item id
 //                printf("spawn: %d\n", item_id);
-//                //Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(colorz[item_id][0]), static_cast<Uint8>(colorz[item_id][1]), static_cast<Uint8>(colorz[item_id][2]),255},{255,255,255,0} ); //temporary item
-//                //Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{255,255,255,0} ); //temporary item
 //                Item temp_item = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255} ); //temporary item
 //                map_items[y*map_width+x].push_back(temp_item);
 //                SDL_Delay(5000);
@@ -2034,6 +2077,9 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_w:
+                        
+                        if(cre1->z != draw_map_z)break;//Disable control if not on current floor??
+                        
                         if(wKeyDown == false //when you first press down the w key
                            && ~sKeyDown && ~dKeyDown && ~aKeyDown ){
                             wKeyDown = true;
@@ -2044,7 +2090,7 @@ int main( int argc, char* args[] ){
                                 break;
                             }
                             //blocked_check
-                            if(block_map[(cre1->y-1)*map_width+(cre1->x)]==true){
+                            if(block_map[ (cre1->z*map_area) + (cre1->y-1)*map_width+(cre1->x)]==true){
                                 break;
                             }
                             //If we made it here, then it's okay to move
@@ -2053,6 +2099,9 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_a:
+                        
+                        if(cre1->z != draw_map_z)break;//Disable control if not on current floor??
+                        
                         if(aKeyDown == false //when you first press down the a key
                            && ~sKeyDown && ~dKeyDown && ~wKeyDown){
                             aKeyDown = true;
@@ -2063,7 +2112,7 @@ int main( int argc, char* args[] ){
                                 break;
                             }
                             //blocked_check
-                            if(block_map[(cre1->y)*map_width+(cre1->x-1)]==true){
+                            if(block_map[ (cre1->z*map_area) + (cre1->y)*map_width+(cre1->x-1)]==true){
                                 break;
                             }
                             //If we made it here, then it's okay to move
@@ -2072,6 +2121,9 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_s:
+                        
+                        if(cre1->z != draw_map_z)break;//Disable control if not on current floor??
+                        
                         if(sKeyDown == false //when you first press down the s key
                            && ~aKeyDown && ~dKeyDown && ~wKeyDown ){ //make sure only one movement key pressed at a time
                             sKeyDown = true;
@@ -2082,7 +2134,7 @@ int main( int argc, char* args[] ){
                                 break;
                             }
                             //blocked_check
-                            if(block_map[(cre1->y+1)*map_width+(cre1->x)]==true){
+                            if(block_map[ (cre1->z*map_area) + (cre1->y+1)*map_width+(cre1->x)]==true){
                                 break;
                             }
                             //If we made it here, then it's okay to move
@@ -2091,6 +2143,9 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_d:
+                        
+                        if(cre1->z != draw_map_z)break;//Disable control if not on current floor??
+                        
                         if(dKeyDown == false //when you first press down the d key
                            && ~aKeyDown && ~sKeyDown && ~wKeyDown){
                             dKeyDown = true;
@@ -2101,7 +2156,7 @@ int main( int argc, char* args[] ){
                                 break;
                             }
                             //blocked_check
-                            if(block_map[(cre1->y)*map_width+(cre1->x+1)]==true){
+                            if(block_map[ (cre1->z*map_area) + (cre1->y)*map_width+(cre1->x+1)]==true){
                                 break;
                             }
                             //If we made it here, then it's okay to move
@@ -2109,9 +2164,39 @@ int main( int argc, char* args[] ){
                         }
                         break;
                         
+                    case SDLK_r: //move up a level if on ladder
+                        if( isItemInList(map_scenery_top[ (cre1->z*map_area) + (cre1->y*map_width) + cre1->x ], 318) == true &&
+                            isItemInList(map_scenery_top[ ( (cre1->z+1) * map_area) + (cre1->y*map_width) + cre1->x ], 318) ){
+                            printf("We are going up");
+                            cre1->z = cre1->z+1;
+                            draw_map_z = cre1->z;
+                        }
+                        break;
+                        
+                    case SDLK_e: //move down a level if on ladder
+                        if( isItemInList(map_scenery_top[ (cre1->z*map_area) + (cre1->y*map_width) + cre1->x ], 318) == true &&
+                           isItemInList(map_scenery_top[ ( (cre1->z-1) * map_area) + (cre1->y*map_width) + cre1->x ], 318) ){
+                            printf("We are going down");
+                            cre1->z = cre1->z-1;
+                            draw_map_z = cre1->z;
+                        }
+                        break;
+                        
                     case SDLK_SPACE:{
                         break;
                     }
+                        
+                    case SDLK_u: //for moving up a floor.
+                        if(draw_map_z < map_floors - 2){ //then we can still go up a level
+                            draw_map_z = draw_map_z + 1;
+                        }
+                        break;
+                        
+                    case SDLK_j: //for moving down a floor.
+                        if(draw_map_z >= 1){ //as long as we can still go down a level
+                            draw_map_z = draw_map_z - 1;
+                        }
+                        break;
                         
                     case SDLK_m:
                         addToConsoleLog("This is the potion, "+ genPotionName()+". It is made of "+ genOilName() +".");
@@ -2244,7 +2329,7 @@ int main( int argc, char* args[] ){
                         break;
                     }
                     //blocked_check
-                    if(block_map[(cre1->y+1)*map_width+cre1->x]==true){
+                    if(block_map[ (cre1->z*map_area) + (cre1->y+1)*map_width+cre1->x]==true){
                         break;
                     }
                     //If we made it here, then it's okay to move
@@ -2280,7 +2365,7 @@ int main( int argc, char* args[] ){
                         break;
                     }
                     //blocked_check
-                    if(block_map[(cre1->y)*map_width+(cre1->x+1)]==true){
+                    if(block_map[ (cre1->z*map_area) + (cre1->y)*map_width+(cre1->x+1)]==true){
                         break;
                     }
                     //If we made it here, then it's okay to move
@@ -2318,7 +2403,7 @@ int main( int argc, char* args[] ){
                         break;
                     }
                     //blocked_check
-                    if(block_map[(cre1->y)*map_width+(cre1->x-1)]==true){
+                    if(block_map[ (cre1->z*map_area) + (cre1->y)*map_width+(cre1->x-1)]==true){
                         break;
                     }
                     //If we made it here, then it's okay to move
@@ -2353,7 +2438,7 @@ int main( int argc, char* args[] ){
                         break;
                     }
                     //blocked_check
-                    if(block_map[(cre1->y-1)*map_width+(cre1->x)]==true){
+                    if(block_map[ (cre1->z*map_area) + (cre1->y-1)*map_width+(cre1->x)]==true){
                         break;
                     }
                     //If we made it here, then it's okay to move
@@ -2377,10 +2462,10 @@ int main( int argc, char* args[] ){
         //BEGIN DRAW ROUTINES
         
         drawVectorMap();
-        draw_environment();
+        draw_environment(cre1);
         //Draw all the sprites
         //#
-        cre1->draw_movement(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s);
+        
         
         //Draw Display windows
         if(inventoryDisplayOn){

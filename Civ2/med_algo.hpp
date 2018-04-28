@@ -30,6 +30,7 @@ SDL_Color color_blend(SDL_Color col1, SDL_Color col2); //belnd two colors
 
 SDL_Color generate_brown(); //generates a random shade of brown
 SDL_Color generate_pink(); //generates a random shade of pink
-SDL_Color color_to_pastel(SDL_Color in_col); //given n input color, convert it to a pastel version (increase the lightness)
+//SDL_Color color_to_pastel(SDL_Color in_col); //given n input color, convert it to a pastel version (increase the lightness)
+SDL_Color color_to_pastel(SDL_Color in_col, SDL_Color low_gray = {180,180,180,255});  //given n input color, convert it to a pastel (increase lightness). Use low_gray as a baseline for "black". E.G. INputting black will out put "low_gray", increasing in_col will hit all colors between low_gray and {255,255,255}
 
 SDL_Color redNoise(SDL_Color redHue); //takes a color and gradually changes it along the redish/orange spectrum

@@ -31,7 +31,6 @@ extern int map_height;
 extern SDL_Renderer* gRenderer;//The window renderer
 
 SDL_Texture* loadTexture( std::string path ); //loads a texture specified by string path name... gets implemented in main function since it requires a gRenderer to be declared
-vector<vector<int>> findPathToCoord(vector<vector<int>>, int x1, int y1, int x2, int y2);
 
 class Sprite{
 public:

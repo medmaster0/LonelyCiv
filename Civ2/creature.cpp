@@ -167,6 +167,7 @@ void Sprite::draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_T
 void Sprite::moveDown(){
     prev_y = y;
     prev_x = x;
+    prev_z = z;
     y = y +1;
     return;
 }
@@ -174,6 +175,7 @@ void Sprite::moveDown(){
 void Sprite::moveUp(){
     prev_y = y;
     prev_x = x;
+    prev_z = z;
     y = y -1;
     return;
 }
@@ -181,6 +183,7 @@ void Sprite::moveUp(){
 void Sprite::moveRight(){
     prev_x = x;
     prev_y = y;
+    prev_z = z;
     x=x+1;;
     return;
 }
@@ -188,6 +191,7 @@ void Sprite::moveRight(){
 void Sprite::moveLeft(){
     prev_x = x;
     prev_y = y;
+    prev_z = z;
     x=x-1;;
     return;
 }
