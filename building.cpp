@@ -22,6 +22,7 @@
 
 #include "med_algo.hpp"
 #include "Item.hpp"
+#include "story.hpp"
 
 //Builds an NxN enclosed box on the map out of standrad bricks
 //Input the vector of Item vectors to update with new items, as well as the block_map to update
@@ -173,15 +174,23 @@ void build_maze(vector<vector<Item>>* map_scenery, bool* block_map, int map_widt
 //Builds an NxN box of floor tiles on the map
 void build_floor_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int x, int y, int z, int n, SDL_Color p_col , SDL_Color s_col ){
     
-    if( !is_square_clear(block_map, map_width, map_height, x, y, z, n)){
-        printf("floor space not clear... not building\n"); 
-        return; //do nothing
-    }
+    int FLOOR_TILE_INDEX = 301; //the Item type for floor tiles
     
     //Cycle through floor space
-    for(int i = 0; i < n; i++){
-        for(int j = 0 ; j < n; j++){
-            Item temp_floor = Item(x+i, y+j, 301, p_col, s_col);
+    for(int i = 0; i < n; i++){ //for x dim
+        for(int j = 0 ; j < n; j++){ // for y dim
+            
+            //make sure a tile isn't already there.
+            bool has_tile = false;
+            for(int p = 0; p < map_scenery->at( (z*map_width*map_height) + ((y+j)*map_width) + (x+i) ).size() ; p++){
+                if(map_scenery->at( (z*map_width*map_height) + ((y+j)*map_width) + (x+i) ).at(p).type == FLOOR_TILE_INDEX){
+                    has_tile = true; //set flag to prevent creation of new tile
+                }
+            }
+            if(has_tile == true){continue;} //move on to next step
+            
+            //If made it here, lay a tile
+            Item temp_floor = Item(x+i, y+j, FLOOR_TILE_INDEX, p_col, s_col);
             map_scenery->at( (z*map_width*map_height) + (temp_floor.y*map_width) + temp_floor.x ).push_back(temp_floor);
         }
     }
@@ -268,17 +277,53 @@ void build_tower_NxN(vector<vector<Item>>* map_scenery_top, vector<vector<Item>>
     
     //ALL OF THE OTHER FLOORS
     for(int i = 0; i < num_floors; i++){
+        //Also need to unblock that region (of floor area)
+        //set_square_clear(block_map, map_width, map_height, build_x+1, build_y+1, i+1, n-2);
+        set_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, i+1, n+2);
+        
         //Build the box walls/doors
         build_box_NxN_door(map_scenery_top, block_map, map_width, map_height, build_x, build_y, i+1, n, brick_col1, brick_col2, door_col1);
-        
-        //Also need to unblock that region (of floor area)
-        set_square_clear(block_map, map_width, map_height, build_x+1, build_y+1, i+1, n-2);
         
         //Build the floors within the box
         build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, build_x+1, build_y+1, i+1, n-2, floor_col1, floor_col2);
         //Put the ladder
         Item temp_ladder = Item(ladder_x, ladder_y, 318, ladder_col1, {0,0,0,255});
         map_scenery_top->at( ((i+1)*map_height*map_width) + (ladder_y*map_width) + ladder_x ).push_back(temp_ladder);
+        
+        //Build a balcony (lay bix box of floor - it will ignore area with floor tile already
+        build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, build_x-1, build_y-1, i+1, n+2, floor_col1, floor_col2);
+        //Create a railing
+        //Bottom railing
+        for(int b = 0; b < n+2; b++){
+            int r_x = build_x - 1 + b;
+            int r_y = build_y + n;
+            Item temp_railing = Item(r_x, r_y, 319);
+            map_scenery_top->at( ((i+1)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
+        }
+        
+        //Left railing
+        for(int b = 0; b < n+2; b++){
+            int r_x = build_x - 1;
+            int r_y = build_y - 1 + b;
+            Item temp_railing = Item(r_x, r_y, 320);
+            map_scenery_top->at( ((i+1)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
+        }
+        
+        //Right railing
+        for(int b = 0; b < n+2; b++){
+            int r_x = build_x + n;
+            int r_y = build_y - 1 + b;
+            Item temp_railing = Item(r_x, r_y, 321);
+            map_scenery_top->at( ((i+1)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
+        }
+        
+        //Top railing
+        for(int b = 0; b < n+2; b++){
+            int r_x = build_x - 1 + b;
+            int r_y = build_y - 2;
+            Item temp_railing = Item(r_x, r_y, 319);
+            map_scenery_top->at( ((i+1)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
+        }
         
     }
 
@@ -602,3 +647,183 @@ void build_two_house_path(vector<vector<Item>>* map_scenery_top,vector<vector<It
     
 }
 
+//Builds a grid of towers and connects them by path
+void build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color brick_p_col_in, SDL_Color brick_s_col_in, SDL_Color floor_p_col_in, SDL_Color floor_s_col_in,  SDL_Color door_col1, SDL_Color ladder_col_p ){
+    
+    //Variables Declare
+    int x1,y1,x2,y2; //stores the coords of two points in the buildings for path finding
+    int build_x, build_y, build_dim, build_floors; //building parameters, temporary
+    int row, col; //stores the x/y coord we'll be building the grid along
+    
+    //Set (random) neighboorhood grid
+    //First, pick a random starting point, All paths (that make up a single street) will lead here...
+    //x1 = rand()%map_width;
+    //y1 = rand()%map_height;
+    x1 = 15 - rand()%5;
+    y1 = 70;
+    //Build a sign post here
+    Item temp_sign = Item(x1, y1-1, 322, ladder_col_p, {0,0,0,255}, genStreetName());
+    map_scenery_top->at( temp_sign.y*map_width + temp_sign.x ).push_back(temp_sign);
+    block_map[temp_sign.y*map_width + temp_sign.x ] = true;
+    
+    //Now that we have a reference point, start going through a placing towers (slightly skewed) along the FIRST ROW
+    for(int i = 0 ; i < 8; i++){ //This is how many towers/row we'll be making
+        
+        build_x = 15 + i*17 + rand()%4; //incremental, skewed
+        build_y = y1 + rand()%3 - rand()%3; //along the same line, skewed
+        build_dim = rand()%4 + 5;
+        build_floors = 3 + rand()%4;
+        
+        //now build a tower there
+        build_tower_NxN(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height, build_x, build_y, build_dim, build_floors, brick_p_col_in, brick_s_col_in, floor_p_col_in, floor_s_col_in, door_col1, ladder_col_p);
+        
+        //now connect tower to road by path
+        //find random point in new tower
+        x2 = build_x + 1 + rand()%(build_dim-2); //random point inside tower
+        y2 = build_y + 1 + rand()%(build_dim-2); //random point inside tower
+        //Find path between two buildings
+        vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps to get between the two buildings
+        build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+        
+        //now update the reference points
+        x1 = x2;
+        y1 = y2;
+        
+    }
+    
+    //What if we changed the design scheme colors for the next row?
+    brick_p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    brick_s_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    floor_p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    floor_s_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    //ladder_p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    
+    //NOW DO the SECOND ROW
+    x1 = 15 - rand()%5;
+    y1 = 40;
+    //Build a sign post here
+    temp_sign = Item(x1, y1-1, 322, ladder_col_p, {0,0,0,255}, genStreetName());
+    map_scenery_top->at( temp_sign.y*map_width + temp_sign.x ).push_back(temp_sign);
+    block_map[temp_sign.y*map_width + temp_sign.x ] = true;
+    
+    //Now that we have a reference point, start going through a placing towers (slightly skewed) along the FIRST ROW
+    for(int i = 0 ; i < 8; i++){ //This is how many towers/row we'll be making
+        
+        build_x = 15 + i*17 + rand()%4; //incremental, skewed
+        build_y = y1 + rand()%3 - rand()%3; //along the same line, skewed
+        build_dim = rand()%4 + 5;
+        build_floors = 3 + rand()%4;
+        
+        //now build a tower there
+        build_tower_NxN(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height, build_x, build_y, build_dim, build_floors, brick_p_col_in, brick_s_col_in, floor_p_col_in, floor_s_col_in, door_col1, ladder_col_p);
+        
+        //now connect tower to road by path
+        //find random point in new tower
+        x2 = build_x + 1 + rand()%(build_dim-2); //random point inside tower
+        y2 = build_y + 1 + rand()%(build_dim-2); //random point inside tower
+        //Find path between two buildings
+        vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps to get between the two buildings
+        build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+        
+        //now update the reference points
+        x1 = x2;
+        y1 = y2;
+        
+    }
+    
+    //What if we changed the design scheme colors for the next row?
+    brick_p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    brick_s_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    floor_p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    floor_s_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    //ladder_p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    
+    //NOW DO the THHIRD ROW
+    x1 = 15 - rand()%5;
+    y1 = 110;
+    //Build a sign post here
+    temp_sign = Item(x1, y1-1, 322, ladder_col_p, {0,0,0,255}, genStreetName());
+    map_scenery_top->at( temp_sign.y*map_width + temp_sign.x ).push_back(temp_sign);
+    block_map[temp_sign.y*map_width + temp_sign.x ] = true;
+    
+    //Now that we have a reference point, start going through a placing towers (slightly skewed) along the FIRST ROW
+    for(int i = 0 ; i < 8; i++){ //This is how many towers/row we'll be making
+        
+        build_x = 15 + i*17 + rand()%4; //incremental, skewed
+        build_y = y1 + rand()%3 - rand()%3; //along the same line, skewed
+        build_dim = rand()%4 + 5;
+        build_floors = 3 + rand()%4;
+        
+        //now build a tower there
+        build_tower_NxN(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height, build_x, build_y, build_dim, build_floors, brick_p_col_in, brick_s_col_in, floor_p_col_in, floor_s_col_in, door_col1, ladder_col_p);
+        
+        //now connect tower to road by path
+        //find random point in new tower
+        x2 = build_x + 1 + rand()%(build_dim-2); //random point inside tower
+        y2 = build_y + 1 + rand()%(build_dim-2); //random point inside tower
+        //Find path between two buildings
+        vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps to get between the two buildings
+        build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+        
+        //now update the reference points
+        x1 = x2;
+        y1 = y2;
+        
+    }
+    
+    //What if we changed the design scheme colors for the next row?
+    brick_p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    brick_s_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    floor_p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    floor_s_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    //ladder_p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    
+    //NOW DO the FOURTH ROW
+    x1 = 15 - rand()%5;
+    y1 = 20;
+    //Build a sign post here
+    temp_sign = Item(x1, y1-1, 322, ladder_col_p, {0,0,0,255}, genStreetName());
+    map_scenery_top->at( temp_sign.y*map_width + temp_sign.x ).push_back(temp_sign);
+    block_map[temp_sign.y*map_width + temp_sign.x ] = true;
+    
+    //Now that we have a reference point, start going through a placing towers (slightly skewed) along the FIRST ROW
+    for(int i = 0 ; i < 8; i++){ //This is how many towers/row we'll be making
+        
+        build_x = 15 + i*17 + rand()%4; //incremental, skewed
+        build_y = y1 + rand()%3 - rand()%3; //along the same line, skewed
+        build_dim = rand()%4 + 5;
+        build_floors = 3 + rand()%4;
+        
+        //now build a tower there
+        build_tower_NxN(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height, build_x, build_y, build_dim, build_floors, brick_p_col_in, brick_s_col_in, floor_p_col_in, floor_s_col_in, door_col1, ladder_col_p);
+        
+        //now connect tower to road by path
+        //find random point in new tower
+        x2 = build_x + 1 + rand()%(build_dim-2); //random point inside tower
+        y2 = build_y + 1 + rand()%(build_dim-2); //random point inside tower
+        //Find path between two buildings
+        vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps to get between the two buildings
+        build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+        
+        //now update the reference points
+        x1 = x2;
+        y1 = y2;
+        
+    }
+    
+    
+    
+    
+    
+    
+//    row = 70;
+//    col = 70;
+       // build_tower_NxN(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, 60, 60, 7, 3, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
+    
+    
+
+    
+}

@@ -11,6 +11,7 @@
 
 #include <SDL2/SDL.h>
 #include <vector>
+#include <string>
 
 #include "Item.hpp"
 
@@ -23,8 +24,8 @@ extern SDL_Renderer* gRenderer;//The window renderer
 class Item{
 public:
     Item(SDL_Texture** tiles1, SDL_Texture** tiles2);
-    Item(int xpos, int ypos, int tile_type, SDL_Color primo, SDL_Color seco);
-    Item(int xpos, int ypos, int tile_type);
+    Item(int xpos, int ypos, int tile_type, SDL_Color primo, SDL_Color seco, string in_desc = "test description");
+    Item(int xpos, int ypos, int tile_type, string in_desc = "test description");
     SDL_Color primColor; //the pirimary color of item
     SDL_Color secoColor; //the secondary color of the item
     int x,y,z; //I think we actually don't keep track of position here....
@@ -32,7 +33,7 @@ public:
     void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s); //draws the item
     void draw(int x, int y, SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s); //draws the item at a specific location
     void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s,SDL_Texture** item_tiles_t); //overload
-    
+    string description; //A Description of the item
     
 };
 

@@ -341,6 +341,22 @@ void loadTiles(){
     item_tiles_s[318] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[318] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[319] = loadTexture("Civ2/Civ2/tiles/railingPrim.png");
+    item_tiles_s[319] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[319] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[320] = loadTexture("Civ2/Civ2/tiles/railingLeftPrim.png");
+    item_tiles_s[320] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[320] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[321] = loadTexture("Civ2/Civ2/tiles/railingRightPrim.png");
+    item_tiles_s[321] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[321] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[322] = loadTexture("Civ2/Civ2/tiles/signPrim.png");
+    item_tiles_s[322] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[322] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
     misc_tiles[1] = loadTexture("Civ2/Civ2/tiles/zodiac/taurus.png");
@@ -506,17 +522,20 @@ void init_environment(){
     
     build_tower_NxN(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, 60, 60, 7, 3, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+    build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
     
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+//    
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+//    
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
+//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
 //
 //    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
 //    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
@@ -621,32 +640,6 @@ void draw_environment(Sprite* cre1){
             
         }
     } //End drawing bottom items, can draw creatures in a separate loop
-        
-    //Draw all top items
-    for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
-        if(i >= map_width || i <= 0){continue;} //bounds checking
-        for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
-            if(j >= map_height || j < 0){continue;} //bounds checking
-            
-            int map_index = (draw_map_z*map_area) + (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
-            
-            //Cycle through all the items in the map_scenery_top list at that location
-            for(int k = 0; k < map_scenery_top[ map_index ].size(); k++ ){
-                map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x) , (map_scenery_top[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s); //call the draw function. We draw the item at a location translated from the current draw_map
-            }
-            
-            //Cycle through all animations on map
-            for(int k = 0; k < map_animations[ map_index ].size(); k++ ){
-                map_animations[map_index][k].draw( (map_animations[map_index][k].x - draw_map_x) , (map_animations[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
-            }
-            
-            //Cycle through all effects on map
-            for(int k = 0; k < map_effects[ map_index ].size(); k++ ){
-                map_effects[map_index][k].drawScroll( (map_effects[map_index][k].x - draw_map_x) , (map_effects[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
-            }
-            
-        }
-    } //End drawing top items
     
     //Cycle through all shrooms and draw...
     for(int c = 0 ; c < map_shrooms.size(); c++){
@@ -676,6 +669,62 @@ void draw_environment(Sprite* cre1){
     
     if(cre1->z == draw_map_z){
         cre1->draw_movement(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s); //DRAW MAIN CREATURE
+    }
+    
+    //Draw all top items
+    for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
+        if(i >= map_width || i <= 0){continue;} //bounds checking
+        for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
+            if(j >= map_height || j < 0){continue;} //bounds checking
+            
+            int map_index = (draw_map_z*map_area) + (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
+            
+            //Cycle through all the items in the map_scenery_top list at that location
+            for(int k = 0; k < map_scenery_top[ map_index ].size(); k++ ){
+                map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x) , (map_scenery_top[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s); //call the draw function. We draw the item at a location translated from the current draw_map
+            }
+            
+            //Cycle through all animations on map
+            for(int k = 0; k < map_animations[ map_index ].size(); k++ ){
+                map_animations[map_index][k].draw( (map_animations[map_index][k].x - draw_map_x) , (map_animations[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
+            }
+            
+            //Cycle through all effects on map
+            for(int k = 0; k < map_effects[ map_index ].size(); k++ ){
+                map_effects[map_index][k].drawScroll( (map_effects[map_index][k].x - draw_map_x) , (map_effects[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
+            }
+            
+        }
+    } //End drawing top items
+    
+//    //Cycle through all shrooms and draw...
+//    for(int c = 0 ; c < map_shrooms.size(); c++){
+//
+//        if(map_shrooms[c].z != draw_map_z){ //if not on currently drawn floor
+//            continue; //skip to next one
+//        }
+//
+//        if (map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
+//            map_shrooms[c].y > draw_map_y && map_shrooms[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+//            map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, map_shrooms[c].y - draw_map_y, item_tiles_p, item_tiles_s);
+//        }
+//    }
+    
+    //Cycle through all creatures and draw their items...
+    for(int c = 0 ; c < map_creatures.size(); c++){
+        
+        if(map_creatures[c].z != draw_map_z){ //if not on currently drawn floor
+            continue; //skip to next one
+        }
+        
+        if (map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
+            map_creatures[c].y > draw_map_y && map_creatures[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+            map_creatures[c].draw_movement_items(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s);
+        }
+    }
+    
+    if(cre1->z == draw_map_z){
+        cre1->draw_movement_items(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s); //DRAW MAIN CREATURE
     }
     
 
@@ -1776,7 +1825,7 @@ void wander_player_thread(Sprite* cre1){
                     break;
                 }
                 //blocked_check
-                if(block_map[(cre1->y-1)*map_width+(cre1->x)]==true){
+                if(block_map[ (cre1->z*map_area) + (cre1->y-1)*map_width+(cre1->x)]==true){
                     break;
                 }
                 //If we made it here, then it's okay to move
@@ -1789,7 +1838,7 @@ void wander_player_thread(Sprite* cre1){
                     break;
                 }
                 //blocked_check
-                if(block_map[(cre1->y)*map_width+(cre1->x-1)]==true){
+                if(block_map[ (cre1->z*map_area) + (cre1->y)*map_width+(cre1->x-1)]==true){
                     break;
                 }
                 //If we made it here, then it's okay to move
@@ -1803,7 +1852,7 @@ void wander_player_thread(Sprite* cre1){
                     break;
                 }
                 //blocked_check
-                if(block_map[(cre1->y+1)*map_width+(cre1->x)]==true){
+                if(block_map[ (cre1->z*map_area) + (cre1->y+1)*map_width+(cre1->x)]==true){
                     break;
                 }
                 //If we made it here, then it's okay to move
@@ -1817,7 +1866,7 @@ void wander_player_thread(Sprite* cre1){
                     break;
                 }
                 //blocked_check
-                if(block_map[(cre1->y)*map_width+(cre1->x+1)]==true){
+                if(block_map[ (cre1->z*map_area) + (cre1->y)*map_width+(cre1->x+1)]==true){
                     break;
                 }
                 //If we made it here, then it's okay to move
@@ -1928,20 +1977,15 @@ int main( int argc, char* args[] ){
     Staff temp_staff = Staff(0,0,309); //a temp Item to be added to the cre's equip inventory
     cre1->staff = &temp_staff;
 
-    //RECIPES
-    for(int j = 0; j <3; j++){
 
-        //Generate some new resource recipes
-        for(int w = 0; w < 5; w++){
-            //Generates a recipe and generatess a required item
-            Resource temp_resource_recipe1 = Resource(rand()%4);
-            cout << temp_resource_recipe1.name << "\n";
-            Item temp_item = Item(10+j, 5+w, temp_resource_recipe1.item_type, temp_resource_recipe1.colorPrim, temp_resource_recipe1.colorSeco);
-            map_items[(temp_item.y * map_width) + temp_item.x].push_back(temp_item);
-        }
-        
+    //STORY TEST
+    for(int p = 0; p < 200; p++){
+        cout << genStreetName() << "\n";
+        cout << genThreadName() << "\n";
+        cout << genTwineName() << "\n";
     }
     
+    //RECIPES
     //Generate some new recipe types
     for(int w = 0; w < 5; w++){
         //Generates a recipe and generates an example item
@@ -2240,6 +2284,59 @@ int main( int argc, char* args[] ){
                     case SDLK_LSHIFT:
                     case SDLK_RSHIFT:
                         shiftDown = true;
+                        break;
+                    
+                    case SDLK_RETURN: //USED FOR READING A SIGN SINCE IT SPECIFICALLY LOOKS FOR 322
+                        if(wKeyDown){ //Then look up
+                            //check if a sign exists at that point (there's a function in Item.hpp for that)
+                            if(isItemInList(map_scenery_top[ cre1->z*map_area + (cre1->y-1)*map_width + cre1->x  ], 322) == true){
+                                
+                                //Now cycle through the list, find which one is signpost, 322, and write out it's contents to console
+                                for(int s = 0; s < map_scenery_top[ cre1->z*map_area + (cre1->y-1)*map_width + cre1->x  ].size() ; s++ ){
+                                    if(map_scenery_top[ cre1->z*map_area + (cre1->y-1)*map_width + cre1->x  ][s].type == 322){ //if it has the right type, then we have the right index, s. This is safe since a lot of items will be pouring into/out-of this tile
+                                        addToConsoleLog( map_scenery_top[ cre1->z*map_area + (cre1->y-1)*map_width + cre1->x][s].description );
+                                    }
+                                }
+                            }
+                        }
+                        if(sKeyDown){ //Then look down
+                            //check if a sign exists at that point (there's a function in Item.hpp for that)
+                            if(isItemInList(map_scenery_top[ cre1->z*map_area + (cre1->y+1)*map_width + cre1->x  ], 322) == true){
+                                
+                                //Now cycle through the list, find which one is signpost, 322, and write out it's contents to console
+                                for(int s = 0; s < map_scenery_top[ cre1->z*map_area + (cre1->y+1)*map_width + cre1->x  ].size() ; s++ ){
+                                    if(map_scenery_top[ cre1->z*map_area + (cre1->y+1)*map_width + cre1->x  ][s].type == 322){ //if it has the right type, then we have the right index, s. This is safe since a lot of items will be pouring into/out-of this tile
+                                        addToConsoleLog( map_scenery_top[ cre1->z*map_area + (cre1->y+1)*map_width + cre1->x][s].description );
+                                    }
+                                }
+                            }
+                        }
+                        if(dKeyDown){ //Then look right
+                            //check if a sign exists at that point (there's a function in Item.hpp for that)
+                            if(isItemInList(map_scenery_top[ cre1->z*map_area + (cre1->y*map_width) + (cre1->x+1) ], 322) == true){
+                                
+                                //Now cycle through the list, find which one is signpost, 322, and write out it's contents to console
+                                for(int s = 0; s < map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x+1 ].size() ; s++ ){
+                                    if(map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x+1  ][s].type == 322){ //if it has the right type, then we have the right index, s. This is safe since a lot of items will be pouring into/out-of this tile
+                                        addToConsoleLog( map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x+1][s].description );
+                                    }
+                                }
+                            }
+                        }
+
+                        if(aKeyDown){ //Then look left
+                            //check if a sign exists at that point (there's a function in Item.hpp for that)
+                            if(isItemInList(map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x-1  ], 322) == true){
+                                
+                                //Now cycle through the list, find which one is signpost, 322, and write out it's contents to console
+                                for(int s = 0; s < map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x-1 ].size() ; s++ ){
+                                    if(map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x-1  ][s].type == 322){ //if it has the right type, then we have the right index, s. This is safe since a lot of items will be pouring into/out-of this tile
+                                        addToConsoleLog( map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x-1][s].description );
+                                    }
+                                }
+                            }
+                        }
+                        
                         break;
 
                         

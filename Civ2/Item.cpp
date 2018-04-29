@@ -41,7 +41,7 @@ using namespace std;
 //}
 ////initial constructor
 //this overloaded constructor actually constructs an instance of object
-Item::Item(int xpos, int ypos, int tile_type){
+Item::Item(int xpos, int ypos, int tile_type, string in_desc){
     
     //static SDL_Texture** tilesPrim = new SDL_Texture * [1]; //contains item tiles, the first version
     //static SDL_Texture** tilesSeco = new SDL_Texture * [1]; //contains item tiles, the secondary version
@@ -52,6 +52,7 @@ Item::Item(int xpos, int ypos, int tile_type){
     type = tile_type;
     primColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
     secoColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
+    description = in_desc;
     
     //tilesPrim = new SDL_Texture * [1];
     
@@ -59,7 +60,7 @@ Item::Item(int xpos, int ypos, int tile_type){
 
 ////initial constructor
 //this overloaded constructor actually constructs an instance of object
-Item::Item(int xpos, int ypos, int tile_type, SDL_Color primo, SDL_Color seco){
+Item::Item(int xpos, int ypos, int tile_type, SDL_Color primo, SDL_Color seco, string in_desc){
     
     //static SDL_Texture** tilesPrim = new SDL_Texture * [1]; //contains item tiles, the first version
     //static SDL_Texture** tilesSeco = new SDL_Texture * [1]; //contains item tiles, the secondary version
@@ -70,6 +71,7 @@ Item::Item(int xpos, int ypos, int tile_type, SDL_Color primo, SDL_Color seco){
     type = tile_type;
     primColor = primo;
     secoColor = seco;
+    description = in_desc;
     
     //tilesPrim = new SDL_Texture * [1];
     
@@ -362,8 +364,6 @@ void Light::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Textur
         SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
     }
 }
-
-
 
 
 

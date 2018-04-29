@@ -68,12 +68,15 @@ private:
 
 //Magic
 vector<int> return_fave_rgb(); //returns the rgb value of a random ravorite color
+string genStreetName(); //generates a random street name (based off colors)
 string rgb_to_trigram(int r, int g, int b); //return the equivalent I ching trigram of the color
 string genPotionName(); //generates random name of a potion
 string genOilName(); //Generates -ine name. These can be the names of the active ingrediant in the above potions
 string genSaltName(); //Generates "-ium -ide" name, These can be the names of the active ingrediant in the above powders
 string genGlassName(); //Generates a glass name //either a (Pyr)-ex name or a (boro)-silicate name
 string genClothName(); //Generates a cloth name // consonant - vowel - consonant - consonant
+string genThreadName(); //Generates a thread name // polyester or "jokolyester"
+string genTwineName(); //Generates a twine name //nylon or pikylon??
 int find_compatibility(int z1, int z2); //returns the compatibility of the entered zodiac sign codes: 0 - Good, 1 - Fine, 2 - Bad
 int find_zodiac_element(int z); //returns the element of the entered zodiac sign code: 1: Air, 2: Fire, 3: Water, 4:Earth
 

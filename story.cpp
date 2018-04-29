@@ -448,9 +448,9 @@ string genName(){
     
 }
 
-vector<string> street_monickers_post = {"Dopest","Dope","Baddest","Bad","Slickest","Slick","Mostest","Rad","Clown","Killa","Slizza","Blizza","Snow","Product","Biggie","Down","Chiller","Bomb","Bombest","Funny","Punk","Chill","Junkhead","Cracker","Lowlife","Thug","Thuggin","Pimpin","Chief","Pill","Rocker","Baller","Insane","Moco","Snoop","JoJo","Fly","Real Deal","Peep","Smalls", "Illest","Dude","Duderino","Baby","Vato","Joker","Homie","Flow","Slug"};
+vector<string> street_monickers_post = {"Dopest","Dope","Baddest","Bad","Slickest","Slick","Mostest","Rad","Clown","Killa","Slizza","Blizza","Snow","Product","Biggie","Down","Chiller","Bomb","Bombest","Funny","Punk","Chill","Junkhead","Cracker","Lowlife","Thug","Thuggin","Pimpin","Chief","Pill","Rocker","Baller","Insane","Moco","Snoop","JoJo","Fly","Real Deal","Peep","Smalls", "Illest","Dude","Duderino","Baby","Vato","Joker","Homie","Flow","Slug","Bastard"};
 
-vector<string> street_monickers_pre = {"Mista", "Lil", "Supa", "Fitty", "Champ", "Kid", "Wiz", "Babyface","Cousin"};
+vector<string> street_monickers_pre = {"Mista", "Lil", "Supa", "Fitty", "Champ", "Kid", "Wiz", "Babyface","Cousin", "Filthy","Trashcan"};
 
 //Adds a post monicker to a name
 //Ex. Jugga the Fly
@@ -2510,6 +2510,28 @@ vector<vector<int>> fave_rgb_colors = {
     {126, 30, 156}
 };
 
+vector<string> street_types = {"lane","street","avenue","road","court","place","drive","boulevard","row","loop","way","walk","plaza"
+};
+
+//generates a random street name (based off colors)
+string genStreetName(){
+    string street = "";
+    street += fave_color_names[rand()%fave_color_names.size()];
+    street += " ";
+    street += street_types[rand()%street_types.size()];
+    
+    //capitalize first letter of each word
+    street.at(0) = toupper(street.at(0));
+    int space_pos = 0;
+    while(space_pos >= 0){ //while we have more spaces to go
+        space_pos = street.find(" ",space_pos+1); //actually record where the space is
+        street.at(space_pos + 1) = toupper(street.at(space_pos + 1)); //make the letter after it capaitalized
+    }
+    
+    return street;
+}
+
+
 //REturns a random favorite color rgb code
 vector<int> return_fave_rgb(){
     
@@ -2631,6 +2653,40 @@ string genClothName(){
     cloth_name += consonants[rand()%21];
     
     return cloth_name;
+}
+
+//Generates a thread name // polyester or "jokolyester"
+string genThreadName(){
+    char consonants[] = "bcdfghjklmnpqrstvwxyz";
+    char vowels[] = "aeiou";
+    
+    string thread_name = "";
+    thread_name += consonants[rand()%21];
+    thread_name += vowels[rand()%5];
+    if(rand()%2 == 1){ //maybe do it again
+        thread_name += consonants[rand()%21];
+        thread_name += vowels[rand()%5];
+    }
+    thread_name += "lyester";
+    
+    
+    return thread_name;
+}
+
+//Generates a twine name //nylon or pikylon??
+string genTwineName(){
+    char consonants[] = "bcdfghjklmnpqrstvwxyz";
+    char vowels[] = "aeiou";
+    
+    string twine_name = "";
+    twine_name += consonants[rand()%21];
+    if(rand()%2 == 1){ //maybe do it again
+        twine_name += vowels[rand()%5];
+        twine_name += consonants[rand()%21];
+    }
+    twine_name += "ylon";
+    
+    return twine_name;
 }
 
 //ZODIAC

@@ -163,6 +163,66 @@ void Sprite::draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_T
     
 }
 
+//draws the sprite's items to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
+void Sprite::draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s){
+//    //Set rendering space and render to screen
+//    SDL_Rect renderQuad = { at_x*16, at_y*16, mWidth, mHeight };
+//    SDL_Rect* clip = NULL;
+//    SDL_RenderCopy( gRenderer, primTexture, clip, &renderQuad );//Render to screen
+//    SDL_RenderCopy( gRenderer, secoTexture, clip, &renderQuad );//Render to screen
+    
+    //But we have to put the items in the correct position...
+    //Basically does everything that drawHat, drawStaff, drawLight does, but a translated verrsion
+    // y's and x's become at_y's and at_x's
+    //prev_y becomes at_y + (prev_y - y)
+    //prev_x becomes at_x + (prev_x - x)
+    
+    //DRAW HAT
+    if(hat != nullptr){
+        hat->y = at_y; //move the hat to the right place
+        hat->x = at_x;
+        hat->draw(gRenderer, item_tiles_p, item_tiles_s);
+    }
+    
+    //DRAW STAFF
+    //the staff should flow behind cre so we need to calculate where that's at on the translated image
+    if(staff != nullptr){
+        staff->y = at_y + (prev_y-y); //Apply the different between y and previous y to the new location
+        staff->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
+        staff->draw(gRenderer, item_tiles_p, item_tiles_s);
+    }
+    
+    //DRAW LIGHT
+    if(light != nullptr){
+        
+        //If has staff, then need to put candle on other side
+        if(staff!=nullptr){
+            if(prev_y < y && prev_x == x){
+                light->y = at_y+1;
+                light->x = at_x;
+            }
+            if(prev_y > y && prev_x == x){
+                light->y = at_y-1;
+                light->x = at_x;
+            }
+            if(prev_x < x && prev_y == y){
+                light->y = at_y;
+                light->x = at_x+1;
+            }
+            if(prev_x > x && prev_y == y){
+                light->y = at_y;
+                light->x = at_x-1;
+            }
+        }else{
+            light->y = at_y + (prev_y-y); //Apply the different between y and previous y to the new location
+            light->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
+        }
+        
+        light->draw(gRenderer, item_tiles_p, item_tiles_s);
+    }
+    
+}
+
 //Move Down (1 step)
 void Sprite::moveDown(){
     prev_y = y;
