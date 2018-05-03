@@ -77,6 +77,7 @@ string genGlassName(); //Generates a glass name //either a (Pyr)-ex name or a (b
 string genClothName(); //Generates a cloth name // consonant - vowel - consonant - consonant
 string genThreadName(); //Generates a thread name // polyester or "jokolyester"
 string genTwineName(); //Generates a twine name //nylon or pikylon??
+string genMeatName(); //Generates animal/meat name -> kinda like on Avatar: Na'vi or Ry'kee (gross or cool?)
 int find_compatibility(int z1, int z2); //returns the compatibility of the entered zodiac sign codes: 0 - Good, 1 - Fine, 2 - Bad
 int find_zodiac_element(int z); //returns the element of the entered zodiac sign code: 1: Air, 2: Fire, 3: Water, 4:Earth
 

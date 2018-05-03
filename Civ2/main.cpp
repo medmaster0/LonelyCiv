@@ -208,10 +208,10 @@ SDL_Texture* loadTexture( std::string path )
 //Load in al the tiles used for the map
 void loadTiles(){
     
-    item_tiles_p = new SDL_Texture* [307];
-    item_tiles_s = new SDL_Texture* [307];
-    item_tiles_t = new SDL_Texture* [307];
-    misc_tiles = new SDL_Texture* [20];
+    item_tiles_p = new SDL_Texture* [326];
+    item_tiles_s = new SDL_Texture* [326];
+    item_tiles_t = new SDL_Texture* [326];
+    misc_tiles = new SDL_Texture* [40];
     //world_colors = new SDL_Color [200];
     SDL_Color temp_col;
     
@@ -357,6 +357,30 @@ void loadTiles(){
     item_tiles_s[322] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[322] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[323] = loadTexture("Civ2/Civ2/tiles/tophatPrim.png");
+    item_tiles_s[323] = loadTexture("Civ2/Civ2/tiles/tophatSeco.png");
+    item_tiles_t[323] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[324] = loadTexture("Civ2/Civ2/tiles/crownPrim.png");
+    item_tiles_s[324] = loadTexture("Civ2/Civ2/tiles/crownSeco.png");
+    item_tiles_t[324] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[325] = loadTexture("Civ2/Civ2/tiles/mailboxPrim.png");
+    item_tiles_s[325] = loadTexture("Civ2/Civ2/tiles/mailboxSeco.png");
+    item_tiles_t[325] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[326] = loadTexture("Civ2/Civ2/tiles/mohawkPrim.png");
+    item_tiles_s[326] = loadTexture("Civ2/Civ2/tiles/mohawkSeco.png");
+    item_tiles_t[326] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[327] = loadTexture("Civ2/Civ2/doodadz/writingPrim.png");
+    item_tiles_s[327] = loadTexture("Civ2/Civ2/doodadz/writingSeco.png");
+    item_tiles_t[327] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[328] = loadTexture("Civ2/Civ2/tiles/flowerPrim.png");
+    item_tiles_s[328] = loadTexture("Civ2/Civ2/tiles/flowerSeco.png");
+    item_tiles_t[328] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
     misc_tiles[1] = loadTexture("Civ2/Civ2/tiles/zodiac/taurus.png");
@@ -480,7 +504,8 @@ void init_environment(){
             if(rand()%2==1){
                 temp_tile=312;
             }else{
-                temp_tile = 311;
+                //temp_tile = 311;
+                temp_tile = 307;
             }
         }
         //temp_tile = rand()%7 + 300;
@@ -573,8 +598,10 @@ void init_environment(){
         map_creatures.push_back(temp_cre);
         
         //randomly give hats
-        if(rand()%2==1){
-            Hat* temp_hat = new Hat(0, 0, 305+(rand()%2) ); //a temp Item to be added to cre's inventory
+        if(rand()%8<5){
+            //hat item no.'s are 305,306,323,324, 326
+            int hat_tiles[5] = {305,306,323,324, 326};
+            Hat* temp_hat = new Hat(0, 0, hat_tiles[rand()%5] ); //a temp Item to be added to cre's inventory
             map_creatures.back().hat = temp_hat;
         }
         //randomly give staffs (staves?)
@@ -582,11 +609,11 @@ void init_environment(){
             Staff* temp_staff = new Staff(0,0,307); //a temp Item to be added to the cre's equip inventory
             map_creatures.back().staff = temp_staff;
         }
-        //randomly give lights
-        if(rand()%2==1){
-            Light* temp_light = new Light(0, 0, 308); //a temp Item to be added to the cre's equip inventory
-            map_creatures.back().light = temp_light;
-        }
+//        //randomly give lights
+//        if(rand()%2==1){
+//            Light* temp_light = new Light(0, 0, 308); //a temp Item to be added to the cre's equip inventory
+//            map_creatures.back().light = temp_light;
+//        }
     }
     
     //Shrooms
@@ -604,6 +631,33 @@ void init_environment(){
                 break;
             }
         }
+    }
+    
+//    //Demons
+//    int num_demons = 5; //How many demons are on the map
+//    for(int i = 0; i < num_demons; i++){
+//        int tx, ty;
+//        while(true){
+//            tx = rand()%map_width;
+//            ty = rand()%map_height;
+//            if(block_map[(ty*map_width)+tx]==false){ //if adjacent is NOT blocked
+//                Shroom temp_demon = Shroom(tx,ty); //create new shroom
+//                temp_demon.loadFromFile("Civ2/Civ2/tiles/demonPrim4.png","Civ2/Civ2/tiles/demonSeco4.png", 16, 16);
+//                temp_demon.changePrimColor(generate_pink());
+//                temp_demon.changeSecoColor({255,255,255,255});
+//                map_shrooms.push_back(temp_demon);
+//                break;
+//            }
+//        }
+//    }
+    
+    //create random items (from the randomly generated assets)
+    for(int g = 0 ; g<225; g++){
+        tempx = rand()%(map_width);
+        tempy = rand()%(map_height);
+        temp_tile = 328;
+        Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
+        map_items[ (tempz*map_area) + (tempy*map_width)+tempx].push_back(temp_item);
     }
     
     
@@ -1171,7 +1225,7 @@ void wander_thread(Sprite* spr1){
         }
         
         if(spr1->path.empty()){ //if path is empty
-            spr1->path = A_Star(block_map, map_width, map_height, spr1->x, spr1->y, rand()%map_width, rand()%map_height );
+            spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, rand()%map_width, rand()%map_height, 0 );
         }
     
         //Check if the search failed (error code (9999,9999)
@@ -1397,6 +1451,7 @@ void gather_thread(Sprite* spr1){
 //The sprite should have it's path set before starting this thread (or else it does nothing)
 //THe sprite's inThread flag is set to false when this thread finishes running
 void walk_path_thread(Sprite* spr1){
+    
     //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
     spr1->move_timer = SDL_GetTicks(); //start move timer
     int steps_to_pop = 0; //how many steps need to be popped off path
@@ -1419,6 +1474,7 @@ void walk_path_thread(Sprite* spr1){
             if(spr1->path.size()>1){ //if the path list is non-empty (and has at least 1 element, which will be saved for actual movement)
                 //Need to register the skipped steps in "prev values"
                 spr1->moveTo(spr1->path[spr1->path.size()-1][0], spr1->path[spr1->path.size()-1][1]);
+                spr1->z = spr1->path[spr1->path.size()-1][2]; //also set correct floor
                 spr1->path.pop_back(); //pop off the last element (skip it)
             }
         }
@@ -1426,6 +1482,7 @@ void walk_path_thread(Sprite* spr1){
         vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
         //Now actually move
         spr1->moveTo(next_step[0], next_step[1]);
+        spr1->z = next_step[2];
         //pop off the step from path
         spr1->path.pop_back();
         
@@ -1478,7 +1535,7 @@ void perform_ritual_thread(Sprite* spr1){
     //Find a path to target
     free_path(*spr1); //clear path on sprite for starters
     if(spr1->path.empty()){ //if path is empty
-        spr1->path = A_Star(block_map, map_width, map_height, spr1->x, spr1->y, loc_x+1, loc_y );
+        spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, loc_x+1, loc_y, 0 );
     }
 
     //Check if the search failed (error code (9999,9999)
@@ -1511,6 +1568,8 @@ void perform_ritual_thread(Sprite* spr1){
             
             //Start a fire Animation (standard protocol)
             int list[4] = {22, 23, 24, 25};
+            loc_x = spr1->x - 1;
+            loc_y = spr1->y;
             Animation temp_animation = Animation(loc_x, loc_y, list);
             map_animations[ ( (loc_y) * map_width ) + (loc_x) ].push_back(temp_animation);
             
@@ -1608,19 +1667,17 @@ void task_creatures_thread(){
                 free_path(map_creatures[i]);//clear old path, fuction to individually delete path
                 map_creatures[i].thread_timer = time(NULL);
                 map_creatures[i].inThread = true;
-                //choice = rand()%3;
-                choice = rand()%2 * 2; 
+                choice = rand()%3;
+                //choice = rand()%2 * 2;
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
-                        //std::thread gatherObj(gather_thread, &map_creatures[i]);
                         std::thread gatherObj(gather_thread, &map_creatures[i]);
                         gatherObj.detach();
                         break;
                     }
                     case 1: {
                         //This thread wanders the input creature
-                        //std::thread wanderObj(wander_thread, &map_creatures[i]);
                         std::thread wanderObj(wander_thread, &map_creatures[i]);
                         wanderObj.detach();
                         break;
@@ -1666,7 +1723,7 @@ void background_color_thread(){
     int b1 = 1;
     //stop color
     int r2 = (rand()%223) + 30;
-    int g2 = (rand()%223) + 30;
+    int g2 = rand()%125; // limit g //int g2 = (rand()%223) + 30;
     int b2 = (rand()%223) + 30;
     //BOUNCES BACK AND FORTH BETWEeN THE VALUES
     
@@ -1771,7 +1828,7 @@ void regen_weedz_thread(){
                         //create a fruit here
                         item_id = 311; //id for fruit
                         printf("spawn: fruit\n", item_id);
-                        Item temp_fruit = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},{255,255,255,0} ); //temporary item
+                        Item temp_fruit = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},generate_brown()); //temporary item
                         map_items[y*map_width+x].push_back(temp_fruit);
                         SDL_Delay(5000);
                         continue;
@@ -1981,8 +2038,9 @@ int main( int argc, char* args[] ){
     //STORY TEST
     for(int p = 0; p < 200; p++){
         cout << genStreetName() << "\n";
-        cout << genThreadName() << "\n";
-        cout << genTwineName() << "\n";
+        //cout << genThreadName() << "\n";
+        //cout << genTwineName() << "\n";
+        //cout << genMeatName() << "\n";
     }
     
     //RECIPES

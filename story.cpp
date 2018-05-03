@@ -2689,6 +2689,30 @@ string genTwineName(){
     return twine_name;
 }
 
+//Generates animal/meat name -> kinda like on Avatar: Na'vi or Ry'kee (gross or cool?)
+string genMeatName(){
+    
+    char consonants[] = "bcdfghjklmnpqrstvwxz"; //NOTE THE ABSENCE OF Y FOR THIS ONE!!!!
+    char vowels[] = "aeiouy"; //NOTE THE ABSENCE OF Y FOR THIS ONE!!!!
+    
+    string meat_name = "";
+    
+    meat_name += toupper(consonants[rand()%20]);
+    meat_name += vowels[rand()%6];
+    meat_name += "'";
+    meat_name += consonants[rand()%20];
+    //we'll either want one or two of the last vowelll
+    int vowel_index = rand()%6;
+    meat_name += vowels[vowel_index];
+    if(rand()%2==1){ //maybe, add it a second time
+        meat_name += vowels[vowel_index];
+    }
+    
+    
+    return meat_name;
+    
+}
+
 //ZODIAC
 //Implementing a codified system of the Zodiac...
 //Each Zodiac Sign assigned a code

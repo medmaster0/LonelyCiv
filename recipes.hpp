@@ -44,7 +44,7 @@ using namespace std;
 // 0 - potions (Recipe) made of 2 and 0
 // 1 - powders (Recipe) made of 1 and 3
 // 2 - wines (Recipe) made of 4  and 3
-
+// 3 - writing (Recipe) made out of 3 and 4
 
 //Resources Class
 //These are for recipes made directly from raw resources

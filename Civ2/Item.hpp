@@ -17,6 +17,41 @@
 
 using namespace std;
 
+///////////////
+//ITEM TILE TYPES
+// 0 - 99 - WEEDZ
+// 100 - 199 - STONEZ
+// 200 - 299 - FRUITZ
+// 300 - CAN
+// 301 - ADOBE TILE
+// 302 - SAX
+// 303 - CELLO
+// 304 - BRICK
+// 305 - HAT
+// 306 - BOW
+// 307 - STAFF
+// 308 - CANDLE
+// 309 - FLAG
+// 310 - herb
+// 311 - fruit
+// 312 - stone
+// 313 - BAG
+// 314 - POTION
+// 315 - COIN
+// 316 - WINE
+// 317 - CURTAINS
+// 318 - LADDER
+// 319 - RAILING (TOP/BOTTOM)
+// 320 - RAILING (LEFT)
+// 321 - RAILING (RIGHT)
+// 322 - SING
+// 323 - TOPHAT
+// 324 - CROWN
+// 325 - MAILBOX
+// 326 - MOHAWK
+// 327 - WRITING
+// 328 - FLOWER
+
 //SDL_Texture* loadTexture( string path, SDL_Renderer* gRenderer );
 extern SDL_Renderer* gRenderer;//The window renderer
 

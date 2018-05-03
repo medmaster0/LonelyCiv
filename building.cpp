@@ -231,11 +231,17 @@ void build_floor_path(vector<vector<Item>>* map_scenery_bottom, bool* block_map,
     SDL_Color floor_p_col = floor_p_col_in;
     SDL_Color floor_s_col = floor_s_col_in;
     bool has_tile = false; //flag used to indicate the path has a tile
-    while(path.size()>0){
+    while(path.size()>0){ //while we still have more steps to go
         
         //get next step from list
         vector<int> temp_step = path.back();
         path.pop_back();
+        
+        //Check if search failed
+        if(temp_step[0] == 9999){ //special error code
+            printf("Build Floor Search Failed");
+            return;
+        }
         
         //make sure a tile isn't already there.
         has_tile = false;
@@ -669,10 +675,15 @@ void build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item
     //Now that we have a reference point, start going through a placing towers (slightly skewed) along the FIRST ROW
     for(int i = 0 ; i < 8; i++){ //This is how many towers/row we'll be making
         
-        build_x = 15 + i*17 + rand()%4; //incremental, skewed
+        build_x = 15 + i*15 + rand()%4; //incremental, skewed
         build_y = y1 + rand()%3 - rand()%3; //along the same line, skewed
         build_dim = rand()%4 + 5;
         build_floors = 3 + rand()%4;
+        
+        //check if square is blocked
+        if( is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, 0, build_dim+2) == false){
+            continue; //just skip if square is blocked
+        }
         
         //now build a tower there
         build_tower_NxN(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height, build_x, build_y, build_dim, build_floors, brick_p_col_in, brick_s_col_in, floor_p_col_in, floor_s_col_in, door_col1, ladder_col_p);
@@ -684,6 +695,12 @@ void build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item
         //Find path between two buildings
         vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps to get between the two buildings
         build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+        
+        //Build a mailbox at new house
+        //Item temp_mailbox = Item(build_x+rand()%build_dim, build_y-2, 325);
+        Item temp_mailbox = Item(build_x-1, build_y-1, 325);
+        map_scenery_top->at( temp_mailbox.y*map_width + temp_mailbox.x ).push_back(temp_mailbox);
+        block_map[temp_mailbox.y*map_width + temp_mailbox.x ] = true;
         
         //now update the reference points
         x1 = x2;
@@ -715,6 +732,11 @@ void build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item
         build_dim = rand()%4 + 5;
         build_floors = 3 + rand()%4;
         
+        //check if square is blocked
+        if( is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, 0, build_dim+2) == false){
+            continue; //just skip if square is blocked
+        }
+        
         //now build a tower there
         build_tower_NxN(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height, build_x, build_y, build_dim, build_floors, brick_p_col_in, brick_s_col_in, floor_p_col_in, floor_s_col_in, door_col1, ladder_col_p);
         
@@ -725,6 +747,12 @@ void build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item
         //Find path between two buildings
         vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps to get between the two buildings
         build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+        
+        //Build a mailbox at new house
+        //Item temp_mailbox = Item(build_x+rand()%build_dim, build_y-2, 325);
+        Item temp_mailbox = Item(build_x-1, build_y-1, 325);
+        map_scenery_top->at( temp_mailbox.y*map_width + temp_mailbox.x ).push_back(temp_mailbox);
+        block_map[temp_mailbox.y*map_width + temp_mailbox.x ] = true;
         
         //now update the reference points
         x1 = x2;
@@ -756,6 +784,11 @@ void build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item
         build_dim = rand()%4 + 5;
         build_floors = 3 + rand()%4;
         
+        //check if square is blocked
+        if( is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, 0, build_dim+2) == false){
+            continue; //just skip if square is blocked
+        }
+        
         //now build a tower there
         build_tower_NxN(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height, build_x, build_y, build_dim, build_floors, brick_p_col_in, brick_s_col_in, floor_p_col_in, floor_s_col_in, door_col1, ladder_col_p);
         
@@ -766,6 +799,12 @@ void build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item
         //Find path between two buildings
         vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps to get between the two buildings
         build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+        
+        //Build a mailbox at new house
+        //Item temp_mailbox = Item(build_x+rand()%build_dim, build_y-2, 325);
+        Item temp_mailbox = Item(build_x-1, build_y-1, 325);
+        map_scenery_top->at( temp_mailbox.y*map_width + temp_mailbox.x ).push_back(temp_mailbox);
+        block_map[temp_mailbox.y*map_width + temp_mailbox.x ] = true;
         
         //now update the reference points
         x1 = x2;
@@ -793,9 +832,14 @@ void build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item
     for(int i = 0 ; i < 8; i++){ //This is how many towers/row we'll be making
         
         build_x = 15 + i*17 + rand()%4; //incremental, skewed
-        build_y = y1 + rand()%3 - rand()%3; //along the same line, skewed
+        build_y = y1 + rand()%2 - rand()%2; //along the same line, skewed
         build_dim = rand()%4 + 5;
         build_floors = 3 + rand()%4;
+        
+        //check if square is blocked
+        if( is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, 0, build_dim+2) == false){
+            continue; //just skip if square is blocked
+        }
         
         //now build a tower there
         build_tower_NxN(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height, build_x, build_y, build_dim, build_floors, brick_p_col_in, brick_s_col_in, floor_p_col_in, floor_s_col_in, door_col1, ladder_col_p);
@@ -807,6 +851,12 @@ void build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item
         //Find path between two buildings
         vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps to get between the two buildings
         build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+        
+        //Build a mailbox at new house
+        //Item temp_mailbox = Item(build_x+rand()%build_dim, build_y-2, 325);
+        Item temp_mailbox = Item(build_x-1, build_y-1, 325);
+        map_scenery_top->at( temp_mailbox.y*map_width + temp_mailbox.x ).push_back(temp_mailbox);
+        block_map[temp_mailbox.y*map_width + temp_mailbox.x ] = true;
         
         //now update the reference points
         x1 = x2;

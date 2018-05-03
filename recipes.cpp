@@ -31,6 +31,7 @@ using namespace std;
 // 0 - potions (Recipe) made of 2 and 0
 // 1 - powders (Recipe) made of 1 and 3
 // 2 - wines (Recipe) made of 4 and 3
+// 3 - writing (Recipe) made out of 3 and 4
 
 //Resources Class
 //These are for recipes made directly from raw resources
@@ -83,7 +84,7 @@ Resource::Resource(int resource_type_in){
 //Recipe class contains a collection of items and descriptions for products that can be made in rituals.
 //Recipes are made up of Resources,
 //The Recipe's properties derived from it's component Resources
-Recipe::Recipe(int in_recipe_type, Resource ing1, Resource ing2) : ingredient1(0), ingredient2(1){
+Recipe::Recipe(int in_recipe_type, Resource ing1, Resource ing2) : ingredient1(0), ingredient2(1){ //The default is 0 and 1, salt and glass
     recipe_type = in_recipe_type;
     ingredient1 = ing1;
     ingredient2 = ing2;
@@ -103,6 +104,11 @@ Recipe::Recipe(int in_recipe_type, Resource ing1, Resource ing2) : ingredient1(0
             item_type = 316; 
             name = genWineName();
             description = "This is the wine, " + name + ". " + genWineTaste(); 
+            break;
+        case 3: //For writings
+            item_type = 327;
+            name = "WRITING";
+            description = "WRITINGs will be randomly generated with a name (which is their type) and content (their description). My calculations may be incorrect, but I do believe you can make this string incredibly long if yaou want too,,,";
             break;
         
         default:

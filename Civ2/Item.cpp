@@ -25,12 +25,35 @@ using namespace std;
 // 100 - 199 - STONEZ
 // 200 - 299 - FRUITZ
 // 300 - CAN
-// 301 - ADOBE
+// 301 - ADOBE TILE
 // 302 - SAX
 // 303 - CELLO
 // 304 - BRICK
 // 305 - HAT
 // 306 - BOW
+// 307 - STAFF
+// 308 - CANDLE
+// 309 - FLAG
+// 310 - herb
+// 311 - fruit
+// 312 - stone
+// 313 - BAG
+// 314 - POTION
+// 315 - COIN
+// 316 - WINE
+// 317 - CURTAINS
+// 318 - LADDER
+// 319 - RAILING (TOP/BOTTOM)
+// 320 - RAILING (LEFT)
+// 321 - RAILING (RIGHT)
+// 322 - SING
+// 323 - TOPHAT
+// 324 - CROWN
+// 325 - MAILBOX
+// 326 - MOHAWK
+// 327 - WRITING
+// 328 - FLOWER
+
 
 //static variable constructor
 //This overloaded constructor sets the static class variables
@@ -227,6 +250,12 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
             item_name = "    coin";
         }else if(item_list[item_index].type==316){ //Then it's a stone
             item_name = "    wine";
+//        }else if(item_list[item_index].type==317){ //Then it's a stone
+//            item_name = "    curtains";
+//        }else if(item_list[item_index].type==318){ //Then it's a stone
+//            item_name = "    ladder";
+        }else if(item_list[item_index].type==327){ //Then it's a stone
+            item_name = "    writing";
         }
     
         //Determine Color

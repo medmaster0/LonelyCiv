@@ -74,6 +74,16 @@ bool Sprite::loadFromFile( std::string path1, std::string path2, int w, int h )
     return primTexture != NULL;
     
 }
+//changes the primary color of the spirte
+void Sprite::changePrimColor(SDL_Color new_col){
+    SDL_SetTextureColorMod( primTexture, new_col.r, new_col.g, new_col.b); //modulate color, update to match the new one
+    return;
+}
+//changes the secondary color of the spirte
+void Sprite::changeSecoColor(SDL_Color new_col){
+    SDL_SetTextureColorMod( secoTexture, new_col.r, new_col.g, new_col.b); //modulate color, update to match the new one
+    return;
+}
 //Draws the sprite to the screen at a specific MAP COORDS
 //This version of draw places the items left and right for a pose
 void Sprite::draw(int in_x, int in_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s){
@@ -408,6 +418,7 @@ Shroom::Shroom(int tx, int ty) : Sprite(tx, ty){
     recipe_list.push_back(Recipe(0, resource_list[2], resource_list[0]));  //create a recipe, with the proper resources
     recipe_list.push_back(Recipe(1, resource_list[1], resource_list[3]));  //create a recipe, with the proper resources
     recipe_list.push_back(Recipe(2, resource_list[4], resource_list[3]));  //create a recipe, with the proper resources
+    recipe_list.push_back(Recipe(3, resource_list[3], resource_list[4]));  //create a recipe, with the proper resources
     
 }
 
