@@ -8,6 +8,7 @@
 
 #include "recipes.hpp"
 #include "story.hpp"
+#include "med_algo.hpp"
 
 #include <stdio.h>
 #include <string>
@@ -72,7 +73,7 @@ Resource::Resource(int resource_type_in){
             item_type = 311; //cloths are made from herb: Item tile code 310
             name = genBerryName(); //assign the salt a name
             colorPrim = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),255}; //assign a single random color
-            colorSeco = {0,0,0,255}; //black
+            colorSeco = generate_brown(); //black
             break;
             
         default:

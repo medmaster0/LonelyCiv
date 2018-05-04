@@ -230,7 +230,7 @@ void loadTiles(){
         item_tiles_p[i] = loadTexture("Civ2/Civ2/weedz/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
-        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b)};
+        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b), 255};
         //world_colors[i] = temp_col;
         world_colors.push_back(temp_col);
     }
@@ -244,7 +244,7 @@ void loadTiles(){
         item_tiles_p[i] = loadTexture("Civ2/Civ2/stonez/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
-        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b)};
+        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b), 255};
         //world_colors[i] = temp_col;
         world_colors.push_back(temp_col);
         
@@ -259,7 +259,7 @@ void loadTiles(){
         item_tiles_p[i] = loadTexture("Civ2/Civ2/fruitz/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
-        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b)};
+        temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b), 255};
         //world_colors[i] = temp_col;
         world_colors.push_back(temp_col);
         
@@ -526,7 +526,7 @@ void init_environment(){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
         temp_tile = rand()%199;
-        Item temp_item = Item(tempx, tempy, temp_tile,world_colors[temp_tile],{255,255,255,0} ); //temporary item (scenery)
+        Item temp_item = Item(tempx, tempy, temp_tile,world_colors[temp_tile],{0,0,0,255} ); //temporary item (scenery)
         map_scenery_bottom[ (tempz*map_area) + (tempy*map_width)+tempx].push_back(temp_item);
     }
     
@@ -656,7 +656,14 @@ void init_environment(){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
         temp_tile = 328;
-        Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
+        //    Both Random Colors
+        //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
+        //    Pink / Green
+        //Item temp_item = Item(tempx, tempy , temp_tile, generate_pink(), generate_green()); //temporary item (scenery)
+        //    Random Color / Greens
+        //Item temp_item = Item(tempx, tempy , temp_tile, {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, generate_green()); //temporary item (scenery)
+        //    Both Random WOLRDZ COLORZ
+        Item temp_item = Item(tempx, tempy , temp_tile, world_colors[rand()%world_colors.size()], world_colors[rand()%world_colors.size()]); //temporary item (scenery)
         map_items[ (tempz*map_area) + (tempy*map_width)+tempx].push_back(temp_item);
     }
     
@@ -704,6 +711,7 @@ void draw_environment(Sprite* cre1){
         
         if (map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
             map_shrooms[c].y > draw_map_y && map_shrooms[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+            drawHorde(&map_shrooms[c], gRenderer, draw_map_x, draw_map_y, 4, item_tiles_p, item_tiles_s);
             map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, map_shrooms[c].y - draw_map_y, item_tiles_p, item_tiles_s);
         }
     }
@@ -1617,9 +1625,9 @@ void perform_ritual_thread(Sprite* spr1){
     Item temp_item = Item(loc_x, loc_y, temp_recipe.item_type, temp_recipe.ingredient1.colorPrim,temp_recipe.ingredient2.colorPrim ); //create temporary item from recipe's fields
     map_items[loc_y*map_width+loc_x].push_back(temp_item);
     
-    //Let's announce the items's creation
-    cout << "\n" << temp_recipe.name << "\n";
-    cout << temp_recipe.description << "\n";
+//    //Let's announce the items's creation
+//    cout << "\n" << temp_recipe.name << "\n";
+//    cout << temp_recipe.description << "\n";
     
     
     //we also wanna add some effects to spruce things up for a bit
@@ -1822,18 +1830,21 @@ void regen_weedz_thread(){
         if(!block_map[y*map_width+x]){ //check if bloecked
             if(map_items[y*map_width+x].size()<2){ //if tile doesn't have too many items on it
                 
-                //If there is an herb there, plant a fruit
-                for(int y = 0; y < map_items[y*map_width+x].size(); y++){ //cycle through items on tiles
-                    if(map_items[y*map_width+x][y].type == 310){ //if item is a weed
-                        //create a fruit here
-                        item_id = 311; //id for fruit
-                        printf("spawn: fruit\n", item_id);
-                        Item temp_fruit = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},generate_brown()); //temporary item
-                        map_items[y*map_width+x].push_back(temp_fruit);
-                        SDL_Delay(5000);
-                        continue;
-                    }
-                }
+//                //If there is an herb there, plant a fruit
+//                for(int y = 0; y < map_items[y*map_width+x].size(); y++){ //cycle through items on tiles
+//                    if(map_items[y*map_width+x][y].type == 310){ //if item is a weed
+//                        //create a fruit here
+//                        item_id = 311; //id for fruit
+//                        Item temp_fruit = Item(x, y, item_id, {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),255},generate_brown()); //temporary item
+//                        map_items[y*map_width+x].push_back(temp_fruit);
+//                        SDL_Delay(5000);
+//                        continue;
+//                    }else{
+//                        //create a herb here
+//                        item_id = 310;
+//
+//                    }
+//                }
                 
 //                //Create an dual-tone item
 //                //item_id = rand()%300; //pick a random item id
@@ -1846,13 +1857,14 @@ void regen_weedz_thread(){
                 x = rand()%map_width;
                 y = rand()%map_height;
                 
-                //Create a basic single-tone item based off shroom recipe resource list
+                //Create a basic item based off shroom recipe resource list
                 Shroom temp_shroom = map_shrooms[rand()%map_shrooms.size()]; //pick a random shroom
                 Resource temp_recipe = temp_shroom.resource_list[rand()%temp_shroom.resource_list.size()]; //pick a random resource from list
                 //assign that item to be created
                 item_id = temp_recipe.item_type;
-                SDL_Color temp_col = temp_recipe.colorPrim;
-                Item temp_item = Item(x, y, item_id, temp_col,{255, 255, 255,0} ); //temporary item
+                SDL_Color temp_col1 = temp_recipe.colorPrim;
+                SDL_Color temp_col2 = temp_recipe.colorSeco;
+                Item temp_item = Item(x, y, item_id, temp_col1, temp_col2 ); //temporary item
                 map_items[y*map_width+x].push_back(temp_item);
                 SDL_Delay(5000);
                 

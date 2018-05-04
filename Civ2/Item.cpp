@@ -204,6 +204,10 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
         if(item_index >= item_list.size()) {//check if sprite's inventory index is out of bounds
             break;
         }
+        
+        //DEBUG:
+        printf("item %d: %d,%d,%d",item_list[item_index].type, item_list[item_index].primColor.r, item_list[item_index].primColor.g, item_list[item_index].primColor.b);
+        
                 //Need to:
                 //Determine item type
                 //  Make string for item_type
@@ -236,6 +240,8 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
             item_name = "    hat";
         }else if(item_list[item_index].type==306){ //Then it's a stone
             item_name = "    bow";
+        }else if(item_list[item_index].type==307){ //Then it's a stone
+            item_name = "    staff";
         }else if(item_list[item_index].type==310){ //Then it's a stone
             item_name = "    weed";
         }else if(item_list[item_index].type==311){ //Then it's a stone
@@ -256,6 +262,8 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
 //            item_name = "    ladder";
         }else if(item_list[item_index].type==327){ //Then it's a stone
             item_name = "    writing";
+        }else if(item_list[item_index].type==328){ //Then it's a stone
+            item_name = "    flower";
         }
     
         //Determine Color

@@ -127,13 +127,6 @@ void Sprite::draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_T
     //prev_y becomes at_y + (prev_y - y)
     //prev_x becomes at_x + (prev_x - x)
     
-    //DRAW HAT
-    if(hat != nullptr){
-        hat->y = at_y; //move the hat to the right place
-        hat->x = at_x;
-        hat->draw(gRenderer, item_tiles_p, item_tiles_s);
-    }
-    
     //DRAW STAFF
     //the staff should flow behind cre so we need to calculate where that's at on the translated image
     if(staff != nullptr){
@@ -169,6 +162,13 @@ void Sprite::draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_T
         }
         
         light->draw(gRenderer, item_tiles_p, item_tiles_s);
+    }
+    
+    //DRAW HAT
+    if(hat != nullptr){
+        hat->y = at_y; //move the hat to the right place
+        hat->x = at_x;
+        hat->draw(gRenderer, item_tiles_p, item_tiles_s);
     }
     
 }
@@ -509,8 +509,43 @@ void displayStatus(Sprite spr1, SDL_Renderer* gRenderer, int SCREEN_HEIGHT , SDL
     
 }
 
-
-
+//draw's the sprites inventory in piles on the ground
+//Takes the sprite's inventory, and displays it on the ground
+// Along a recangular grid (of size NxN) centered on sprite's positon
+//Mainly useful for a stationary creature with many items (shroom)
+// Draws the inventory backwards -> last is the first one to be drawn....
+void drawHorde(Sprite* spr1, SDL_Renderer* gRenderer, int draw_map_x, int draw_map_y, int display_n, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s){
+    
+    int x1,y1; //the left corner of the display grid
+    
+    //Determine grid bounds (center on Sprite's position
+    if(display_n%2 == 0){ //if even n
+        x1 = spr1->x - ((display_n/2) - 1);
+        y1 = spr1->y - ((display_n/2) - 1);
+    }else{
+        x1 = spr1->x - (display_n/2);
+        y1 = spr1->y - (display_n/2);
+    }
+    
+    //Also apply the draw_map positioning
+    x1 = x1 - draw_map_x;
+    y1 = y1 - draw_map_y; 
+    
+    //Now cycle throughout BOTH the grid and the items in inventory...
+    int inventory_left = spr1->inventory.size(); //the amount of items in inventory left to draw
+    for(int i = 0; i < display_n; i++){
+        for(int j = 0; j < display_n; j++){
+            
+            if(inventory_left>0){ //if there are items left to draw...
+                spr1->inventory[inventory_left-1].draw(x1+i, y1+j, gRenderer, item_tiles_p, item_tiles_s); //then draw them, dummy
+                inventory_left = inventory_left - 1; //Also descrease counter
+            }else{
+                break;
+            }
+        }
+    }
+    
+}
 
 
 

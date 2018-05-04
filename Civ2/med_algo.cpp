@@ -1098,6 +1098,18 @@ SDL_Color generate_pink(){
     
 }
 
+//generates a random shade of green
+SDL_Color generate_green(){
+    int g = rand()%255;
+    if(g == 0){g++;} //so we don't % by zero
+    int r = rand()%g;
+    int b = rand()%g;
+    
+    SDL_Color green = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b),255};
+    return green;
+    
+}
+
 ////given n input color, convert it to a pastel version (increase the lightness)
 ////This can be used to simulate metallic shiny color (think rose gold, silver gold, etc.)
 ////This new color is above 180 in all components.
