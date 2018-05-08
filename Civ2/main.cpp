@@ -27,6 +27,7 @@
 #include "image_gen.hpp"
 #include "building.hpp"
 #include "recipes.hpp"
+#include "dispersal.hpp"
 //#include <unistd.h>
 
 
@@ -49,8 +50,8 @@ bool* block_map; //this is the map indicating whether a tile is blocked
 //These keep track of what parts of the map to draw
 //The dimensinos of the draw map. These indices "swim" through the main map
 //int draw_map_x, draw_map_y = 60;
-int draw_map_x = 50;
-int draw_map_y = 50;
+int draw_map_x = 100;
+int draw_map_y = 100;
 int draw_map_z = 0; //which floor, we're drawing
 int draw_map_width, draw_map_height;
 
@@ -546,6 +547,15 @@ void init_environment(){
     //build_floor_path(&map_scenery_bottom, block_map, map_width, map_height, 13, 10, 30, 30, floor_col_p, floor_col_s);
     
     build_tower_NxN(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, 60, 60, 7, 3, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
+    
+    build_maze(&map_scenery_top, block_map, map_width, map_height, 85, 70, 0);
+    build_maze(&map_scenery_top, block_map, map_width, map_height, 85, 110, 0);
+    
+    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, true);
+    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, false);
+    
+    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, true);
+    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, false);
     
 //    build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
@@ -1700,7 +1710,7 @@ void background_color_thread(){
     int b1 = 1;
     //stop color
     int r2 = (rand()%223) + 30;
-    int g2 = rand()%125; // limit g //int g2 = (rand()%223) + 30;
+    int g2 = 6 + rand()%125; // limit g //int g2 = (rand()%223) + 30;
     int b2 = (rand()%223) + 30;
     //BOUNCES BACK AND FORTH BETWEeN THE VALUES
     
@@ -2042,6 +2052,7 @@ int main( int argc, char* args[] ){
     
     //...Sprites
     Sprite* cre1 = new Sprite(draw_map_x + (int)(draw_map_width/2.0),draw_map_y + (int)(draw_map_height/2.0) ); //start creaturein the middle of the screen
+    //Sprite* cre1 = new Sprite(100,110);
     printf("%d,%d\n",(int)(draw_map_width), (int)(draw_map_height/2.0));
     cre1->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
     

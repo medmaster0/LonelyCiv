@@ -140,7 +140,7 @@ void build_box_NxN_door(vector<vector<Item>>* map_scenery, bool* block_map, int 
 
 
 //Builds a maze on the map
-void build_maze(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int x, int y, int z){
+void build_maze(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int x, int y, int z, SDL_Color p_col_in, SDL_Color s_col_in){
 
     //Make a brick maze
     vector<vector<short>> gmap = gen_maze_corridor(20,30);

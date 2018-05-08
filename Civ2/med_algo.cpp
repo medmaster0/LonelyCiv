@@ -1203,8 +1203,30 @@ SDL_Color redNoise(SDL_Color redHue){
     
 }
 
-
-
+//take a color and gradually (slightly) change the RGB values
+//input the plus or minus variance value
+SDL_Color warpColor(SDL_Color inputHue, int variance){
+    
+    int r,g,b; //temp vars for the color values
+    
+    r = inputHue.r + rand()%(2*variance) - (variance); //2 to -2
+    g = inputHue.g + rand()%(2*variance) - (variance); //2 to -2
+    b = inputHue.b + rand()%(2*variance) - (variance); //2 to -2
+    
+    //Bounds check (and set)
+    
+    //Bounds checks
+    if(r > 255) r = 255;
+    if(g > 255) g = 255;
+    if(b > 255) b = 255;
+    if(r < 0) r = 0;
+    if(g < 0) g = 0;
+    if(b < 0) b = 0;
+    
+    SDL_Color outputHue = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b),255};
+    return outputHue;
+    
+}
 
 
 
