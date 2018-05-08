@@ -205,9 +205,6 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
             break;
         }
         
-        //DEBUG:
-        printf("item %d: %d,%d,%d",item_list[item_index].type, item_list[item_index].primColor.r, item_list[item_index].primColor.g, item_list[item_index].primColor.b);
-        
                 //Need to:
                 //Determine item type
                 //  Make string for item_type

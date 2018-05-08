@@ -52,6 +52,7 @@ Sprite::Sprite(int xp, int yp)
     move_timer = 0; //keeps track of SDL_GetTicks() for last movement
     move_speed = 2.0; //how many tiles to move per 1 second
     isNeededByThread = false; //prevents scheduler from starting another thread
+    task_status = "none";
     
 }
 //Destructor
@@ -86,7 +87,7 @@ void Sprite::changeSecoColor(SDL_Color new_col){
 }
 //Draws the sprite to the screen at a specific MAP COORDS
 //This version of draw places the items left and right for a pose
-void Sprite::draw(int in_x, int in_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s){
+void Sprite::draw(int in_x, int in_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t){
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { in_x*16, in_y*16, mWidth, mHeight };
     SDL_Rect* clip = NULL;
@@ -433,7 +434,7 @@ int status_texH = 0;//constants used in displaying fonts
 void displayStatus(Sprite spr1, SDL_Renderer* gRenderer, int SCREEN_HEIGHT , SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** misc_tiles){
     string status_text = "                  Status of " + spr1.name; //Char buffer that is displayed
     //Blackout Box {x,y,w,h}
-    SDL_Rect r = {0,0,160,96};
+    SDL_Rect r = {0,0,160,112};
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
     SDL_RenderFillRect(gRenderer, &r);
     status_display_surface = TTF_RenderText_Blended_Wrapped(font1, status_text.c_str(), status_font_clr, 155);
@@ -445,7 +446,19 @@ void displayStatus(Sprite spr1, SDL_Renderer* gRenderer, int SCREEN_HEIGHT , SDL
     //FREE MEMORY
     SDL_DestroyTexture(status_display_texture);
     SDL_FreeSurface(status_display_surface);
-    //FINISH PUtting the Title: Status
+    //FINISH PUtting the Title
+    
+    //Write out what the CURRENT TASK is
+    status_display_surface = TTF_RenderText_Blended_Wrapped(font1, ("Task: " + spr1.task_status).c_str(), status_font_clr, 155);
+    status_display_texture = SDL_CreateTextureFromSurface(gRenderer, status_display_surface);
+    //create text rect (text box)
+    SDL_QueryTexture(status_display_texture, NULL, NULL, &status_texW, &status_texH); //gets the dimenstions of the font/text
+    dstrect = {0, 5*16, status_texW, status_texH }; //so we can make the proper rect to dispay it
+    SDL_RenderCopy(gRenderer, status_display_texture, NULL, &dstrect); //write
+    //FREE MEMORY
+    SDL_DestroyTexture(status_display_texture);
+    SDL_FreeSurface(status_display_surface);
+    //FINISH Writing task stauts
 
     //Show Fave Colors
     SDL_Color status_color1 = spr1.faveColor; //The prim color of the cre

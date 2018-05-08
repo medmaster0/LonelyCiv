@@ -543,48 +543,14 @@ void init_environment(){
     //Now build some houses
     build_floor_radius(&map_scenery_bottom, block_map, map_width, map_height, 13, 10, 0, 8, floor_col_p, floor_col_s); //notice how it is one less than wall build radius
     build_circle_radius_door(&map_scenery_top, block_map, map_width, map_height, 9, 13, 10, 0, build_col_p, build_col_s, door_col_p);
-    build_floor_path(&map_scenery_bottom, block_map, map_width, map_height, 13, 10, 30, 30, floor_col_p, floor_col_s);
+    //build_floor_path(&map_scenery_bottom, block_map, map_width, map_height, 13, 10, 30, 30, floor_col_p, floor_col_s);
     
     build_tower_NxN(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, 60, 60, 7, 3, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
-    build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
+//    build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
+    build_neighbor_grid(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-//    
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-//    
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_p);
-//
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
-//    build_two_house_path(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, floor_col_p, floor_col_s, build_col_p, build_col_s, door_col_s);
     
     printf("Done with build aye\\\n");
     
@@ -683,7 +649,7 @@ void draw_environment(Sprite* cre1){
 
     //Draw all bottom items
     for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
-        if(i >= map_width || i <= 0){continue;} //bounds checking
+        if(i >= map_width || i < 0){continue;} //bounds checking
         for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
             if(j >= map_height || j < 0){continue;} //bounds checking
             
@@ -735,7 +701,7 @@ void draw_environment(Sprite* cre1){
     
     //Draw all top items
     for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
-        if(i >= map_width || i <= 0){continue;} //bounds checking
+        if(i >= map_width || i < 0){continue;} //bounds checking
         for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
             if(j >= map_height || j < 0){continue;} //bounds checking
             
@@ -1680,12 +1646,14 @@ void task_creatures_thread(){
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
+                        map_creatures[i].task_status = "gather";
                         std::thread gatherObj(gather_thread, &map_creatures[i]);
                         gatherObj.detach();
                         break;
                     }
                     case 1: {
                         //This thread wanders the input creature
+                        map_creatures[i].task_status = "wander";
                         std::thread wanderObj(wander_thread, &map_creatures[i]);
                         wanderObj.detach();
                         break;
@@ -1693,6 +1661,7 @@ void task_creatures_thread(){
                         
                     case 2: {
                         //This thread makes the creatures walk somewhere specifc
+                        map_creatures[i].task_status = "ritual";
                         std::thread ritualObj(perform_ritual_thread, &map_creatures[i]);
                         ritualObj.detach();
                         break;
@@ -1886,6 +1855,43 @@ void wander_player_thread(Sprite* cre1){
             continue;
         }
         
+        //CLIMP LADDER, (make it  probability so don't always climb ladder...)
+        if(rand()%2 == 0){
+            for(int i = 0 ; i<map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x ].size(); i++){ //cycle through all of map's scenery items (where ladderrs reside)
+                if(map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x ][i].type == 318){
+                    
+                    //Now check if the other floors have maps... (another probability thing for which you try)
+                    if(rand()%2==0){
+                        
+                        //cycle for those above..
+                        for(int j = 0 ; j<map_scenery_top[ (cre1->z+1)*map_area + cre1->y*map_width + cre1->x ].size(); j++){
+                            if(map_scenery_top[ (cre1->z+1)*map_area + cre1->y*map_width + cre1->x ][j].type == 318){//if this tils is a ladder too
+                                cre1->z = cre1->z + 1; //update position
+                                draw_map_z = cre1->z; //tie the draw map back
+                            }
+                        }
+                        
+                        
+                    }else{
+                        
+                         if(cre1->z <= 0)continue; //BOUNDS CHECK!!!!!! Means we don't have anything below
+                        
+                        //cycle for those below..
+                        for(int j = 0 ; j<map_scenery_top[ (cre1->z-1)*map_area + cre1->y*map_width + cre1->x ].size(); j++){
+                            if(map_scenery_top[ (cre1->z-1)*map_area + cre1->y*map_width + cre1->x ][j].type == 318){ //if that tile is a ladder too
+                                cre1->z = cre1->z - 1; //update position
+                                draw_map_z = cre1->z; //tie the draw map back
+                            }
+                        }
+                        
+                        
+                    }
+                    
+                    
+                }
+            }
+        }//END CLIMB LADDER
+        
         switch (choice) {
             case 0:
                 //move up
@@ -2050,6 +2056,7 @@ int main( int argc, char* args[] ){
     //STORY TEST
     for(int p = 0; p < 200; p++){
         cout << genStreetName() << "\n";
+        cout << genPrayer() << "\n";
         //cout << genThreadName() << "\n";
         //cout << genTwineName() << "\n";
         //cout << genMeatName() << "\n";
@@ -2174,6 +2181,7 @@ int main( int argc, char* args[] ){
     
     //MAIN GAME LOOP
     while(!quit){
+        
         //Handle events on queue
         while( SDL_PollEvent( &e ) != 0 )
         {

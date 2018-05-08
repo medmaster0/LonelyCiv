@@ -39,7 +39,7 @@ public:
     bool loadFromFile(std::string path1,std::string path2, int w, int h);//Load a texture from file for the sprite
     void changePrimColor(SDL_Color new_col);//changes the primary color of the spirte
     void changeSecoColor(SDL_Color new_col);//changes the secondary color of the spirte
-    void draw(int in_x, int in_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //Draws the sprite to the screen at a specific MAP COORDS. Also draws items in "pose form"
+    void draw(int in_x, int in_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t = NULL); //Draws the sprite to the screen at a specific MAP COORDS. Also draws items in "pose form"
     void draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draws the sprite to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
     void draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draws the sprite's items to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
     void drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //Draw's the sprite's inventory
@@ -68,6 +68,7 @@ public:
     void moveTo(int x1, int y1); //moves to a specific (x,y) coord
     //Targeting stuff, below - hopefully GENERAL PURPOSE
     vector<vector<int>> path; //a path to whatever target it has
+    string task_status; //a string describing what creaure is doing...
     int target_index; //the index of the target (index of tile stack OR index of enemy for example
     //For threads
     bool inThread;

@@ -653,7 +653,7 @@ void build_two_house_path(vector<vector<Item>>* map_scenery_top,vector<vector<It
     
 }
 
-//Builds a grid of towers and connects them by path
+//Builds a a few rows of towers and connects them by paths
 void build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color brick_p_col_in, SDL_Color brick_s_col_in, SDL_Color floor_p_col_in, SDL_Color floor_s_col_in,  SDL_Color door_col1, SDL_Color ladder_col_p ){
     
     //Variables Declare
@@ -863,17 +863,248 @@ void build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item
         y1 = y2;
         
     }
-    
-    
-    
-    
-    
-    
-//    row = 70;
-//    col = 70;
-       // build_tower_NxN(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, 60, 60, 7, 3, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
-    
-    
 
+}
+
+
+//Builds a couple of rows and a couple of columns of houses, making a square grid
+void build_neighbor_grid(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color brick_p_col_in, SDL_Color brick_s_col_in, SDL_Color floor_p_col_in, SDL_Color floor_s_col_in,  SDL_Color door_col1, SDL_Color ladder_col_p ){
+    
+    //Variables Declare
+    int x1,y1,x2,y2; //stores the coords of two points in the buildings for path finding
+    int build_x, build_y, build_dim, build_floors; //building parameters, temporary
+    
+    //Build FIRST street (Top-Running Row)
+    //------------------------------------------------------------
+    x1 = 0;
+    y1 = 35 + rand()%5 - rand()%5;
+    x2 = map_width-1;
+    y2 = y1;
+    
+    //Create the path
+    build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+    
+    //Build a sign posts at each end
+    string street_name = genStreetName(); //string holding name of street we're making
+    Item temp_sign = Item(5+rand()%5, y1-1, 322, ladder_col_p, {0,0,0,255}, street_name);
+    map_scenery_top->at( temp_sign.y*map_width + temp_sign.x ).push_back(temp_sign);
+    block_map[temp_sign.y*map_width + temp_sign.x ] = true;
+    temp_sign = Item(map_width-5-rand()%5, y1-1, 322, ladder_col_p, {0,0,0,255}, street_name);
+    map_scenery_top->at( temp_sign.y*map_width + temp_sign.x ).push_back(temp_sign);
+    block_map[temp_sign.y*map_width + temp_sign.x ] = true;
+    
+    //Place towers all along the path...
+    x1 = 35;//move the x cursor on the other side of the vertical column path
+    while(x1<map_width-35-15){
+        
+        //Initialize the build dimensions along the pathh....
+        build_dim = rand()%4 + 5;
+        build_x = x1 + 15 + rand()%5;
+        build_y = y1 - 5 - rand()%5 - build_dim;
+        build_floors = 3 + rand()%4;
+        
+        //Now update reference points
+        x1 = build_x;
+        y1 = y1;
+        
+        //check if square is blocked
+        if( is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, 0, build_dim+2) == false){
+            continue; //just skip if square is blocked
+        }
+        
+        //now build a tower there
+        build_tower_NxN(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height, build_x, build_y, build_dim, build_floors, brick_p_col_in, brick_s_col_in, floor_p_col_in, floor_s_col_in, door_col1, ladder_col_p);
+        
+        //Build a mailbox at new house
+        //Item temp_mailbox = Item(build_x+rand()%build_dim, build_y-2, 325);
+        Item temp_mailbox = Item(build_x-1, build_y+1+build_dim, 325);
+        map_scenery_top->at( temp_mailbox.y*map_width + temp_mailbox.x ).push_back(temp_mailbox);
+        block_map[temp_mailbox.y*map_width + temp_mailbox.x ] = true;
+        
+        //now connect tower to road by path
+        //find random point in new tower
+        x2 = build_x + 1 + rand()%(build_dim-2); //random point inside tower
+        y2 = build_y + 1 + rand()%(build_dim-2); //random point inside tower
+        //Find path between two buildings
+        vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps between the point and the street ref point
+        build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+    
+    }
+    
+    //Build SECOND street (Bottom-Running Row)
+    //------------------------------------------------------------
+    x1 = 0;
+    y1 = map_height - 35 + rand()%5 - rand()%5;
+    x2 = map_width-1;
+    y2 = y1;
+    
+    //Create the path
+    build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+    
+    //Build a sign posts at each end
+    street_name = genStreetName(); //string holding name of street we're making
+    temp_sign = Item(5+rand()%5, y1+1, 322, ladder_col_p, {0,0,0,255}, street_name);
+    map_scenery_top->at( temp_sign.y*map_width + temp_sign.x ).push_back(temp_sign);
+    block_map[temp_sign.y*map_width + temp_sign.x ] = true;
+    temp_sign = Item(map_width-5-rand()%5, y1+1, 322, ladder_col_p, {0,0,0,255}, street_name);
+    map_scenery_top->at( temp_sign.y*map_width + temp_sign.x ).push_back(temp_sign);
+    block_map[temp_sign.y*map_width + temp_sign.x ] = true;
+
+    //Place towers all along the path...
+    x1 = 35;//move the x cursor on the other side of the vertical column path
+    while(x1<map_width-35-15){
+
+        //Initialize the build dimensions along the pathh....
+        build_dim = rand()%4 + 5;
+        build_x = x1 + 15 + rand()%5;
+        build_y = y1 + 5 + rand()%5 + build_dim;
+        build_floors = 3 + rand()%4;
+
+        //Now update reference points
+        x1 = build_x;
+        y1 = y1;
+
+        //check if square is blocked
+        if( is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, 0, build_dim+2) == false){
+            continue; //just skip if square is blocked
+        }
+
+        //now build a tower there
+        build_tower_NxN(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height, build_x, build_y, build_dim, build_floors, brick_p_col_in, brick_s_col_in, floor_p_col_in, floor_s_col_in, door_col1, ladder_col_p);
+
+        //Build a mailbox at new house
+        //Item temp_mailbox = Item(build_x+rand()%build_dim, build_y-2, 325);
+        Item temp_mailbox = Item(build_x-1, build_y-2, 325);
+        map_scenery_top->at( temp_mailbox.y*map_width + temp_mailbox.x ).push_back(temp_mailbox);
+        block_map[temp_mailbox.y*map_width + temp_mailbox.x ] = true;
+        
+        //now connect tower to road by path
+        //find random point in new tower
+        x2 = build_x + 1 + rand()%(build_dim-2); //random point inside tower
+        y2 = build_y + 1 + rand()%(build_dim-2); //random point inside tower
+        //Find path between two buildings
+        vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps between the point and the street ref point
+        build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+
+    }
+    
+    //Build THIRD street (RIGHT-Running Row)
+    //------------------------------------------------------------
+    x1 = map_width - 35 + rand()%5 - rand()%5;
+    y1 = 0;
+    x2 = x1;
+    y2 = map_height-1;
+    
+    //Create the path
+    build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+    
+    //Build a sign posts at each end
+    street_name = genStreetName(); //string holding name of street we're making
+    temp_sign = Item(x1+1, 5+rand()%5, 322, ladder_col_p, {0,0,0,255}, street_name);
+    map_scenery_top->at( temp_sign.y*map_width + temp_sign.x ).push_back(temp_sign);
+    block_map[temp_sign.y*map_width + temp_sign.x ] = true;
+    temp_sign = Item(x1+1, map_height-5-rand()%5, 322, ladder_col_p, {0,0,0,255}, street_name);
+    map_scenery_top->at( temp_sign.y*map_width + temp_sign.x ).push_back(temp_sign);
+    block_map[temp_sign.y*map_width + temp_sign.x ] = true;
+    
+    //Place towers all along the path...
+    y1 = 35;//move the x cursor on the other side of the vertical column path
+    while(y1<map_height-35-15){
+
+        //Initialize the build dimensions along the pathh....
+        build_dim = rand()%4 + 5;
+        build_x = x1 + 5 + rand()%5 + build_dim;
+        build_y = y1 + 15 + rand()%5;
+        build_floors = 3 + rand()%4;
+
+        //Now update reference points
+        x1 = x1;
+        y1 = build_y-1;
+
+        //check if square is blocked
+        if( is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, 0, build_dim+2) == false){
+            continue; //just skip if square is blocked
+        }
+
+        //now build a tower there
+        build_tower_NxN(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height, build_x, build_y, build_dim, build_floors, brick_p_col_in, brick_s_col_in, floor_p_col_in, floor_s_col_in, door_col1, ladder_col_p);
+
+        //Build a mailbox at new house
+        //Item temp_mailbox = Item(build_x+rand()%build_dim, build_y-2, 325);
+        Item temp_mailbox = Item(build_x-2, build_y-1+build_dim, 325);
+        map_scenery_top->at( temp_mailbox.y*map_width + temp_mailbox.x ).push_back(temp_mailbox);
+        block_map[temp_mailbox.y*map_width + temp_mailbox.x ] = true;
+        
+        //now connect tower to road by path
+        //find random point in new tower
+        x2 = build_x + 1 + rand()%(build_dim-2); //random point inside tower
+        y2 = build_y + 1 + rand()%(build_dim-2); //random point inside tower
+        //Find path between two buildings
+        vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps between the point and the street ref point
+        build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+
+
+    }
+    
+    //Build FOURTH street (LEFT-Running Row)
+    //------------------------------------------------------------
+    x1 = 35 + rand()%5 - rand()%5;
+    y1 = 0;
+    x2 = x1;
+    y2 = map_height-1;
+    
+    //Create the path
+    build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+    
+    //Build a sign posts at each end
+    street_name = genStreetName(); //string holding name of street we're making
+    temp_sign = Item(x1-1, 5+rand()%5, 322, ladder_col_p, {0,0,0,255}, street_name);
+    map_scenery_top->at( temp_sign.y*map_width + temp_sign.x ).push_back(temp_sign);
+    block_map[temp_sign.y*map_width + temp_sign.x ] = true;
+    temp_sign = Item(x1-1, map_height-5-rand()%5, 322, ladder_col_p, {0,0,0,255}, street_name);
+    map_scenery_top->at( temp_sign.y*map_width + temp_sign.x ).push_back(temp_sign);
+    block_map[temp_sign.y*map_width + temp_sign.x ] = true;
+    
+    //Place towers all along the path...
+    y1 = 35;//move the x cursor on the other side of the vertical column path
+    while(y1<map_height-35-15){
+
+        //Initialize the build dimensions along the pathh....
+        build_dim = rand()%4 + 5;
+        build_x = x1 - 5 - rand()%5 - build_dim;
+        build_y = y1 + 15 + rand()%5;
+        build_floors = 3 + rand()%4;
+
+        //Now update reference points
+        x1 = x1;
+        y1 = build_y-1;
+
+        //check if square is blocked
+        if( is_square_clear(block_map, map_width, map_height, build_x-1, build_y-1, 0, build_dim+2) == false){
+            continue; //just skip if square is blocked
+        }
+
+        //now build a tower there
+        build_tower_NxN(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height, build_x, build_y, build_dim, build_floors, brick_p_col_in, brick_s_col_in, floor_p_col_in, floor_s_col_in, door_col1, ladder_col_p);
+
+        //Build a mailbox at new house
+        //Item temp_mailbox = Item(build_x+rand()%build_dim, build_y-2, 325);
+        Item temp_mailbox = Item(build_x+1 + build_dim, build_y-1+build_dim, 325);
+        map_scenery_top->at( temp_mailbox.y*map_width + temp_mailbox.x ).push_back(temp_mailbox);
+        block_map[temp_mailbox.y*map_width + temp_mailbox.x ] = true;
+        
+        //now connect tower to road by path
+        //find random point in new tower
+        x2 = build_x + 1 + rand()%(build_dim-2); //random point inside tower
+        y2 = build_y + 1 + rand()%(build_dim-2); //random point inside tower
+        //Find path between two buildings
+        vector<vector<int>> path = A_Star(block_map, map_width, map_height, x1, y1, x2, y2); //a list of steps between the point and the street ref point
+        build_floor_path(map_scenery_bottom, block_map, map_width, map_height, x1, y1, x2, y2, floor_p_col_in, floor_s_col_in);
+
+
+    }
     
 }
+
+
+

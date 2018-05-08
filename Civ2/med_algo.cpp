@@ -409,8 +409,6 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
         //THIS MEANS WE HIT THE END OF OPEN_SET AND HAVENT FOUND TARGET
         if(open_set.first == nullptr){
             
-            
-            
             //DELETIION
             //Delete out the closed and open_sets
             //...the closed set
@@ -441,7 +439,7 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
                 
             }
             
-
+            printf("A star flat couldn't find target\n");
             return {{9999,9999}};
         }
         
@@ -697,7 +695,10 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
         //Now check if there are LADDERS on the tile
         //
         for(int i = 0; i < map_scenery_top->at( q->z*(map_height*map_width) + q->y*map_width + q->x ).size(); i++ ){
-            if( map_scenery_top->at( q->z*(map_height*map_width) + q->y*map_width + q->x ).at(i).type == 318){
+            if( map_scenery_top->at( q->z*(map_height*map_width) + q->y*map_width + q->x ).at(i).type == 318){ //check if a ladder is on tile.
+                //DEBUG:
+                printf("found a ladder\n");
+                
                 //check if ladder can go up
                 for(int j = 0; j < map_scenery_top->at( (q->z+1)*(map_height*map_width) + q->y*map_width + q->x ).size() ; j++){ //for looop for up items
                     if(map_scenery_top->at( (q->z+1)*(map_height*map_width) + q->y*map_width + q->x ).at(j).type == 318){
@@ -874,7 +875,7 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
                     ladder_node->prev = open_set.last; //update ladder_node who it's behind
                     if(open_set.last!=nullptr){open_set.last->next = ladder_node;} //the (former) last item in list now points to ladder_node
                     open_set.last = ladder_node; //the open_set is updated
-                    if(open_set.first==nullptr){open_set.first= ladder_node;}; //if this is the first item in open_set
+                    if(open_set.first==nullptr){open_set.first = ladder_node;}; //if this is the first item in open_set
                     
                     //Must do: Check if the above step is in CLOSED or OPEN Sets. (or if it's target)
                 }
@@ -882,6 +883,7 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
             }
         }
         ////////////////////////////////////////////////
+        //End ladder search
         
         
 
@@ -929,7 +931,7 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
                 
             }
             
-            
+            printf("A_star_z can't find target...\n");
             return {{9999,9999,0}};
         }
         
