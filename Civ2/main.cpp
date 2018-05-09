@@ -551,8 +551,8 @@ void init_environment(){
     build_maze(&map_scenery_top, block_map, map_width, map_height, 85, 70, 0);
     build_maze(&map_scenery_top, block_map, map_width, map_height, 85, 110, 0);
     
-    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, true);
-    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, false);
+    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, true, generate_golden(), generate_pink());
+    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, false, generate_golden(), generate_pink());
     
     flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, true);
     flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, false);
@@ -667,12 +667,12 @@ void draw_environment(Sprite* cre1){
             
             //Cycle through all the items in the map_scenery_bottom list at that location
             for(int k = 0; k < map_scenery_bottom[ map_index ].size(); k++ ){
-                map_scenery_bottom[map_index][k].draw( (map_scenery_bottom[map_index][k].x - draw_map_x) , (map_scenery_bottom[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s); //call the draw function. We draw the item at a location translated from the current draw_map
+                map_scenery_bottom[map_index][k].draw( (map_scenery_bottom[map_index][k].x - draw_map_x) , (map_scenery_bottom[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
             }
             
             //Cycle through all the items on the map
             for(int k = 0; k < map_items[ map_index ].size(); k++ ){
-                map_items[map_index][k].draw( (map_items[map_index][k].x - draw_map_x) , (map_items[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s); //call the draw function. We draw the item at a location translated from the current draw_map
+                map_items[map_index][k].draw( (map_items[map_index][k].x - draw_map_x) , (map_items[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
             }
             
         }
@@ -687,7 +687,7 @@ void draw_environment(Sprite* cre1){
         
         if (map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
             map_shrooms[c].y > draw_map_y && map_shrooms[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
-            drawHorde(&map_shrooms[c], gRenderer, draw_map_x, draw_map_y, 4, item_tiles_p, item_tiles_s);
+            drawHorde(&map_shrooms[c], gRenderer, draw_map_x, draw_map_y, 4, item_tiles_p, item_tiles_s, item_tiles_t);
             map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, map_shrooms[c].y - draw_map_y, item_tiles_p, item_tiles_s);
         }
     }
@@ -719,7 +719,7 @@ void draw_environment(Sprite* cre1){
             
             //Cycle through all the items in the map_scenery_top list at that location
             for(int k = 0; k < map_scenery_top[ map_index ].size(); k++ ){
-                map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x) , (map_scenery_top[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s); //call the draw function. We draw the item at a location translated from the current draw_map
+                map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x) , (map_scenery_top[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
             }
             
             //Cycle through all animations on map

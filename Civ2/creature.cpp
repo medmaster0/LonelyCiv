@@ -527,7 +527,7 @@ void displayStatus(Sprite spr1, SDL_Renderer* gRenderer, int SCREEN_HEIGHT , SDL
 // Along a recangular grid (of size NxN) centered on sprite's positon
 //Mainly useful for a stationary creature with many items (shroom)
 // Draws the inventory backwards -> last is the first one to be drawn....
-void drawHorde(Sprite* spr1, SDL_Renderer* gRenderer, int draw_map_x, int draw_map_y, int display_n, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s){
+void drawHorde(Sprite* spr1, SDL_Renderer* gRenderer, int draw_map_x, int draw_map_y, int display_n, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t){
     
     int x1,y1; //the left corner of the display grid
     
@@ -550,7 +550,7 @@ void drawHorde(Sprite* spr1, SDL_Renderer* gRenderer, int draw_map_x, int draw_m
         for(int j = 0; j < display_n; j++){
             
             if(inventory_left>0){ //if there are items left to draw...
-                spr1->inventory[inventory_left-1].draw(x1+i, y1+j, gRenderer, item_tiles_p, item_tiles_s); //then draw them, dummy
+                spr1->inventory[inventory_left-1].draw(x1+i, y1+j, gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //then draw them, dummy
                 inventory_left = inventory_left - 1; //Also descrease counter
             }else{
                 break;

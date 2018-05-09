@@ -115,7 +115,7 @@ void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture*
 }
 
 //draw method at specific location
-void Item::draw(int in_x, int in_y, SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s){
+void Item::draw(int in_x, int in_y, SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s,SDL_Texture** item_tiles_t){
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { in_x*16, in_y*16, 16, 16 };
     SDL_Rect* clip = NULL;
@@ -126,30 +126,12 @@ void Item::draw(int in_x, int in_y, SDL_Renderer* gRenderer, SDL_Texture** item_
         SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
     }
     
-}
-
-
-//Overloaded draw method
-void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s,SDL_Texture** item_tiles_t){
-    //Set rendering space and render to screen
-    SDL_Rect renderQuad = { x*16, y*16, 16, 16 };
-    SDL_Rect* clip = nullptr;
-    SDL_SetTextureColorMod( item_tiles_p[type], primColor.r, primColor.g, primColor.b); //modulate color, update to match the new one
-    SDL_RenderCopy( gRenderer, item_tiles_p[type], clip, &renderQuad );//Render to screen
-    if(item_tiles_s[type] != (SDL_Texture*) 0x9999 ){
-        SDL_SetTextureColorMod( item_tiles_s[type], secoColor.r, secoColor.g, secoColor.b); //modulate color, update to match the new one
-        SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
-    }
-    //Draw the tert pic... shouldnt change color
+    //Draw the tert part (if applicable)
     if(item_tiles_t[type] != (SDL_Texture*) 0x9999 ){
+        //SDL_SetTextureColorMod( item_tiles_t[type], secoColor.r, secoColor.g, secoColor.b); //no need to modulate this one
         SDL_RenderCopy( gRenderer, item_tiles_t[type], clip, &renderQuad );//Render to screen
-        //DEBUGGING ABOVE LINE!!!:
-        //item_tiles_t[type] is NOT the EXC_BAD_ACCESS...
-        //gRenderer is NOT the mutha fuckin EXC_BAD_ACCESS
-        //renderQuad ain't the EXC_BAD_ACCESS...
-        //Must be something Else
     }
-
+    
 }
 
 

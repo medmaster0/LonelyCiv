@@ -36,9 +36,9 @@ void flower_spray(vector<vector<Item>>* map_scenery_bottom, bool* block_map, int
     
     //Create the starting point
     x1 = x;
-    x2 = x;
+    x2 = x+1;
     y1 = y;
-    y2 = y;
+    y2 = y+1;
     
     //Keep going until we reach end of map
     while(true){
