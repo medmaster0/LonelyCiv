@@ -584,6 +584,10 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
         //For each neighbor/successor
         for(int i = 0; i<4; i++){
             
+            //Check to make sure we aren't at an impossibly high level (and endlessly getting higher)
+            //put a limit to the level of floor you can search.
+            if(neighbors[i]->z > 10){ printf("floor too hgih\n"); continue;}
+            
             //if neighbor is out of bounds then we can throw it away
             if( (neighbors[i]->y < 0) || (neighbors[i]->x < 0) || (neighbors[i]->x >= map_width) || (neighbors[i]->y >= map_height)    ){
                 delete neighbors[i]; //delete what we've created!!!
@@ -696,8 +700,6 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
         //
         for(int i = 0; i < map_scenery_top->at( q->z*(map_height*map_width) + q->y*map_width + q->x ).size(); i++ ){
             if( map_scenery_top->at( q->z*(map_height*map_width) + q->y*map_width + q->x ).at(i).type == 318){ //check if a ladder is on tile.
-                //DEBUG:
-                printf("found a ladder\n");
                 
                 //check if ladder can go up
                 for(int j = 0; j < map_scenery_top->at( (q->z+1)*(map_height*map_width) + q->y*map_width + q->x ).size() ; j++){ //for looop for up items

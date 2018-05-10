@@ -51,6 +51,11 @@ using namespace std;
 // 326 - MOHAWK
 // 327 - WRITING
 // 328 - FLOWER
+// 329 - PERFUME
+// 330 - QUILL
+// 331 - DAGGER
+// 332 - BOMB
+// 333 - CLOUD
 
 //SDL_Texture* loadTexture( string path, SDL_Renderer* gRenderer );
 extern SDL_Renderer* gRenderer;//The window renderer
@@ -63,6 +68,7 @@ public:
     Item(int xpos, int ypos, int tile_type, string in_desc = "test description");
     SDL_Color primColor; //the pirimary color of item
     SDL_Color secoColor; //the secondary color of the item
+    SDL_Color tertColor; //the tertiary color of the item (usually optional)
     int x,y,z; //I think we actually don't keep track of position here....
     int type; //specifies item type
     void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s); //draws the item

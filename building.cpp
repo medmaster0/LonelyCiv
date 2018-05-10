@@ -147,8 +147,8 @@ void build_maze(vector<vector<Item>>* map_scenery, bool* block_map, int map_widt
     int con_x = x;//the starting point of construction
     int con_y = y;//the starting point of construction
     //redefine color
-    SDL_Color p1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
-    SDL_Color s1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)};
+    SDL_Color p1 = p_col_in;
+    SDL_Color s1 = s_col_in;
     //BASIC RECIPE FOR MAKING A MAZE OUT OF PHYSICAL ITEMS
     for(int j = 0 ; j < gmap.size(); j++){ //the ROWS of
         for(int i = 0; i<gmap[j].size();i++){ //the COLS of

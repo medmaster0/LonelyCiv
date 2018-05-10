@@ -53,6 +53,11 @@ using namespace std;
 // 326 - MOHAWK
 // 327 - WRITING
 // 328 - FLOWER
+// 329 - PERFUME
+// 330 - QUILL
+// 331 - DAGGER
+// 332 - BOMB
+// 333 - CLOUD
 
 
 //static variable constructor
@@ -75,6 +80,7 @@ Item::Item(int xpos, int ypos, int tile_type, string in_desc){
     type = tile_type;
     primColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
     secoColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
+    tertColor = {0,0,0,255}; 
     description = in_desc;
     
     //tilesPrim = new SDL_Texture * [1];

@@ -382,6 +382,26 @@ void loadTiles(){
     item_tiles_s[328] = loadTexture("Civ2/Civ2/tiles/flowerSeco.png");
     item_tiles_t[328] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[329] = loadTexture("Civ2/Civ2/tiles/perfumePrim.png");
+    item_tiles_s[329] = loadTexture("Civ2/Civ2/tiles/perfumeSeco.png");
+    item_tiles_t[329] = loadTexture("Civ2/Civ2/tiles/perfumeTert.png");
+    
+    item_tiles_p[330] = loadTexture("Civ2/Civ2/tiles/quillPrim.png");
+    item_tiles_s[330] = loadTexture("Civ2/Civ2/tiles/quillSeco.png");
+    item_tiles_t[330] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[331] = loadTexture("Civ2/Civ2/tiles/daggerPrim.png");
+    item_tiles_s[331] = loadTexture("Civ2/Civ2/tiles/daggerSeco.png");
+    item_tiles_t[331] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[332] = loadTexture("Civ2/Civ2/tiles/bombPrim.png");
+    item_tiles_s[332] = loadTexture("Civ2/Civ2/tiles/bombSeco.png");
+    item_tiles_t[332] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[333] = loadTexture("Civ2/Civ2/tiles/cloudPrim2.png");
+    item_tiles_s[333] = loadTexture("Civ2/Civ2/tiles/cloudSeco2.png");
+    item_tiles_t[333] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
     misc_tiles[1] = loadTexture("Civ2/Civ2/tiles/zodiac/taurus.png");
@@ -548,14 +568,28 @@ void init_environment(){
     
     build_tower_NxN(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, 60, 60, 7, 3, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
-    build_maze(&map_scenery_top, block_map, map_width, map_height, 85, 70, 0);
-    build_maze(&map_scenery_top, block_map, map_width, map_height, 85, 110, 0);
+    //center two mazes
+    build_maze(&map_scenery_top, block_map, map_width, map_height, 85, 71, 0, build_col_p, build_col_s);
+    build_maze(&map_scenery_top, block_map, map_width, map_height, 85, 109, 0, build_col_p, build_col_s);
+    
+    //left column of 3 mazes
+    build_maze(&map_scenery_top, block_map, map_width, map_height, 55, 71, 0, build_col_p, build_col_s);
+    build_maze(&map_scenery_top, block_map, map_width, map_height, 55, 90, 0, build_col_p, build_col_s);
+    build_maze(&map_scenery_top, block_map, map_width, map_height, 55, 109, 0, build_col_p, build_col_s);
+    
+    //right column of 3 mazes
+    build_maze(&map_scenery_top, block_map, map_width, map_height, 115, 71, 0, build_col_p, build_col_s);
+    build_maze(&map_scenery_top, block_map, map_width, map_height, 115, 90, 0, build_col_p, build_col_s);
+    build_maze(&map_scenery_top, block_map, map_width, map_height, 115, 109, 0, build_col_p, build_col_s);
+    
     
     flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, true, generate_golden(), generate_pink());
     flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, false, generate_golden(), generate_pink());
     
     flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, true);
     flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, false);
+
+    cloud_place(&map_scenery_bottom, block_map, map_width, map_height, 120, 110, 1, floor_col_p, {255,255,255,255});
     
 //    build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
@@ -631,7 +665,7 @@ void init_environment(){
     for(int g = 0 ; g<225; g++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
-        temp_tile = 328;
+        temp_tile = 328; //328 for flowers
         //    Both Random Colors
         //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
         //    Pink / Green
@@ -640,6 +674,7 @@ void init_environment(){
         //Item temp_item = Item(tempx, tempy , temp_tile, {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, generate_green()); //temporary item (scenery)
         //    Both Random WOLRDZ COLORZ
         Item temp_item = Item(tempx, tempy , temp_tile, world_colors[rand()%world_colors.size()], world_colors[rand()%world_colors.size()]); //temporary item (scenery)
+        //temp_item.tertColor = generate_golden(); //since item is perfume, apply gold to it's third color
         map_items[ (tempz*map_area) + (tempy*map_width)+tempx].push_back(temp_item);
     }
     
