@@ -58,6 +58,7 @@ using namespace std;
 // 331 - DAGGER
 // 332 - BOMB
 // 333 - CLOUD
+// 334 - BLANK (a blank item used for transparent effects)
 
 
 //static variable constructor

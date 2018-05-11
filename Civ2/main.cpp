@@ -50,8 +50,8 @@ bool* block_map; //this is the map indicating whether a tile is blocked
 //These keep track of what parts of the map to draw
 //The dimensinos of the draw map. These indices "swim" through the main map
 //int draw_map_x, draw_map_y = 60;
-int draw_map_x = 100;
-int draw_map_y = 100;
+int draw_map_x = 90;
+int draw_map_y = 90;
 int draw_map_z = 0; //which floor, we're drawing
 int draw_map_width, draw_map_height;
 
@@ -67,6 +67,7 @@ vector<vector<Item>> map_scenery_top; //a list of list of scenery on a tile. Ind
 vector<vector<Item>> map_scenery_bottom; //a list of list of scenery on a tile. Index correspongs to [y*map_width + x]
                                     //THis is separate from the map_items list so creatures won't pick these items up
                                     //This version will be the first to be drawn on screen
+vector<vector<Item>> map_clouds; //a list of clouds on the map. treated exactly like the previous item lists but needed to be kept separate for drawing (and updating) cloud physics.
 
 //Creatures Stuff
 vector<Sprite> map_creatures; //a list of all creatures on map
@@ -402,6 +403,10 @@ void loadTiles(){
     item_tiles_s[333] = loadTexture("Civ2/Civ2/tiles/cloudSeco2.png");
     item_tiles_t[333] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[334] = loadTexture("Civ2/Civ2/tiles/blankPrim.png");
+    item_tiles_s[334] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[334] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
     misc_tiles[1] = loadTexture("Civ2/Civ2/tiles/zodiac/taurus.png");
@@ -505,6 +510,7 @@ void init_environment(){
     map_items.resize(map_width*map_height*map_floors);
     map_scenery_top.resize(map_width*map_height*map_floors);
     map_scenery_bottom.resize(map_width*map_height*map_floors);
+    map_clouds.resize(map_width*map_height*map_floors);
     map_effects.resize(map_width*map_height*map_floors);
     map_animations.resize(map_width*map_height*map_floors);
     
@@ -558,6 +564,7 @@ void init_environment(){
     SDL_Color floor_col_p = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
     SDL_Color floor_col_s = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
     SDL_Color door_col_p = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    SDL_Color shadow_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
     SDL_Color ladder_col_p = generate_brown();
     
     //I guess you could say houses are all built on first floor anyway...
@@ -582,14 +589,15 @@ void init_environment(){
     build_maze(&map_scenery_top, block_map, map_width, map_height, 115, 90, 0, build_col_p, build_col_s);
     build_maze(&map_scenery_top, block_map, map_width, map_height, 115, 109, 0, build_col_p, build_col_s);
     
-    
-    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, true, generate_golden(), generate_pink());
-    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, false, generate_golden(), generate_pink());
-    
-    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, true);
-    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, false);
+//    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, true, generate_golden(), generate_pink());
+//    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, false, generate_golden(), generate_pink());
+//    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, true);
+//    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, false);
 
-    cloud_place(&map_scenery_bottom, block_map, map_width, map_height, 120, 110, 1, floor_col_p, {255,255,255,255});
+    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 110, 1, shadow_col, {255,255,255,255}); //{0,0,0,255} /{255,255,255,255}/
+    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 120, 1, shadow_col, {255,255,255,255}); //{0,0,0,255} /{255,255,255,255}/
+    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 110, 1, shadow_col, {255,255,255,255}); //{0,0,0,255} /{255,255,255,255}/
+    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 120, 1, shadow_col, {255,255,255,255}); //{0,0,0,255} /{255,255,255,255}/
     
 //    build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
@@ -691,7 +699,7 @@ void init_environment(){
 
 //This method is not the most efficient (I imagine?) but will do for now.
 void draw_environment(Sprite* cre1){
-
+    
     //Draw all bottom items
     for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
         if(i >= map_width || i < 0){continue;} //bounds checking
@@ -767,21 +775,20 @@ void draw_environment(Sprite* cre1){
                 map_effects[map_index][k].drawScroll( (map_effects[map_index][k].x - draw_map_x) , (map_effects[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
             }
             
+//            //TODO: COnsider making a SEPARATE DRAW CLOUD FUNCTION!!!!!! TO KEEP IT OUTTA HERE...
+//            //THING TO NOTE: WHILE we draw clouds, we need to pay attention to alpha mod on the textures
+//            //Cycle through all the items in the map_cloud list at that location
+//            for(int k = 0; k < map_clouds[ map_index ].size(); k++ ){
+//
+//                //Ensure texture is good
+//                SDL_SetTextureAlphaMod(item_tiles_p[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a); //temorarily set the global alpha mod of the tile we need to use to draw
+//
+//                map_clouds[map_index][k].draw( (map_clouds[map_index][k].x - draw_map_x) , (map_clouds[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
+//            }//end clouds
+            
+            
         }
     } //End drawing top items
-    
-//    //Cycle through all shrooms and draw...
-//    for(int c = 0 ; c < map_shrooms.size(); c++){
-//
-//        if(map_shrooms[c].z != draw_map_z){ //if not on currently drawn floor
-//            continue; //skip to next one
-//        }
-//
-//        if (map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
-//            map_shrooms[c].y > draw_map_y && map_shrooms[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
-//            map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, map_shrooms[c].y - draw_map_y, item_tiles_p, item_tiles_s);
-//        }
-//    }
     
     //Cycle through all creatures and draw their items...
     for(int c = 0 ; c < map_creatures.size(); c++){
@@ -795,10 +802,28 @@ void draw_environment(Sprite* cre1){
             map_creatures[c].draw_movement_items(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s);
         }
     }
-    
     if(cre1->z == draw_map_z){
         cre1->draw_movement_items(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s); //DRAW MAIN CREATURE
     }
+    
+    //NOW FINALLY AT END DRAW THE CLOUDSS. THEY ARE ABOVE ALL
+    for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
+        if(i >= map_width || i < 0){continue;} //bounds checking
+        for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
+            if(j >= map_height || j < 0){continue;} //bounds checking
+            
+            int map_index = (draw_map_z*map_area) + (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
+
+            //Cycle through all the items in the map_cloud list at that location
+            for(int k = 0; k < map_clouds[ map_index ].size(); k++ ){
+                
+                //Ensure texture is good
+                SDL_SetTextureAlphaMod(item_tiles_p[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a); //temorarily set the global alpha mod of the tile we need to use to draw
+                
+                map_clouds[map_index][k].draw( (map_clouds[map_index][k].x - draw_map_x) , (map_clouds[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
+            }//end clouds
+        }
+    } //End drawing CLOUDDSS
     
 
 }
