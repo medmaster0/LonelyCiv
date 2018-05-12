@@ -75,7 +75,7 @@
 		0CCDE8761FB29921005CDAD6 /* music.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = music.cpp; sourceTree = "<group>"; };
 		0CCDE8771FB29921005CDAD6 /* music.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = music.hpp; sourceTree = "<group>"; };
 		0CE22F011EFF778800FC41F4 /* Civ2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Civ2; sourceTree = BUILT_PRODUCTS_DIR; };
-		0CE22F041EFF778800FC41F4 /* main.cpp */ = {isa = PBXFileReference; indentWidth = 5; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		0CE22F041EFF778800FC41F4 /* main.cpp */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0CE22F0C1EFF780000FC41F4 /* Frameworks */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Frameworks; path = ../../../../../Library/Frameworks; sourceTree = "<group>"; };
 		0CE22F0E1EFF783200FC41F4 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
 		0CE85D262083BDB200C0FC49 /* building.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = building.cpp; sourceTree = "<group>"; };

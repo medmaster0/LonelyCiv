@@ -669,24 +669,12 @@ void init_environment(){
             }
         }
     }
-    
-//    //Demons
-//    int num_demons = 5; //How many demons are on the map
-//    for(int i = 0; i < num_demons; i++){
-//        int tx, ty;
-//        while(true){
-//            tx = rand()%map_width;
-//            ty = rand()%map_height;
-//            if(block_map[(ty*map_width)+tx]==false){ //if adjacent is NOT blocked
-//                Shroom temp_demon = Shroom(tx,ty); //create new shroom
-//                temp_demon.loadFromFile("Civ2/Civ2/tiles/demonPrim4.png","Civ2/Civ2/tiles/demonSeco4.png", 16, 16);
-//                temp_demon.changePrimColor(generate_pink());
-//                temp_demon.changeSecoColor({255,255,255,255});
-//                map_shrooms.push_back(temp_demon);
-//                break;
-//            }
-//        }
-//    }
+     
+//     //Start a fire Animation (standard protocol)
+//     int list[4] = {22, 23, 24, 25};
+//     Animation temp_animation = Animation(100, 100, list);
+//     temp_animation.z = 1;
+//     map_animations[ ( temp_animation.z*map_area) + temp_animation.y*map_width + temp_animation.x ].push_back(temp_animation);
     
     //create random items (from the randomly generated assets)
     for(int g = 0 ; g<225; g++){
@@ -787,15 +775,15 @@ void draw_environment(Sprite* cre1){
                          map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t      );//call the draw function with location translated for this view
                     }
                     
-//                    //Now cycle through the elements in the map_animations list at that location
-//                    for(int k = 0; k < map_animations[map_index].size(); k++){
-//                         map_animations[map_index][k].draw( (map_animations[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, misc_tiles );//call the draw function with location translated for this view
-//                    }
-//
-//                    //Now cycle through the elements in the map_effects list at that location
-//                    for(int k = 0; k < map_effects[map_index].size(); k++){
-//                         map_effects[map_index][k].drawScroll( (map_effects[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, misc_tiles  );//call the draw function with location translated for this view
-//                    }
+                    //Now cycle through the elements in the map_animations list at that location
+                    for(int k = 0; k < map_animations[map_index].size(); k++){
+                         map_animations[map_index][k].draw( (map_animations[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, misc_tiles );//call the draw function with location translated for this view
+                    }
+
+                    //Now cycle through the elements in the map_effects list at that location
+                    for(int k = 0; k < map_effects[map_index].size(); k++){
+                         map_effects[map_index][k].drawScroll( (map_effects[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, misc_tiles  );//call the draw function with location translated for this view
+                    }
                     
                }
           }//End drawing top items
@@ -1726,9 +1714,9 @@ void perform_ritual_thread(Sprite* spr1){
             loc_x = spr1->x - 1;
             loc_y = spr1->y;
             Animation temp_animation = Animation(loc_x, loc_y, list);
-            map_animations[ ( (loc_y) * map_width ) + (loc_x) ].push_back(temp_animation);
+            map_animations[ ( temp_animation.y * map_width ) + (temp_animation.x) ].push_back(temp_animation);
             
-            //Start Timer on sprite
+            //Start Timer on sprite (since it's going to stand here for 10 seconds)
             spr1->thread_timer = SDL_GetTicks();
             
             break; //break out of wait loop
@@ -2221,7 +2209,9 @@ int main( int argc, char* args[] ){
     //...Map
     generateTilez(); //call this before loadTiles()
     loadTiles();
+    printf("ani:%d\n",map_animations.size());
     init_environment();
+    printf("ani:%d\n",map_animations.size());
     
     //...Sprites
     Sprite* cre1 = new Sprite(draw_map_x + (int)(draw_map_width/2.0),draw_map_y + (int)(draw_map_height/2.0) ); //start creaturein the middle of the screen
