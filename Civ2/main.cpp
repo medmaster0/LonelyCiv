@@ -50,10 +50,12 @@ bool* block_map; //this is the map indicating whether a tile is blocked
 //These keep track of what parts of the map to draw
 //The dimensinos of the draw map. These indices "swim" through the main map
 //int draw_map_x, draw_map_y = 60;
-int draw_map_x = 90;
+int draw_map_x = 90; //The (x,y,z) coords of the top left corner
 int draw_map_y = 90;
 int draw_map_z = 0; //which floor, we're drawing
 int draw_map_width, draw_map_height;
+//Balcony View Stuff
+bool isBalconyView = false; //flag for whether 2D-side view is activated
 
 //ItemTile Stuff
 SDL_Texture** item_tiles_p; //primo item tiles
@@ -457,9 +459,26 @@ void generateTilez(){
 
 //Print out a tile-based map give a vector 2D array
 void drawVectorMap(){
+    
     //Clear screen
     SDL_SetRenderDrawColor( gRenderer,back_col.r, back_col.g, back_col.b, back_col.a );
     SDL_RenderClear( gRenderer );
+    
+    //////////////////////////////////////////
+    //BEGIN BALCONY VIEW
+    if(isBalconyView == true){
+        
+        //Draw black boxes at the boundaries...
+         if( (draw_map_z - draw_map_height) < 0 ){ //if there will be negative floors on draw_map...
+              SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+              SDL_Rect rect1 = {0, 16*(draw_map_height - ((draw_map_z - draw_map_height)*-1)), SCREEN_WIDTH, SCREEN_HEIGHT};
+              SDL_RenderFillRect(gRenderer, &rect1);
+         }
+        
+        return; //return right here and skip the below code
+    }
+    //END BLACONY VIEW
+    //////////////////////////////////////////
     
     //We also want to draw black boxes at boundaries...
     if(draw_map_x < 0){ //for left boundary
@@ -693,12 +712,116 @@ void init_environment(){
 //This function uses the indices:
 //  draw_map_width, draw_map_height, draw_map_x, and draw_map_y
 //
+// NOTE: Another function updates the draw_map_x,y,z
+//
 //It only cycles through though specific indices in the map lists
 //HOWEVER,
 //when it calls the draw function. It needs to call it in a certain way so as to draw it in the correct (translated) location...
 
 //This method is not the most efficient (I imagine?) but will do for now.
 void draw_environment(Sprite* cre1){
+    
+     ////////////////////////////////////////
+     //BEGIN BALCONY VIEW
+     //In Balcony View, we draw the (x,z) slice (y-dim is going into the screen)
+     //Remember: draw_map_z is elevated up by draw_height/2 when Balcony View is first entered.
+     if(isBalconyView == true){
+
+          draw_map_y = cre1->y; //make sure to center on
+
+          //Start drawing BOTTOM Items
+          for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
+               for(int j = draw_map_z; j >= 0; j--){ //cycle through the z-dim
+                    int map_index = (j*map_area) + (draw_map_y*map_width) + i; //compute the index in item lists we'll use
+
+                    //Now cycle through the elements in the map_scenery_bottom list at that location
+                    for(int k = 0; k < map_scenery_bottom[map_index].size(); k++){
+                    map_scenery_bottom[map_index][k].draw( (map_scenery_bottom[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t      );//call the draw function with location translated for this view
+                    }
+
+                    //Now cycle through the elements in the map_items list at that location
+                    for(int k = 0; k < map_items[map_index].size(); k++){
+                      map_items[map_index][k].draw( (map_items[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t      );//call the draw function with location translated for this view
+                    }
+                
+               }
+          }//end drawing bottom items
+          
+          //Cycle through all shrooms and draw
+          for(int c = 0; c < map_shrooms.size(); c++){
+               
+               if(map_shrooms[c].y != draw_map_y){ //if not on current y-dim slice
+                    continue; //skiip to next one
+               }
+               
+               if(map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
+                  map_shrooms[c].z < draw_map_z && map_shrooms[c].z > draw_map_z - draw_map_height){ //do bounds checking so we don't draw out of screen
+                    map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p, item_tiles_s);
+               }
+          }//end drawing shrooms
+          
+          //Cycle through all creatures and draw...
+          for(int c = 0; c < map_creatures.size(); c++){
+               
+               if(map_creatures[c].y != draw_map_y){
+                    continue; //skip to next one
+               }
+               
+               if(map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
+                  map_creatures[c].z < draw_map_z && map_creatures[c].z > draw_map_z - draw_map_height){ //do bounds checking
+                    map_creatures[c].draw_movement(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p, item_tiles_s);
+               }
+          }//end drawing creatures
+          
+          if(cre1->y == draw_map_y){
+               cre1->draw_movement(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p, item_tiles_s); //DRAW MAIN CREATURE
+          }
+          
+          //Start drawing TOP Items
+          for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
+               for(int j = draw_map_z; j >= 0; j--){ //cycle through the z-dim
+                    int map_index = (j*map_area) + (draw_map_y*map_width) + i; //compute the index in item lists we'll use
+                    
+                    //Now cycle through the elements in the map_scenery_top list at that location
+                    for(int k = 0; k < map_scenery_top[map_index].size(); k++){
+                         map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t      );//call the draw function with location translated for this view
+                    }
+                    
+//                    //Now cycle through the elements in the map_animations list at that location
+//                    for(int k = 0; k < map_animations[map_index].size(); k++){
+//                         map_animations[map_index][k].draw( (map_animations[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, misc_tiles );//call the draw function with location translated for this view
+//                    }
+//
+//                    //Now cycle through the elements in the map_effects list at that location
+//                    for(int k = 0; k < map_effects[map_index].size(); k++){
+//                         map_effects[map_index][k].drawScroll( (map_effects[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, misc_tiles  );//call the draw function with location translated for this view
+//                    }
+                    
+               }
+          }//End drawing top items
+          
+          //Cycle through all creatures and draw their items...
+          for(int c = 0; c < map_creatures.size(); c++){
+               
+               if(map_creatures[c].y != draw_map_y){
+                    continue; //skip to next one
+               }
+               
+               if(map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
+                  map_creatures[c].z < draw_map_z && map_creatures[c].z > draw_map_z - draw_map_height){ //do bounds checking
+                    map_creatures[c].draw_movement_items(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p, item_tiles_s);
+               }
+          
+               if(cre1->y == draw_map_y){
+                    cre1->draw_movement_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p, item_tiles_s); //DRAW MAIN CREATURE's ITEMS
+               }
+               
+          }
+
+     return; //return right here and skip all the below stuff
+     }
+     //END BALCONY VIEW
+     ////////////////////////////////////////
     
     //Draw all bottom items
     for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
@@ -775,18 +898,6 @@ void draw_environment(Sprite* cre1){
                 map_effects[map_index][k].drawScroll( (map_effects[map_index][k].x - draw_map_x) , (map_effects[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
             }
             
-//            //TODO: COnsider making a SEPARATE DRAW CLOUD FUNCTION!!!!!! TO KEEP IT OUTTA HERE...
-//            //THING TO NOTE: WHILE we draw clouds, we need to pay attention to alpha mod on the textures
-//            //Cycle through all the items in the map_cloud list at that location
-//            for(int k = 0; k < map_clouds[ map_index ].size(); k++ ){
-//
-//                //Ensure texture is good
-//                SDL_SetTextureAlphaMod(item_tiles_p[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a); //temorarily set the global alpha mod of the tile we need to use to draw
-//
-//                map_clouds[map_index][k].draw( (map_clouds[map_index][k].x - draw_map_x) , (map_clouds[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
-//            }//end clouds
-            
-            
         }
     } //End drawing top items
     
@@ -803,7 +914,7 @@ void draw_environment(Sprite* cre1){
         }
     }
     if(cre1->z == draw_map_z){
-        cre1->draw_movement_items(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s); //DRAW MAIN CREATURE
+        cre1->draw_movement_items(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s); //DRAW MAIN CREATURE's Items
     }
     
     //NOW FINALLY AT END DRAW THE CLOUDSS. THEY ARE ABOVE ALL
@@ -1840,7 +1951,9 @@ void background_color_thread(){
         
         
         //back_col (already initialized, becomes a pastel color)
-        back_col = color_to_pastel({static_cast<Uint8>(new_r),static_cast<Uint8>(new_g),static_cast<Uint8>(new_b),255},{static_cast<Uint8>(draw_map_z*10),static_cast<Uint8>(draw_map_z*10),static_cast<Uint8>(draw_map_z*10),255});
+        if(isBalconyView == false){ //only apply the pastel translation if BalconyView is disabled
+            back_col = color_to_pastel({static_cast<Uint8>(new_r),static_cast<Uint8>(new_g),static_cast<Uint8>(new_b),255},{static_cast<Uint8>(draw_map_z*10),static_cast<Uint8>(draw_map_z*10),static_cast<Uint8>(draw_map_z*10),255});
+        }
         
         
         //Update animate timer
@@ -2396,6 +2509,19 @@ int main( int argc, char* args[] ){
                         addToConsoleLog("This is the powder, "+ genPotionName()+". It is made of "+ genSaltName() +".");
                         break;
                         
+                    case SDLK_b:
+                        if(isBalconyView == false){ //if balcony view is ABOUT TO BE TURNED ON
+                            //move up draw_map_z by halft the width of screen. (in order to center current level)
+                            draw_map_z = cre1->z + (draw_map_height/2);
+                            draw_map_y = cre1->y;
+                        }else{ //then, otherwise, BALCONY VIEW about to be TURNED OFF
+                            //move back to the original position
+                            draw_map_z = cre1->z;
+                            draw_map_y = cre1->y - draw_map_height/2;
+                        }
+                        isBalconyView = !isBalconyView; //toggle balconyView
+                        break;
+                        
                     case SDLK_p:{
                         shroomDepoDisplayOn = !shroomDepoDisplayOn;
                         break;
@@ -2591,7 +2717,9 @@ int main( int argc, char* args[] ){
                 sKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
                 
                 //Finally, update draw_map indices
-                draw_map_y = cre1->y - draw_map_height/2;
+                if(isBalconyView==false){ //only update if not in Balcony View
+                    draw_map_y = cre1->y - draw_map_height/2;
+                }
                 
             }//end s key processing
             //D-KEY TIMER
@@ -2698,7 +2826,9 @@ int main( int argc, char* args[] ){
                 wKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
                 
                 //Finally, update draw_map indices
-                draw_map_y = cre1->y - draw_map_height/2;
+                if(isBalconyView==false){ //only update if not in Balcony View
+                    draw_map_y = cre1->y - draw_map_height/2;
+                }
                 
             }//end a key processing
             
