@@ -162,7 +162,7 @@ void build_maze(vector<vector<Item>>* map_scenery, bool* block_map, int map_widt
             //if(gmap[i][j] == 1){
             if(gmap[j][i] == 1){
                 //then we need a wall here
-                Item con_item = Item(tempx, tempy, 304, p1, s1);
+                Item con_item = Item(tempx, tempy, 335, p1, s1);
                 map_scenery->at( (z*map_height*map_width) + (tempy*map_width)+tempx).push_back(con_item);
                 block_map[ (z*map_height*map_width) + (tempy*map_width)+tempx] = true;
             }
@@ -303,7 +303,7 @@ void build_tower_NxN(vector<vector<Item>>* map_scenery_top, vector<vector<Item>>
         for(int b = 0; b < n+2; b++){
             int r_x = build_x - 1 + b;
             int r_y = build_y + n;
-            Item temp_railing = Item(r_x, r_y, 319);
+            Item temp_railing = Item(r_x, r_y, 319, {0,0,0,255}, {0,0,0,255});
             map_scenery_top->at( ((i+1)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
         }
         
@@ -311,7 +311,7 @@ void build_tower_NxN(vector<vector<Item>>* map_scenery_top, vector<vector<Item>>
         for(int b = 0; b < n+2; b++){
             int r_x = build_x - 1;
             int r_y = build_y - 1 + b;
-            Item temp_railing = Item(r_x, r_y, 320);
+            Item temp_railing = Item(r_x, r_y, 320, {0,0,0,255}, {0,0,0,255});
             map_scenery_top->at( ((i+1)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
         }
         
@@ -319,7 +319,7 @@ void build_tower_NxN(vector<vector<Item>>* map_scenery_top, vector<vector<Item>>
         for(int b = 0; b < n+2; b++){
             int r_x = build_x + n;
             int r_y = build_y - 1 + b;
-            Item temp_railing = Item(r_x, r_y, 321);
+            Item temp_railing = Item(r_x, r_y, 321, {0,0,0,255}, {0,0,0,255});
             map_scenery_top->at( ((i+1)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
         }
         
@@ -327,7 +327,7 @@ void build_tower_NxN(vector<vector<Item>>* map_scenery_top, vector<vector<Item>>
         for(int b = 0; b < n+2; b++){
             int r_x = build_x - 1 + b;
             int r_y = build_y - 2;
-            Item temp_railing = Item(r_x, r_y, 319);
+            Item temp_railing = Item(r_x, r_y, 319, {0,0,0,255}, {0,0,0,255});
             map_scenery_top->at( ((i+1)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
         }
         

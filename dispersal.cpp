@@ -194,8 +194,6 @@ void cloud_place(vector<vector<Item>>* map_scenery_bottom, bool* block_map, int 
     //DONE FLUFFY PART
     ///////////////////////////
     
-    printf("done fluffy$$%$%$^W^W^W");
-    
     //START DRAWING THE TAPER OFF -> convergence
     while(true){
         
@@ -250,7 +248,7 @@ void cloud_place_shadow(vector<vector<Item>>* map_scenery_bottom, bool* block_ma
                     if(alpha_value<0)alpha_value = 0; //bounds check
                     SDL_Color shadow_col_p = {p_col_in.r, p_col_in.g, p_col_in.b, 255 };
                     shadow_col_p.a = alpha_value;
-                    SDL_Color shadow_col_s = {0,0,0,0};
+                    SDL_Color shadow_col_s = {0,0,0,255};
                     Item temp_shadow = Item(i, j, 334, shadow_col_p, shadow_col_s); //place a single cloud at x,y
                     temp_shadow.z = cur_z;
                     map_scenery_bottom->at( (temp_shadow.z*map_width*map_height) + (temp_shadow.y*map_width) + temp_shadow.x).push_back(temp_shadow); // add it to global map

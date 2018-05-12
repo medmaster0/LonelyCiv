@@ -61,6 +61,11 @@ bool isBalconyView = false; //flag for whether 2D-side view is activated
 SDL_Texture** item_tiles_p; //primo item tiles
 SDL_Texture** item_tiles_s; //seco item tiles
 SDL_Texture** item_tiles_t; //terto item tiles
+
+SDL_Texture** item_tiles_p_balcony; //primo item tiles, for Balcony View
+SDL_Texture** item_tiles_s_balcony; //seco item tiles, for Balcony View
+SDL_Texture** item_tiles_t_balcony; //terto item tiles, Balcony View
+
 vector<SDL_Color> world_colors; //array of sdl_colors
 vector<vector<Item>> map_items; //a list of list of items on a tile. Index corresponds to [y*map_width + x]
 vector<vector<Item>> map_scenery_top; //a list of list of scenery on a tile. Index correspongs to [y*map_width + x]
@@ -215,6 +220,9 @@ void loadTiles(){
     item_tiles_p = new SDL_Texture* [326];
     item_tiles_s = new SDL_Texture* [326];
     item_tiles_t = new SDL_Texture* [326];
+    item_tiles_p_balcony = new SDL_Texture* [326];
+    item_tiles_s_balcony = new SDL_Texture* [326];
+    item_tiles_t_balcony = new SDL_Texture* [326];
     misc_tiles = new SDL_Texture* [40];
     //world_colors = new SDL_Color [200];
     SDL_Color temp_col;
@@ -234,6 +242,9 @@ void loadTiles(){
         item_tiles_p[i] = loadTexture("Civ2/Civ2/weedz/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+        item_tiles_p_balcony[i] = loadTexture("Civ2/Civ2/weedz/"+std::to_string(i)+".png");
+        item_tiles_s_balcony[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+        item_tiles_t_balcony[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b), 255};
         //world_colors[i] = temp_col;
         world_colors.push_back(temp_col);
@@ -248,6 +259,9 @@ void loadTiles(){
         item_tiles_p[i] = loadTexture("Civ2/Civ2/stonez/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+        item_tiles_p_balcony[i] = loadTexture("Civ2/Civ2/stonez/"+std::to_string(i)+".png");
+        item_tiles_s_balcony[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+        item_tiles_t_balcony[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b), 255};
         //world_colors[i] = temp_col;
         world_colors.push_back(temp_col);
@@ -263,6 +277,9 @@ void loadTiles(){
         item_tiles_p[i] = loadTexture("Civ2/Civ2/fruitz/"+std::to_string(i)+".png");
         item_tiles_s[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         item_tiles_t[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+        item_tiles_p_balcony[i] = loadTexture("Civ2/Civ2/fruitz/"+std::to_string(i)+".png");
+        item_tiles_s_balcony[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+        item_tiles_t_balcony[i] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
         temp_col = {static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b), 255};
         //world_colors[i] = temp_col;
         world_colors.push_back(temp_col);
@@ -272,142 +289,254 @@ void loadTiles(){
     item_tiles_p[300] = loadTexture("Civ2/Civ2/tiles/canPrim.png");
     item_tiles_s[300] = loadTexture("Civ2/Civ2/tiles/canSeco.png");
     item_tiles_t[300] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[300] = loadTexture("Civ2/Civ2/tiles/canPrim.png");
+    item_tiles_s_balcony[300] = loadTexture("Civ2/Civ2/tiles/canSeco.png");
+    item_tiles_t_balcony[300] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[301] = loadTexture("Civ2/Civ2/tiles/adobePrim.png");
     item_tiles_s[301] = loadTexture("Civ2/Civ2/tiles/adobeSeco.png");
     item_tiles_t[301] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[301] = loadTexture("Civ2/Civ2/tiles/balcony/floor2DPrim.png");
+    item_tiles_s_balcony[301] = loadTexture("Civ2/Civ2/tiles/balcony/floor2DSeco.png");
+    item_tiles_t_balcony[301] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
 
     item_tiles_p[302] = loadTexture("Civ2/Civ2/tiles/saxPrim.png");
     item_tiles_s[302] = loadTexture("Civ2/Civ2/tiles/saxSeco.png");
     item_tiles_t[302] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[302] = loadTexture("Civ2/Civ2/tiles/saxPrim.png");
+    item_tiles_s_balcony[302] = loadTexture("Civ2/Civ2/tiles/saxSeco.png");
+    item_tiles_t_balcony[302] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[303] = loadTexture("Civ2/Civ2/tiles/celloPrim.png");
     item_tiles_s[303] = loadTexture("Civ2/Civ2/tiles/celloSeco.png");
     item_tiles_t[303] = loadTexture("Civ2/Civ2/tiles/celloTert.png");
+    item_tiles_p_balcony[303] = loadTexture("Civ2/Civ2/tiles/celloPrim.png");
+    item_tiles_s_balcony[303] = loadTexture("Civ2/Civ2/tiles/celloSeco.png");
+    item_tiles_t_balcony[303] = loadTexture("Civ2/Civ2/tiles/celloTert.png");
     
     item_tiles_p[304] = loadTexture("Civ2/Civ2/tiles/brickPrim.png");
     item_tiles_s[304] = loadTexture("Civ2/Civ2/tiles/brickSeco.png");
     item_tiles_t[304] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[304] = loadTexture("Civ2/Civ2/tiles/balcony/windowPrim.png");
+    item_tiles_s_balcony[304] = loadTexture("Civ2/Civ2/tiles/balcony/windowSeco.png");
+    item_tiles_t_balcony[304] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[305] = loadTexture("Civ2/Civ2/tiles/capPrim.png");
     item_tiles_s[305] = loadTexture("Civ2/Civ2/tiles/capSeco.png");
     item_tiles_t[305] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[305] = loadTexture("Civ2/Civ2/tiles/capPrim.png");
+    item_tiles_s_balcony[305] = loadTexture("Civ2/Civ2/tiles/capSeco.png");
+    item_tiles_t_balcony[305] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[306] = loadTexture("Civ2/Civ2/tiles/bow2Prim.png");
     item_tiles_s[306] = loadTexture("Civ2/Civ2/tiles/bow2Seco.png");
     item_tiles_t[306] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[306] = loadTexture("Civ2/Civ2/tiles/bow2Prim.png");
+    item_tiles_s_balcony[306] = loadTexture("Civ2/Civ2/tiles/bow2Seco.png");
+    item_tiles_t_balcony[306] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[307] = loadTexture("Civ2/Civ2/doodadz/staff.png");
     item_tiles_s[307] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[307] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[307] = loadTexture("Civ2/Civ2/doodadz/staff.png");
+    item_tiles_s_balcony[307] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[307] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[308] = loadTexture("Civ2/Civ2/doodadz/candlePrim.png");
     item_tiles_s[308] = loadTexture("Civ2/Civ2/doodadz/candleSeco.png");
     item_tiles_t[308] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[308] = loadTexture("Civ2/Civ2/doodadz/candlePrim.png");
+    item_tiles_s_balcony[308] = loadTexture("Civ2/Civ2/doodadz/candleSeco.png");
+    item_tiles_t_balcony[308] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[309] = loadTexture("Civ2/Civ2/doodadz/flagPrim.png");
     item_tiles_s[309] = loadTexture("Civ2/Civ2/doodadz/flagSeco.png");
     item_tiles_t[309] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[309] = loadTexture("Civ2/Civ2/doodadz/flagPrim.png");
+    item_tiles_s_balcony[309] = loadTexture("Civ2/Civ2/doodadz/flagSeco.png");
+    item_tiles_t_balcony[309] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[310] = loadTexture("Civ2/Civ2/doodadz/herbPrim.png");
     item_tiles_s[310] = loadTexture("Civ2/Civ2/doodadz/herbSecotry.png");
     item_tiles_t[310] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[310] = loadTexture("Civ2/Civ2/doodadz/herbPrim.png");
+    item_tiles_s_balcony[310] = loadTexture("Civ2/Civ2/doodadz/herbSecotry.png");
+    item_tiles_t_balcony[310] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[311] = loadTexture("Civ2/Civ2/doodadz/fruitPrim.png");
     item_tiles_s[311] = loadTexture("Civ2/Civ2/doodadz/fruitSeco.png");
     item_tiles_t[311] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[311] = loadTexture("Civ2/Civ2/doodadz/fruitPrim.png");
+    item_tiles_s_balcony[311] = loadTexture("Civ2/Civ2/doodadz/fruitSeco.png");
+    item_tiles_t_balcony[311] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[312] = loadTexture("Civ2/Civ2/doodadz/stonePrim.png");
     item_tiles_s[312] = loadTexture("Civ2/Civ2/doodadz/stoneSeco.png");
     item_tiles_t[312] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[312] = loadTexture("Civ2/Civ2/doodadz/stonePrim.png");
+    item_tiles_s_balcony[312] = loadTexture("Civ2/Civ2/doodadz/stoneSeco.png");
+    item_tiles_t_balcony[312] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[313] = loadTexture("Civ2/Civ2/doodadz/bagPrim.png");
     item_tiles_s[313] = loadTexture("Civ2/Civ2/doodadz/bagSeco.png");
     item_tiles_t[313] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[313] = loadTexture("Civ2/Civ2/doodadz/bagPrim.png");
+    item_tiles_s_balcony[313] = loadTexture("Civ2/Civ2/doodadz/bagSeco.png");
+    item_tiles_t_balcony[313] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[314] = loadTexture("Civ2/Civ2/doodadz/potionPrim.png");
     item_tiles_s[314] = loadTexture("Civ2/Civ2/doodadz/potionSeco.png");
     item_tiles_t[314] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[314] = loadTexture("Civ2/Civ2/doodadz/potionPrim.png");
+    item_tiles_s_balcony[314] = loadTexture("Civ2/Civ2/doodadz/potionSeco.png");
+    item_tiles_t_balcony[314] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[315] = loadTexture("Civ2/Civ2/doodadz/coinPrim.png");
     item_tiles_s[315] = loadTexture("Civ2/Civ2/doodadz/coinSeco.png");
     item_tiles_t[315] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[315] = loadTexture("Civ2/Civ2/doodadz/coinPrim.png");
+    item_tiles_s_balcony[315] = loadTexture("Civ2/Civ2/doodadz/coinSeco.png");
+    item_tiles_t_balcony[315] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[316] = loadTexture("Civ2/Civ2/doodadz/winePrim.png");
     item_tiles_s[316] = loadTexture("Civ2/Civ2/doodadz/wineSeco.png");
     item_tiles_t[316] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[316] = loadTexture("Civ2/Civ2/doodadz/winePrim.png");
+    item_tiles_s_balcony[316] = loadTexture("Civ2/Civ2/doodadz/wineSeco.png");
+    item_tiles_t_balcony[316] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[317] = loadTexture("Civ2/Civ2/tiles/curtainsPrim.png");
     item_tiles_s[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[317] = loadTexture("Civ2/Civ2/tiles/curtainsPrim.png");
+    item_tiles_s_balcony[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[318] = loadTexture("Civ2/Civ2/tiles/ladderPrim.png");
     item_tiles_s[318] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[318] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[318] = loadTexture("Civ2/Civ2/tiles/ladderPrim.png");
+    item_tiles_s_balcony[318] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[318] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[319] = loadTexture("Civ2/Civ2/tiles/railingPrim.png");
     item_tiles_s[319] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[319] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[319] = loadTexture("Civ2/Civ2/tiles/balcony/balconyFrontPrim.png");
+    item_tiles_s_balcony[319] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[319] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[320] = loadTexture("Civ2/Civ2/tiles/railingLeftPrim.png");
     item_tiles_s[320] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[320] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[320] = loadTexture("Civ2/Civ2/tiles/balcony/balconyLeftPrim.png");
+    item_tiles_s_balcony[320] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[320] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[321] = loadTexture("Civ2/Civ2/tiles/railingRightPrim.png");
     item_tiles_s[321] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[321] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[321] = loadTexture("Civ2/Civ2/tiles/balcony/balconyRightPrim.png");
+    item_tiles_s_balcony[321] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[321] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[322] = loadTexture("Civ2/Civ2/tiles/signPrim.png");
     item_tiles_s[322] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[322] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[322] = loadTexture("Civ2/Civ2/tiles/signPrim.png");
+    item_tiles_s_balcony[322] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[322] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[323] = loadTexture("Civ2/Civ2/tiles/tophatPrim.png");
     item_tiles_s[323] = loadTexture("Civ2/Civ2/tiles/tophatSeco.png");
     item_tiles_t[323] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[323] = loadTexture("Civ2/Civ2/tiles/tophatPrim.png");
+    item_tiles_s_balcony[323] = loadTexture("Civ2/Civ2/tiles/tophatSeco.png");
+    item_tiles_t_balcony[323] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[324] = loadTexture("Civ2/Civ2/tiles/crownPrim.png");
     item_tiles_s[324] = loadTexture("Civ2/Civ2/tiles/crownSeco.png");
     item_tiles_t[324] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[324] = loadTexture("Civ2/Civ2/tiles/crownPrim.png");
+    item_tiles_s_balcony[324] = loadTexture("Civ2/Civ2/tiles/crownSeco.png");
+    item_tiles_t_balcony[324] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[325] = loadTexture("Civ2/Civ2/tiles/mailboxPrim.png");
     item_tiles_s[325] = loadTexture("Civ2/Civ2/tiles/mailboxSeco.png");
     item_tiles_t[325] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[325] = loadTexture("Civ2/Civ2/tiles/mailboxPrim.png");
+    item_tiles_s_balcony[325] = loadTexture("Civ2/Civ2/tiles/mailboxSeco.png");
+    item_tiles_t_balcony[325] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[326] = loadTexture("Civ2/Civ2/tiles/mohawkPrim.png");
     item_tiles_s[326] = loadTexture("Civ2/Civ2/tiles/mohawkSeco.png");
     item_tiles_t[326] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[326] = loadTexture("Civ2/Civ2/tiles/mohawkPrim.png");
+    item_tiles_s_balcony[326] = loadTexture("Civ2/Civ2/tiles/mohawkSeco.png");
+    item_tiles_t_balcony[326] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[327] = loadTexture("Civ2/Civ2/doodadz/writingPrim.png");
     item_tiles_s[327] = loadTexture("Civ2/Civ2/doodadz/writingSeco.png");
     item_tiles_t[327] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[327] = loadTexture("Civ2/Civ2/doodadz/writingPrim.png");
+    item_tiles_s_balcony[327] = loadTexture("Civ2/Civ2/doodadz/writingSeco.png");
+    item_tiles_t_balcony[327] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[328] = loadTexture("Civ2/Civ2/tiles/flowerPrim.png");
     item_tiles_s[328] = loadTexture("Civ2/Civ2/tiles/flowerSeco.png");
     item_tiles_t[328] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[328] = loadTexture("Civ2/Civ2/tiles/flowerPrim.png");
+    item_tiles_s_balcony[328] = loadTexture("Civ2/Civ2/tiles/flowerSeco.png");
+    item_tiles_t_balcony[328] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[329] = loadTexture("Civ2/Civ2/tiles/perfumePrim.png");
     item_tiles_s[329] = loadTexture("Civ2/Civ2/tiles/perfumeSeco.png");
     item_tiles_t[329] = loadTexture("Civ2/Civ2/tiles/perfumeTert.png");
+    item_tiles_p_balcony[329] = loadTexture("Civ2/Civ2/tiles/perfumePrim.png");
+    item_tiles_s_balcony[329] = loadTexture("Civ2/Civ2/tiles/perfumeSeco.png");
+    item_tiles_t_balcony[329] = loadTexture("Civ2/Civ2/tiles/perfumeTert.png");
     
     item_tiles_p[330] = loadTexture("Civ2/Civ2/tiles/quillPrim.png");
     item_tiles_s[330] = loadTexture("Civ2/Civ2/tiles/quillSeco.png");
     item_tiles_t[330] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[330] = loadTexture("Civ2/Civ2/tiles/quillPrim.png");
+    item_tiles_s_balcony[330] = loadTexture("Civ2/Civ2/tiles/quillSeco.png");
+    item_tiles_t_balcony[330] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[331] = loadTexture("Civ2/Civ2/tiles/daggerPrim.png");
     item_tiles_s[331] = loadTexture("Civ2/Civ2/tiles/daggerSeco.png");
     item_tiles_t[331] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[331] = loadTexture("Civ2/Civ2/tiles/daggerPrim.png");
+    item_tiles_s_balcony[331] = loadTexture("Civ2/Civ2/tiles/daggerSeco.png");
+    item_tiles_t_balcony[331] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[332] = loadTexture("Civ2/Civ2/tiles/bombPrim.png");
     item_tiles_s[332] = loadTexture("Civ2/Civ2/tiles/bombSeco.png");
     item_tiles_t[332] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[332] = loadTexture("Civ2/Civ2/tiles/bombPrim.png");
+    item_tiles_s_balcony[332] = loadTexture("Civ2/Civ2/tiles/bombSeco.png");
+    item_tiles_t_balcony[332] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[333] = loadTexture("Civ2/Civ2/tiles/cloudPrim2.png");
     item_tiles_s[333] = loadTexture("Civ2/Civ2/tiles/cloudSeco2.png");
     item_tiles_t[333] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[333] = loadTexture("Civ2/Civ2/tiles/balcony/cloud2DPrim.png");
+    item_tiles_s_balcony[333] = loadTexture("Civ2/Civ2/tiles/balcony/cloud2DSeco.png");
+    item_tiles_t_balcony[333] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[334] = loadTexture("Civ2/Civ2/tiles/blankPrim.png");
     item_tiles_s[334] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[334] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[334] = loadTexture("Civ2/Civ2/tiles/blankPrim.png");
+    item_tiles_s_balcony[334] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[334] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[335] = loadTexture("Civ2/Civ2/tiles/brickPrim.png");
+    item_tiles_s[335] = loadTexture("Civ2/Civ2/tiles/brickSeco.png");
+    item_tiles_t[335] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[335] = loadTexture("Civ2/Civ2/tiles/brickPrim.png");
+    item_tiles_s_balcony[335] = loadTexture("Civ2/Civ2/tiles/brickSeco.png");
+    item_tiles_t_balcony[335] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
@@ -519,7 +648,7 @@ void init_environment(){
     map_width = 200;
     map_height = 200;
     map_area = map_width*map_height;
-    map_floors = 18;
+    map_floors = 26;
     
     //draw_map DOES depend on screen dimension
     draw_map_width = SCREEN_WIDTH/16;
@@ -613,10 +742,10 @@ void init_environment(){
 //    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, true);
 //    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, false);
 
-    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 110, 1, shadow_col, {255,255,255,255}); //{0,0,0,255} /{255,255,255,255}/
-    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 120, 1, shadow_col, {255,255,255,255}); //{0,0,0,255} /{255,255,255,255}/
-    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 110, 1, shadow_col, {255,255,255,255}); //{0,0,0,255} /{255,255,255,255}/
-    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 120, 1, shadow_col, {255,255,255,255}); //{0,0,0,255} /{255,255,255,255}/
+    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 110, 1, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
+    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 120, 1, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
+    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 110, 1, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
+    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 120, 1, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
     
 //    build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
@@ -719,17 +848,20 @@ void draw_environment(Sprite* cre1){
 
           //Start drawing BOTTOM Items
           for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
-               for(int j = draw_map_z; j >= 0; j--){ //cycle through the z-dim
-                    int map_index = (j*map_area) + (draw_map_y*map_width) + i; //compute the index in item lists we'll use
+              if(i >= map_width || i < 0){continue;} //bounds checking
+              for(int j = draw_map_z; j >= 0; j--){ //cycle through the z-dim
+                  if( j >= map_floors || j < 0){continue;} //bounds checking
+                      
+                  int map_index = (j*map_area) + (draw_map_y*map_width) + i; //compute the index in item lists we'll use
 
                     //Now cycle through the elements in the map_scenery_bottom list at that location
                     for(int k = 0; k < map_scenery_bottom[map_index].size(); k++){
-                    map_scenery_bottom[map_index][k].draw( (map_scenery_bottom[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t      );//call the draw function with location translated for this view
+                    map_scenery_bottom[map_index][k].draw( (map_scenery_bottom[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony      );//call the draw function with location translated for this view
                     }
 
                     //Now cycle through the elements in the map_items list at that location
                     for(int k = 0; k < map_items[map_index].size(); k++){
-                      map_items[map_index][k].draw( (map_items[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t      );//call the draw function with location translated for this view
+                      map_items[map_index][k].draw( (map_items[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony      );//call the draw function with location translated for this view
                     }
                 
                }
@@ -744,7 +876,7 @@ void draw_environment(Sprite* cre1){
                
                if(map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
                   map_shrooms[c].z < draw_map_z && map_shrooms[c].z > draw_map_z - draw_map_height){ //do bounds checking so we don't draw out of screen
-                    map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p, item_tiles_s);
+                    map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
                }
           }//end drawing shrooms
           
@@ -757,22 +889,24 @@ void draw_environment(Sprite* cre1){
                
                if(map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
                   map_creatures[c].z < draw_map_z && map_creatures[c].z > draw_map_z - draw_map_height){ //do bounds checking
-                    map_creatures[c].draw_movement(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p, item_tiles_s);
+                    map_creatures[c].draw_movement(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
                }
           }//end drawing creatures
           
           if(cre1->y == draw_map_y){
-               cre1->draw_movement(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p, item_tiles_s); //DRAW MAIN CREATURE
+               cre1->draw_movement(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE
           }
           
           //Start drawing TOP Items
           for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
+              if(i >= map_width || i < 0){continue;} //bounds checking
                for(int j = draw_map_z; j >= 0; j--){ //cycle through the z-dim
-                    int map_index = (j*map_area) + (draw_map_y*map_width) + i; //compute the index in item lists we'll use
+                   if( j >= map_floors || j < 0){continue;} //bounds checking
+                   int map_index = (j*map_area) + (draw_map_y*map_width) + i; //compute the index in item lists we'll use
                     
                     //Now cycle through the elements in the map_scenery_top list at that location
                     for(int k = 0; k < map_scenery_top[map_index].size(); k++){
-                         map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t      );//call the draw function with location translated for this view
+                         map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony      );//call the draw function with location translated for this view
                     }
                     
                     //Now cycle through the elements in the map_animations list at that location
@@ -797,14 +931,38 @@ void draw_environment(Sprite* cre1){
                
                if(map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
                   map_creatures[c].z < draw_map_z && map_creatures[c].z > draw_map_z - draw_map_height){ //do bounds checking
-                    map_creatures[c].draw_movement_items(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p, item_tiles_s);
+                    map_creatures[c].draw_movement_items(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
                }
           
                if(cre1->y == draw_map_y){
-                    cre1->draw_movement_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p, item_tiles_s); //DRAW MAIN CREATURE's ITEMS
+                    cre1->draw_movement_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE's ITEMS
                }
-               
           }
+    
+         //AT END, DRAW THE CLOUDSSS
+         for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
+             if(i >= map_width || i < 0){continue;} //bounds checking
+             for(int j = draw_map_z; j >= 0; j--){ //cycle through the z-dim
+                 if( j >= map_floors || j < 0){continue;} //bounds checking
+         
+                 int map_index = (j*map_area) + (draw_map_y*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
+                 
+                 //Cycle through all the items in the map_cloud list at that location
+                 for(int k = 0; k < map_clouds[ map_index ].size(); k++ ){
+                     
+                     //Ensure texture is good
+                     SDL_SetTextureAlphaMod(item_tiles_p_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a); //temorarily set the global alpha mod of the tile we need to use to draw
+                     
+                     map_clouds[map_index][k].draw( (map_clouds[map_index][k].x - draw_map_x) , (draw_map_z - j -1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony); //call the draw function. We draw the item at a location translated from the current draw_map
+                 }//end clouds
+             }
+         } //End drawing CLOUDDSS
+         
+         
+         
+         
+         
+         
 
      return; //return right here and skip all the below stuff
      }
@@ -1941,6 +2099,8 @@ void background_color_thread(){
         //back_col (already initialized, becomes a pastel color)
         if(isBalconyView == false){ //only apply the pastel translation if BalconyView is disabled
             back_col = color_to_pastel({static_cast<Uint8>(new_r),static_cast<Uint8>(new_g),static_cast<Uint8>(new_b),255},{static_cast<Uint8>(draw_map_z*10),static_cast<Uint8>(draw_map_z*10),static_cast<Uint8>(draw_map_z*10),255});
+        }else{
+            back_col = {static_cast<Uint8>(new_r),static_cast<Uint8>(new_g),static_cast<Uint8>(new_b),255};
         }
         
         

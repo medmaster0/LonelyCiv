@@ -59,6 +59,7 @@ using namespace std;
 // 332 - BOMB
 // 333 - CLOUD
 // 334 - BLANK (a blank item used for transparent effects)
+// 335 - BRICK (OUTSIDE)
 
 
 //static variable constructor

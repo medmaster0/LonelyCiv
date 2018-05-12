@@ -182,6 +182,7 @@ Animation::Animation(int xp, int yp, int tile_list_in[]){
     mHeight = 16;
     x = xp;
     y = yp;
+    z = 0;
     animate_index = 0;
     tile_list[0] = tile_list_in[0];
     tile_list[1] = tile_list_in[1];

@@ -57,6 +57,7 @@ using namespace std;
 // 332 - BOMB
 // 333 - CLOUD
 // 334 - BLANK (a blank item used for transparent effects)
+// 335 - BRICK (OUTSIDE)
 
 //SDL_Texture* loadTexture( string path, SDL_Renderer* gRenderer );
 extern SDL_Renderer* gRenderer;//The window renderer
