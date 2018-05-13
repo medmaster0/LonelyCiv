@@ -58,6 +58,8 @@ using namespace std;
 // 333 - CLOUD
 // 334 - BLANK (a blank item used for transparent effects)
 // 335 - BRICK (OUTSIDE)
+// 336 - CROWN (BUNNY)
+// 337 - EYEPATCH (BUNNY)
 
 //SDL_Texture* loadTexture( string path, SDL_Renderer* gRenderer );
 extern SDL_Renderer* gRenderer;//The window renderer

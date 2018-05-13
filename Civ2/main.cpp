@@ -50,8 +50,8 @@ bool* block_map; //this is the map indicating whether a tile is blocked
 //These keep track of what parts of the map to draw
 //The dimensinos of the draw map. These indices "swim" through the main map
 //int draw_map_x, draw_map_y = 60;
-int draw_map_x = 90; //The (x,y,z) coords of the top left corner
-int draw_map_y = 90;
+int draw_map_x = 50; //The (x,y,z) coords of the top left corner
+int draw_map_y = 50;
 int draw_map_z = 0; //which floor, we're drawing
 int draw_map_width, draw_map_height;
 //Balcony View Stuff
@@ -538,6 +538,20 @@ void loadTiles(){
     item_tiles_s_balcony[335] = loadTexture("Civ2/Civ2/tiles/brickSeco.png");
     item_tiles_t_balcony[335] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[336] = loadTexture("Civ2/Civ2/tiles/crownBunPrim.png");
+    item_tiles_s[336] = loadTexture("Civ2/Civ2/tiles/crownBunkSeco.png");
+    item_tiles_t[336] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[336] = loadTexture("Civ2/Civ2/tiles/crownBunPrim.png");
+    item_tiles_s_balcony[336] = loadTexture("Civ2/Civ2/tiles/crownBunSeco.png");
+    item_tiles_t_balcony[336] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[337] = loadTexture("Civ2/Civ2/tiles/eyepatchBunPrim.png");
+    item_tiles_s[337] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[337] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[337] = loadTexture("Civ2/Civ2/tiles/eyepatchBunPrim.png");
+    item_tiles_s_balcony[337] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[337] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
     misc_tiles[1] = loadTexture("Civ2/Civ2/tiles/zodiac/taurus.png");
@@ -780,6 +794,26 @@ void init_environment(){
 //            Light* temp_light = new Light(0, 0, 308); //a temp Item to be added to the cre's equip inventory
 //            map_creatures.back().light = temp_light;
 //        }
+    }
+    
+    //LOVELYs
+    int num_fifis = 7; //how many fifis are on the map
+    for(int i = 0 ; i < num_fifis; i++){
+        Sprite temp_cre = Sprite(61 + rand()%4, 61 + rand()%4); //set them up in a specific spot
+        temp_cre.loadFromFile("Civ2/Civ2/tiles/bunPrim.png","Civ2/Civ2/tiles/bunSeco.png", 16, 16);
+        //temp_cre.changeSecoColor(generate_pink());
+        map_creatures.push_back(temp_cre);
+        
+        //randomly give hats/accessories
+        int hat_type = 0;
+        if(rand()%2==1){
+            hat_type = 336;
+        }else{
+            hat_type = 337;
+        }
+        Hat* temp_hat = new Hat(0, 0, hat_type ); //a temp Item to be added to cre's inventory
+        map_creatures.back().hat = temp_hat; //the last creature we just created, give em the hat
+        
     }
     
     //Shrooms
@@ -2432,7 +2466,6 @@ int main( int argc, char* args[] ){
     //...Sprites
     Sprite* cre1 = new Sprite(draw_map_x + (int)(draw_map_width/2.0),draw_map_y + (int)(draw_map_height/2.0) ); //start creaturein the middle of the screen
     //Sprite* cre1 = new Sprite(100,110);
-    printf("%d,%d\n",(int)(draw_map_width), (int)(draw_map_height/2.0));
     cre1->loadFromFile("Civ2/Civ2/tiles/crePrim.png","Civ2/Civ2/tiles/creSeco.png", 16, 16);
     
     Hat temp_accessory = Hat(0, 0, 305); //a temp Item to be added to cre's inventory
