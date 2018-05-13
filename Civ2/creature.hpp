@@ -57,6 +57,8 @@ public:
     int prev_x, prev_y, prev_z; //the former pposition of the sprite
     int mWidth;//Image dimensions - pixels
     int mHeight;//Image dimensions - pixels
+    SDL_Texture* primTexture;//primary texture of the sprite
+    SDL_Texture* secoTexture;//secondary texture of the sprite
     vector<Item> inventory; //list of items the sprite is carrying
     SDL_Color faveColor; //the sprite's favorite color
     SDL_Color faveColor2; //the sprite's alternative favorite color
@@ -79,8 +81,6 @@ public:
     //For signalling from other threads
     bool isNeededByThread; //indicates sprite is needed in another thread (so not to schedule it another task)
 private:
-    SDL_Texture* primTexture;//primary texture of the sprite
-    SDL_Texture* secoTexture;//secondary texture of the sprite
     int r,g,b; //colors of the sprite
     //Some vars for movement timing
 };

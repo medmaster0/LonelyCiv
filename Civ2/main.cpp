@@ -317,8 +317,8 @@ void loadTiles(){
     item_tiles_p[304] = loadTexture("Civ2/Civ2/tiles/brickPrim.png");
     item_tiles_s[304] = loadTexture("Civ2/Civ2/tiles/brickSeco.png");
     item_tiles_t[304] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
-    item_tiles_p_balcony[304] = loadTexture("Civ2/Civ2/tiles/balcony/windowPrim.png");
-    item_tiles_s_balcony[304] = loadTexture("Civ2/Civ2/tiles/balcony/windowSeco.png");
+    item_tiles_p_balcony[304] = loadTexture("Civ2/Civ2/tiles/brickPrim.png");
+    item_tiles_s_balcony[304] = loadTexture("Civ2/Civ2/tiles/brickSeco.png");
     item_tiles_t_balcony[304] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[305] = loadTexture("Civ2/Civ2/tiles/capPrim.png");
@@ -408,8 +408,8 @@ void loadTiles(){
     item_tiles_p[317] = loadTexture("Civ2/Civ2/tiles/curtainsPrim.png");
     item_tiles_s[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
-    item_tiles_p_balcony[317] = loadTexture("Civ2/Civ2/tiles/curtainsPrim.png");
-    item_tiles_s_balcony[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[317] = loadTexture("Civ2/Civ2/tiles/balcony/door2DPrim.png");
+    item_tiles_s_balcony[317] = loadTexture("Civ2/Civ2/tiles/balcony/door2DSecowww.png");
     item_tiles_t_balcony[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[318] = loadTexture("Civ2/Civ2/tiles/ladderPrim.png");
@@ -809,7 +809,7 @@ void init_environment(){
     for(int g = 0 ; g<225; g++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
-        temp_tile = 328; //328 for flowers
+        temp_tile = 315; //328 for flowers
         //    Both Random Colors
         //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
         //    Pink / Green
@@ -838,77 +838,134 @@ void init_environment(){
 //This method is not the most efficient (I imagine?) but will do for now.
 void draw_environment(Sprite* cre1){
     
-     ////////////////////////////////////////
-     //BEGIN BALCONY VIEW
-     //In Balcony View, we draw the (x,z) slice (y-dim is going into the screen)
-     //Remember: draw_map_z is elevated up by draw_height/2 when Balcony View is first entered.
-     if(isBalconyView == true){
+    ////////////////////////////////////////
+    //BEGIN BALCONY VIEW
+    //In Balcony View, we draw the (x,z) slice (y-dim is going into the screen)
+    //Remember: draw_map_z is elevated up by draw_height/2 when Balcony View is first entered.
+    if(isBalconyView == true){
 
-          draw_map_y = cre1->y; //make sure to center on
+        //Cycle through all of the drawn slices (starting with farthest behind first)
+        for(int s = 5; s >= 0; s--){
+            //BEGIN DRAWING A SINGLE SLICE
+            draw_map_y = cre1->y - s; //make sure to center on creature. But also draw behind slices first
+            int alpha_mod = 255 - ( (s/6.0)*255); //calculate the transparency level for this layer
 
-          //Start drawing BOTTOM Items
-          for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
-              if(i >= map_width || i < 0){continue;} //bounds checking
-              for(int j = draw_map_z; j >= 0; j--){ //cycle through the z-dim
-                  if( j >= map_floors || j < 0){continue;} //bounds checking
-                      
-                  int map_index = (j*map_area) + (draw_map_y*map_width) + i; //compute the index in item lists we'll use
+            //Start drawing BOTTOM Items
+            for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
+                if(i >= map_width || i < 0){continue;} //bounds checking
+                for(int j = draw_map_z; j >= 0; j--){ //cycle through the z-dim
+                    if( j >= map_floors || j < 0){continue;} //bounds checking
+                  
+                    int map_index = (j*map_area) + (draw_map_y*map_width) + i; //compute the index in item lists we'll use
 
                     //Now cycle through the elements in the map_scenery_bottom list at that location
                     for(int k = 0; k < map_scenery_bottom[map_index].size(); k++){
-                    map_scenery_bottom[map_index][k].draw( (map_scenery_bottom[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony      );//call the draw function with location translated for this view
+                        
+                        //Adjust alpha level based on depth
+                        SDL_SetTextureAlphaMod(item_tiles_p_balcony[map_scenery_bottom[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                        if(item_tiles_s_balcony[map_scenery_bottom[map_index][k].type] != (SDL_Texture*) 0x9999){
+                            SDL_SetTextureAlphaMod(item_tiles_s_balcony[map_scenery_bottom[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                        }
+                        if(item_tiles_t_balcony[map_scenery_bottom[map_index][k].type] != (SDL_Texture*) 0x9999){
+                            SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_scenery_bottom[map_index][k].type], 255-((s/6)*255) ); //temorarily set the global alpha mod of the tile we need to use to draw
+                        }
+                        
+                        //call the draw function with location translated for this view
+                        map_scenery_bottom[map_index][k].draw( (map_scenery_bottom[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony      );
                     }
 
                     //Now cycle through the elements in the map_items list at that location
                     for(int k = 0; k < map_items[map_index].size(); k++){
-                      map_items[map_index][k].draw( (map_items[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony      );//call the draw function with location translated for this view
+                        
+                        //Adjust alpha level based on depth
+                        SDL_SetTextureAlphaMod(item_tiles_p_balcony[map_items[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                        if(item_tiles_s_balcony[map_items[map_index][k].type] != (SDL_Texture*) 0x9999){
+                            SDL_SetTextureAlphaMod(item_tiles_s_balcony[map_items[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                        }
+                        if(item_tiles_t_balcony[map_items[map_index][k].type] != (SDL_Texture*) 0x9999){
+                            SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_items[map_index][k].type], 255-((s/6)*255) ); //temorarily set the global alpha mod of the tile we need to use to draw
+                        }
+                            
+                        //call the draw function with location translated for this view
+                        map_items[map_index][k].draw( (map_items[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony      );
                     }
                 
-               }
-          }//end drawing bottom items
-          
-          //Cycle through all shrooms and draw
-          for(int c = 0; c < map_shrooms.size(); c++){
-               
-               if(map_shrooms[c].y != draw_map_y){ //if not on current y-dim slice
+                }
+            }//end drawing bottom items
+         
+            //Cycle through all shrooms and draw
+            for(int c = 0; c < map_shrooms.size(); c++){
+              
+                if(map_shrooms[c].y != draw_map_y){ //if not on current y-dim slice
                     continue; //skiip to next one
-               }
-               
-               if(map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
-                  map_shrooms[c].z < draw_map_z && map_shrooms[c].z > draw_map_z - draw_map_height){ //do bounds checking so we don't draw out of screen
+                }
+              
+                if(map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
+                   map_shrooms[c].z < draw_map_z && map_shrooms[c].z > draw_map_z - draw_map_height){ //do bounds checking so we don't draw out of screen
+                   
+                    //Apply proper Alpha Modifier based on layer distance
+                    SDL_SetTextureAlphaMod(map_shrooms[c].primTexture, alpha_mod);
+                    SDL_SetTextureAlphaMod(map_shrooms[c].secoTexture, alpha_mod);
+
+                    //Now call actual draw function
                     map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
-               }
-          }//end drawing shrooms
-          
-          //Cycle through all creatures and draw...
-          for(int c = 0; c < map_creatures.size(); c++){
-               
-               if(map_creatures[c].y != draw_map_y){
-                    continue; //skip to next one
-               }
-               
-               if(map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
-                  map_creatures[c].z < draw_map_z && map_creatures[c].z > draw_map_z - draw_map_height){ //do bounds checking
+                    
+                    //REturn the texture alpha level when done!!
+                    SDL_SetTextureAlphaMod(map_shrooms[c].primTexture, 255);
+                    SDL_SetTextureAlphaMod(map_shrooms[c].secoTexture, 255);
+                }
+            }//end drawing shrooms
+         
+            //Cycle through all creatures and draw...
+            for(int c = 0; c < map_creatures.size(); c++){
+              
+                if(map_creatures[c].y != draw_map_y){
+                        continue; //skip to next one
+                }
+              
+                if(map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
+                   map_creatures[c].z < draw_map_z && map_creatures[c].z > draw_map_z - draw_map_height){ //do bounds checking
+                    
+                    //Apply proper Alpha Modifier based on layer distance
+                    SDL_SetTextureAlphaMod(map_creatures[c].primTexture, alpha_mod);
+                    SDL_SetTextureAlphaMod(map_creatures[c].secoTexture, alpha_mod);
+                    
+                    //No call actual draw function
                     map_creatures[c].draw_movement(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
-               }
-          }//end drawing creatures
-          
-          if(cre1->y == draw_map_y){
-               cre1->draw_movement(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE
-          }
-          
-          //Start drawing TOP Items
-          for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
-              if(i >= map_width || i < 0){continue;} //bounds checking
-               for(int j = draw_map_z; j >= 0; j--){ //cycle through the z-dim
-                   if( j >= map_floors || j < 0){continue;} //bounds checking
-                   int map_index = (j*map_area) + (draw_map_y*map_width) + i; //compute the index in item lists we'll use
+                    
+                    //REturn the texture alpha level when done!!
+                    SDL_SetTextureAlphaMod(map_creatures[c].primTexture, 255);
+                    SDL_SetTextureAlphaMod(map_creatures[c].secoTexture, 255);
+                }
+            }//end drawing creatures
+         
+            if(cre1->y == draw_map_y){
+                cre1->draw_movement(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE
+            }
+         
+            //Start drawing TOP Items
+            for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
+                if(i >= map_width || i < 0){continue;} //bounds checking
+                for(int j = draw_map_z; j >= 0; j--){ //cycle through the z-dim
+                    if( j >= map_floors || j < 0){continue;} //bounds checking
+                    int map_index = (j*map_area) + (draw_map_y*map_width) + i; //compute the index in item lists we'll use
                     
                     //Now cycle through the elements in the map_scenery_top list at that location
                     for(int k = 0; k < map_scenery_top[map_index].size(); k++){
-                         map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony      );//call the draw function with location translated for this view
+                        
+                        //Adjust alpha level based on depth
+                        SDL_SetTextureAlphaMod(item_tiles_p_balcony[map_scenery_top[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                        if(item_tiles_s_balcony[map_scenery_top[map_index][k].type] != (SDL_Texture*) 0x9999){
+                            SDL_SetTextureAlphaMod(item_tiles_s_balcony[map_scenery_top[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                        }
+                        if(item_tiles_t_balcony[map_scenery_top[map_index][k].type] != (SDL_Texture*) 0x9999){
+                            SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_scenery_top[map_index][k].type], 255-((s/6)*255) ); //temorarily set the global alpha mod of the tile we need to use to draw
+                        }
+                        
+                        //call the draw function with location translated for this view
+                        map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony      );
                     }
-                    
+                   
                     //Now cycle through the elements in the map_animations list at that location
                     for(int k = 0; k < map_animations[map_index].size(); k++){
                          map_animations[map_index][k].draw( (map_animations[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, misc_tiles );//call the draw function with location translated for this view
@@ -918,17 +975,17 @@ void draw_environment(Sprite* cre1){
                     for(int k = 0; k < map_effects[map_index].size(); k++){
                          map_effects[map_index][k].drawScroll( (map_effects[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, misc_tiles  );//call the draw function with location translated for this view
                     }
-                    
-               }
-          }//End drawing top items
-          
+                   
+                }
+            }//End drawing top items
+         
           //Cycle through all creatures and draw their items...
           for(int c = 0; c < map_creatures.size(); c++){
-               
+              
                if(map_creatures[c].y != draw_map_y){
                     continue; //skip to next one
                }
-               
+              
                if(map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
                   map_creatures[c].z < draw_map_z && map_creatures[c].z > draw_map_z - draw_map_height){ //do bounds checking
                     map_creatures[c].draw_movement_items(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
@@ -938,7 +995,7 @@ void draw_environment(Sprite* cre1){
                     cre1->draw_movement_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE's ITEMS
                }
           }
-    
+
          //AT END, DRAW THE CLOUDSSS
          for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
              if(i >= map_width || i < 0){continue;} //bounds checking
@@ -950,15 +1007,20 @@ void draw_environment(Sprite* cre1){
                  //Cycle through all the items in the map_cloud list at that location
                  for(int k = 0; k < map_clouds[ map_index ].size(); k++ ){
                      
-                     //Ensure texture is good
+                     //Ensure texture transparency is good
                      SDL_SetTextureAlphaMod(item_tiles_p_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a); //temorarily set the global alpha mod of the tile we need to use to draw
                      
                      map_clouds[map_index][k].draw( (map_clouds[map_index][k].x - draw_map_x) , (draw_map_z - j -1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony); //call the draw function. We draw the item at a location translated from the current draw_map
                  }//end clouds
              }
          } //End drawing CLOUDDSS
+    
+            
+            ///END DRAWING A SINGLE SLICE
+        }
+        
          
-     return; //return right here and skip all the below stuff
+         return; //return right here and skip all the below stuff
      }
      //END BALCONY VIEW
      ////////////////////////////////////////
