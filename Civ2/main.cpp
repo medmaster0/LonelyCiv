@@ -742,10 +742,10 @@ void init_environment(){
 //    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, true);
 //    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, false);
 
-    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 110, 1, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
-    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 120, 1, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
-    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 110, 1, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
-    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 120, 1, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
+    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 110, 4, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
+    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 120, 2, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
+    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 110, 5, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
+    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 120, 3, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
     
 //    build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
@@ -958,12 +958,6 @@ void draw_environment(Sprite* cre1){
              }
          } //End drawing CLOUDDSS
          
-         
-         
-         
-         
-         
-
      return; //return right here and skip all the below stuff
      }
      //END BALCONY VIEW
@@ -2534,7 +2528,7 @@ int main( int argc, char* args[] ){
                         
                     case SDLK_w:
                         
-                        if(cre1->z != draw_map_z)break;//Disable control if not on current floor??
+                        //if(cre1->z != draw_map_z)break;//Disable control if not on current floor??
                         
                         if(wKeyDown == false //when you first press down the w key
                            && ~sKeyDown && ~dKeyDown && ~aKeyDown ){
@@ -2556,7 +2550,7 @@ int main( int argc, char* args[] ){
                         
                     case SDLK_a:
                         
-                        if(cre1->z != draw_map_z)break;//Disable control if not on current floor??
+                        //if(cre1->z != draw_map_z)break;//Disable control if not on current floor??
                         
                         if(aKeyDown == false //when you first press down the a key
                            && ~sKeyDown && ~dKeyDown && ~wKeyDown){
@@ -2578,7 +2572,7 @@ int main( int argc, char* args[] ){
                         
                     case SDLK_s:
                         
-                        if(cre1->z != draw_map_z)break;//Disable control if not on current floor??
+                        //if(cre1->z != draw_map_z)break;//Disable control if not on current floor??
                         
                         if(sKeyDown == false //when you first press down the s key
                            && ~aKeyDown && ~dKeyDown && ~wKeyDown ){ //make sure only one movement key pressed at a time
@@ -2600,7 +2594,7 @@ int main( int argc, char* args[] ){
                         
                     case SDLK_d:
                         
-                        if(cre1->z != draw_map_z)break;//Disable control if not on current floor??
+                        //if(cre1->z != draw_map_z)break;//Disable control if not on current floor??
                         
                         if(dKeyDown == false //when you first press down the d key
                            && ~aKeyDown && ~sKeyDown && ~wKeyDown){
@@ -2625,7 +2619,7 @@ int main( int argc, char* args[] ){
                             isItemInList(map_scenery_top[ ( (cre1->z+1) * map_area) + (cre1->y*map_width) + cre1->x ], 318) ){
                             printf("We are going up");
                             cre1->z = cre1->z+1;
-                            draw_map_z = cre1->z;
+                            if(isBalconyView == false){draw_map_z = cre1->z;}else{draw_map_z = cre1->z + draw_map_height/2;} ///adjust draw view
                         }
                         break;
                         
@@ -2634,7 +2628,7 @@ int main( int argc, char* args[] ){
                            isItemInList(map_scenery_top[ ( (cre1->z-1) * map_area) + (cre1->y*map_width) + cre1->x ], 318) ){
                             printf("We are going down");
                             cre1->z = cre1->z-1;
-                            draw_map_z = cre1->z;
+                            if(isBalconyView == false){draw_map_z = cre1->z;}else{draw_map_z = cre1->z + draw_map_height/2;} ///adjust draw view
                         }
                         break;
                         
