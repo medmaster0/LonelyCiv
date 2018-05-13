@@ -62,6 +62,7 @@ using namespace std;
 // 335 - BRICK (OUTSIDE)
 // 336 - CROWN (BUNNY)
 // 337 - EYEPATCH (BUNNY)
+// 338 - DOOR
 
 
 //static variable constructor

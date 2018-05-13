@@ -133,7 +133,7 @@ void build_box_NxN_door(vector<vector<Item>>* map_scenery, bool* block_map, int 
     
     //Now create a new doorway Item and add to scenery
     SDL_Color col3 = door_col1_in;
-    Item temp_door = Item(tempx, tempy, 317, col3, {0,0,0,255}); //create a DOORWAY (Curtains) Item
+    Item temp_door = Item(tempx, tempy, 338, col3, {0,0,0,255}); //create a DOORWAY (Curtains) Item
     map_scenery->at( (z*map_height*map_width) + (tempy*map_width)+tempx).push_back(temp_door);
     
 }

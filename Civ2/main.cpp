@@ -408,8 +408,8 @@ void loadTiles(){
     item_tiles_p[317] = loadTexture("Civ2/Civ2/tiles/curtainsPrim.png");
     item_tiles_s[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
-    item_tiles_p_balcony[317] = loadTexture("Civ2/Civ2/tiles/balcony/door2DPrim.png");
-    item_tiles_s_balcony[317] = loadTexture("Civ2/Civ2/tiles/balcony/door2DSecowww.png");
+    item_tiles_p_balcony[317] = loadTexture("Civ2/Civ2/tiles/curtainsPrim.png");
+    item_tiles_s_balcony[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t_balcony[317] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[318] = loadTexture("Civ2/Civ2/tiles/ladderPrim.png");
@@ -551,6 +551,13 @@ void loadTiles(){
     item_tiles_p_balcony[337] = loadTexture("Civ2/Civ2/tiles/eyepatchBunPrim.png");
     item_tiles_s_balcony[337] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t_balcony[337] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[338] = loadTexture("Civ2/Civ2/tiles/balcony/door2DPrim.png");
+    item_tiles_s[338] = loadTexture("Civ2/Civ2/tiles/balcony/door2DSeco.png");
+    item_tiles_t[338] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[338] = loadTexture("Civ2/Civ2/tiles/blacony/door2DPrim.png");
+    item_tiles_s_balcony[338] = loadTexture("Civ2/Civ2/tiles/balcony/door2DSeco.png");
+    item_tiles_t_balcony[338] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
