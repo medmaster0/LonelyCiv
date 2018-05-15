@@ -972,7 +972,7 @@ void draw_environment(Sprite* cre1){
                     SDL_SetTextureAlphaMod(map_creatures[c].secoTexture, alpha_mod);
                     
                     //No call actual draw function
-                    map_creatures[c].draw_movement(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
+                    map_creatures[c].draw_forward_pose(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
                     
                     //REturn the texture alpha level when done!!
                     SDL_SetTextureAlphaMod(map_creatures[c].primTexture, 255);
@@ -981,7 +981,7 @@ void draw_environment(Sprite* cre1){
             }//end drawing creatures
          
             if(cre1->y == draw_map_y){
-                cre1->draw_movement(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE
+                cre1->draw_forward_pose(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE
             }
          
             //Start drawing TOP Items
@@ -1029,11 +1029,11 @@ void draw_environment(Sprite* cre1){
               
                if(map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
                   map_creatures[c].z < draw_map_z && map_creatures[c].z > draw_map_z - draw_map_height){ //do bounds checking
-                    map_creatures[c].draw_movement_items(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
+                    map_creatures[c].draw_forward_pose_items(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
                }
           
                if(cre1->y == draw_map_y){
-                    cre1->draw_movement_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE's ITEMS
+                    cre1->draw_forward_pose_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE's ITEMS
                }
           }
 
@@ -2482,7 +2482,10 @@ int main( int argc, char* args[] ){
     Staff temp_staff = Staff(0,0,309); //a temp Item to be added to the cre's equip inventory
     cre1->staff = &temp_staff;
 
-
+    //Give cre1 a light
+    Light temp_light = Light(0,0,308);//a temp Item to be added to the cre's equip inventory
+    cre1->light = &temp_light;
+    
     //STORY TEST
     for(int p = 0; p < 200; p++){
         cout << genStreetName() << "\n";

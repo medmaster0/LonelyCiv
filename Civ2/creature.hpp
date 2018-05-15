@@ -42,6 +42,12 @@ public:
     void draw(int in_x, int in_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t = NULL); //Draws the sprite to the screen at a specific MAP COORDS. Also draws items in "pose form"
     void draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draws the sprite to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
     void draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draws the sprite's items to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
+    //////////////////////////////////
+    //SPECIAL BALCONY DRAW FUNCTIONS
+    void draw_forward_pose(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draws the sprite to the screen at specific map coords, but items are side by side creature (considers prev location) FOR BALCONY VIEW
+    void draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draws the sprite's items to the screen at specific map coords, but items are side by side (considers prev location) FOR BALCONY VIEW
+    //END BALCONY DRAW FUNCTIONS
+    //////////////////////////////////
     void drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //Draw's the sprite's inventory
     //These functions position the Creature's Items after movement
     void drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the creature's hat (just moved up 8 px)
