@@ -768,6 +768,14 @@ void init_environment(){
     cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 110, 5, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
     cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 120, 3, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
     
+    //Place some random clouds
+    for(int u = 0; u < 15; u++){
+        
+        cloud_place_shadow(&map_clouds, block_map, map_width, map_height, rand()%map_width, rand()%map_height, rand()%13, shadow_col, {0,0,0,255} );
+        
+    }
+    
+    
 //    build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
     build_neighbor_grid(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
@@ -885,11 +893,15 @@ void draw_environment(Sprite* cre1){
     //Remember: draw_map_z is elevated up by draw_height/2 when Balcony View is first entered.
     if(isBalconyView == true){
 
+        //SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
+        
         //Cycle through all of the drawn slices (starting with farthest behind first)
-        for(int s = 5; s >= 0; s--){
+        for(int s = 15; s >= 0; s--){
             //BEGIN DRAWING A SINGLE SLICE
             draw_map_y = cre1->y - s; //make sure to center on creature. But also draw behind slices first
-            int alpha_mod = 255 - ( (s/6.0)*255); //calculate the transparency level for this layer
+            if(draw_map_y < 0)continue; //bounds check
+            
+            int alpha_mod = 255 - ( (s/15.0)*255); //calculate the transparency level for this layer
 
             //Start drawing BOTTOM Items
             for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
@@ -972,7 +984,7 @@ void draw_environment(Sprite* cre1){
                     SDL_SetTextureAlphaMod(map_creatures[c].secoTexture, alpha_mod);
                     
                     //No call actual draw function
-                    map_creatures[c].draw_forward_pose(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
+                    map_creatures[c].draw_forward_pose(map_creatures[c].x - draw_map_x, draw_map_z - map_creatures[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
                     
                     //REturn the texture alpha level when done!!
                     SDL_SetTextureAlphaMod(map_creatures[c].primTexture, 255);
@@ -1629,6 +1641,7 @@ void wander_thread(Sprite* spr1){
         //Check if the search failed (error code (9999,9999)
         if(spr1->path[0][0] == 9999){
             spr1->path.pop_back();
+            printf("search faillled ytr gain");
             continue; //search failed, try again....
         }
         
