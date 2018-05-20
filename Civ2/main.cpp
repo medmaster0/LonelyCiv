@@ -770,8 +770,11 @@ void init_environment(){
     
     //Place some random clouds
     for(int u = 0; u < 15; u++){
-        
-        cloud_place_shadow(&map_clouds, block_map, map_width, map_height, rand()%map_width, rand()%map_height, rand()%13, shadow_col, {0,0,0,255} );
+        int x = rand()%map_width;
+        int y = rand()%map_height;
+        if(x>map_width-10 || x < 10){continue;}
+        if(y>map_height-10 || y < 10){continue;}
+        cloud_place_shadow(&map_clouds, block_map, map_width, map_height, x, y, 1+rand()%13, shadow_col, {0,0,0,255} );
         
     }
     
@@ -785,6 +788,7 @@ void init_environment(){
     
     //Creatures
     int num_creatures = 25; //How many creatures are on the map
+    //int num_creatures = 1; //How many creatures are on the map DEBUG DEBUG DEBUG
     //int num_creatures = 1; //DEBUG How many creatures are on the map
     for(int i = 0 ; i < num_creatures; i++){
         //Sprite temp_cre = Sprite(1+rand()%(map_width-2), 1+rand()%(map_height-2));
@@ -811,25 +815,25 @@ void init_environment(){
 //        }
     }
     
-    //LOVELYs
-    int num_fifis = 7; //how many fifis are on the map
-    for(int i = 0 ; i < num_fifis; i++){
-        Sprite temp_cre = Sprite(61 + rand()%4, 61 + rand()%4); //set them up in a specific spot
-        temp_cre.loadFromFile("Civ2/Civ2/tiles/bunPrim.png","Civ2/Civ2/tiles/bunSeco.png", 16, 16);
-        //temp_cre.changeSecoColor(generate_pink());
-        map_creatures.push_back(temp_cre);
-        
-        //randomly give hats/accessories
-        int hat_type = 0;
-        if(rand()%2==1){
-            hat_type = 336;
-        }else{
-            hat_type = 337;
-        }
-        Hat* temp_hat = new Hat(0, 0, hat_type ); //a temp Item to be added to cre's inventory
-        map_creatures.back().hat = temp_hat; //the last creature we just created, give em the hat
-        
-    }
+//    //LOVELYs
+//    int num_fifis = 7; //how many fifis are on the map
+//    for(int i = 0 ; i < num_fifis; i++){
+//        Sprite temp_cre = Sprite(61 + rand()%4, 61 + rand()%4); //set them up in a specific spot
+//        temp_cre.loadFromFile("Civ2/Civ2/tiles/bunPrim.png","Civ2/Civ2/tiles/bunSeco.png", 16, 16);
+//        //temp_cre.changeSecoColor(generate_pink());
+//        map_creatures.push_back(temp_cre);
+//        
+//        //randomly give hats/accessories
+//        int hat_type = 0;
+//        if(rand()%2==1){
+//            hat_type = 336;
+//        }else{
+//            hat_type = 337;
+//        }
+//        Hat* temp_hat = new Hat(0, 0, hat_type ); //a temp Item to be added to cre's inventory
+//        map_creatures.back().hat = temp_hat; //the last creature we just created, give em the hat
+//        
+//    }
     
     //Shrooms
     int num_shrooms = 5; //How many shrooms are on the map
@@ -2479,9 +2483,8 @@ int main( int argc, char* args[] ){
     //...Map
     generateTilez(); //call this before loadTiles()
     loadTiles();
-    printf("ani:%d\n",map_animations.size());
     init_environment();
-    printf("ani:%d\n",map_animations.size());
+    if(block_map[1*map_area+20*map_width+2]){printf("isBlockedkkkkkk\n");}
     
     //...Sprites
     Sprite* cre1 = new Sprite(draw_map_x + (int)(draw_map_width/2.0),draw_map_y + (int)(draw_map_height/2.0) ); //start creaturein the middle of the screen

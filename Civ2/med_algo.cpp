@@ -167,7 +167,7 @@ void printMaze(vector<vector<short>> maze){
 
 
 
-///////////////////////////
+////////////////////////////////////////////////////////////LIST STUFFF
 //Implemented linked list function
 
 //need struct for linked list node, list_node
@@ -211,6 +211,101 @@ struct list{
     list_node* first;
     list_node* last;
 };
+
+//returns the number of nodes in the input list
+int list_size(list in_list){
+    
+    int size = 0; //keeps track of size of list
+    
+    list_node* current = in_list.first; //iterates through the list's nodes
+    
+    //if list is empty
+    if(current == nullptr){
+        return 0;
+    }
+    
+    while(current->next != nullptr){
+        
+        size = size + 1;
+        current = current->next;
+        
+    }
+    
+    return size;
+    
+}
+
+//print list... time to print the damn list
+void print_list(list in_list){
+    list_node* current = in_list.first; //iterates through the list's nodes
+    
+    while(current->next != nullptr){
+        
+        printf("(%d,%d,%d)\n", current->x, current->y, current->z);
+        current = current->next;
+        
+    }
+}
+
+//Check if the node is in the list,
+//node must also have a lesser f value
+bool isNodeIn(list_node* check_node, list in_list){
+    
+    list_node* current = in_list.first;
+    
+    //Cycle Through set and check if the neighbor is already in there (with lower f )
+    while(true){
+        
+        //means we've got to end of list and haven't found node
+        if(current == nullptr){
+            return false; //say we can't find
+        }
+        
+        //Check x,y values in node
+        if( (current->x==check_node->x) && (current->y==check_node->y) && (current->z==check_node->z)){
+            if(current->f <= check_node->f){
+                return true;
+            }
+        }
+        
+        //Move on to search next node in list
+        current = current->next;
+        
+    }
+    
+}
+
+
+//Add a node to end of a set
+void addNodeToSet(list_node* in_node, list* in_set){
+    
+    in_node->next = nullptr; //make this node an endpoint (null terminated)
+    in_node->prev = in_set->last; //update node with who it's behind in list
+    if(in_set->last!=nullptr){in_set->last->next = in_node;} //the (former) last item in the list now points to input node
+    in_set->last = in_node; //the end of in_set is updated
+    if(in_set->first==nullptr){in_set->first = in_node;};  //if this is the first item in the input set
+    
+}
+
+//Pop a node off a set
+void popNodeFromSet(list_node* in_node, list* in_set){
+    
+    if(in_node->prev!=nullptr){ //if this node is not FIRST in list
+        (in_node->prev)->next = in_node->next; //update the previous node in the list
+    }else{ //if this node is first in the list
+        in_set->first = in_node->next; //update the in_set struct
+    }
+    
+    if(in_node->next!=nullptr){ //if this node is not LAST in list
+        (in_node->next)->prev = in_node->prev; //update the next node in list
+    }else{ //if this node is last in list
+        in_set->last = in_node->prev;// update the in_set struct
+    }
+    
+}
+
+
+////////////////////////////////////////////////END END NED LIST STUFFF
 
 //An even better A*, gash damn!
 //Returns a list (vector) of steps from x1,y1 to x2,y2
@@ -406,6 +501,8 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
             
         }//Done cycling through neighbors
         
+        //printf("havent found targ%d\n", open_set.size());
+        
         //THIS MEANS WE HIT THE END OF OPEN_SET AND HAVENT FOUND TARGET
         if(open_set.first == nullptr){
             
@@ -443,9 +540,9 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
             return {{9999,9999}};
         }
         
-        
     }//end open_list empty
     
+    printf("got out of open loop");
     
     //CCONSTRUCT VECTOR TO RETURN BY TRAVERSING THE CLOSED LIST
     vector<vector<int>> search_q; //the main "list", could really be turned into what ever datat type you wantx
@@ -506,8 +603,18 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
 //Steps are in form of (x,y,z)
 //returns error code {{9999,9999}} if can't find path
 
+//If the target, x2,y2,z2 is blocked, the ENTIRE MAP will be searched before exiting.
+//TODO:
+//Checking the inputs before may be a good idea. 
 vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery_top, int map_width, int map_height,
                                   int x1, int y1, int z1, int x2, int y2, int z2){
+    
+    //Check if target is blocked, so we don't have to bother searching the whole map
+    if(block_map[ (z2*map_height*map_width) + (y2*map_width) + x2 ] ==  true){
+        printf("A_star_z can't find target...\n");
+        return {{9999,9999,0}};
+    }
+    
     
     //DEBUG
     int num_news = 0; //keeps track of calls to new
@@ -563,7 +670,7 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
         }else{ //if lowest_f is first in list
             open_set.first = q->next; //update the open_set struct
         }
-        if(q->next!=nullptr){ //if lowest_f is not LAST in list
+        if(q->next!=nullptr){ //if lowest_f is NOT LAST in list
             (q->next)->prev = q->prev; //update the next node in list
         }else{ //if lowest_f is last in list
             open_set.last = q->prev; //update the open_set struct
@@ -586,7 +693,7 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
             
             //Check to make sure we aren't at an impossibly high level (and endlessly getting higher)
             //put a limit to the level of floor you can search.
-            if(neighbors[i]->z > 10){ printf("floor too hgih\n"); continue;}
+            //if(neighbors[i]->z > 10){ printf("floor too hgih\n"); continue;}
             
             //if neighbor is out of bounds then we can throw it away
             if( (neighbors[i]->y < 0) || (neighbors[i]->x < 0) || (neighbors[i]->x >= map_width) || (neighbors[i]->y >= map_height)    ){
@@ -596,7 +703,7 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
             }
             
             //if neighbor tile is blocked then we can stop
-            if(block_map[((neighbors[i]->y)*map_width)+neighbors[i]->x]==true){
+            if(block_map[ (neighbors[i]->z*map_width*map_height) + ((neighbors[i]->y)*map_width) + neighbors[i]->x]==true){
                 delete neighbors[i]; //delete what we've created!!!
                 num_news = num_news - 1;
                 continue; //move on to next neighbor
@@ -606,11 +713,7 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
             if((neighbors[i]->x==x2)&&(neighbors[i]->y==y2)&&(neighbors[i]->z==z2)){
                 
                 //ADD neighbor to CLOSED_SET
-                neighbors[i]->next = nullptr; //indicate neighbor is at end of list
-                neighbors[i]->prev = closed_set.last; //update neighbor who it's behind
-                if(closed_set.last!=nullptr){closed_set.last->next = neighbors[i];} //the (former) last item in list now points to neighbor
-                closed_set.last = neighbors[i]; //the closed_set is updated
-                if(closed_set.first==nullptr){closed_set.first= neighbors[i];}; //if this is the first item in open_set
+                addNodeToSet(neighbors[i], &closed_set);
                 
                 //we also need to delete the rest of the neighbors that we've created but haven't had a chance to process
                 int j = i + 1;
@@ -629,55 +732,15 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
             neighbors[i]->h = abs(y2-(neighbors[i]->y)) + abs(x2-(neighbors[i]->x)) + abs(z2-(neighbors[i]->z));
             neighbors[i]->f = neighbors[i]->g + neighbors[i]->h;
             
-            //Cycle Through OPEN_SET and check if the neighbor is already in there (with lower f or does it matter here?)
-            bool search_o = true; //search flag
-            bool in_open =  false; //flag indicating if neighbor is in OPNE_SET
-            current = open_set.first; //start at beginning
-            while(search_o){
-                
-                //Check if at end of list
-                if(current==nullptr){
-                    search_o = false;
-                    break;
-                }
-                
-                //Check x,y values in node
-                if( (current->x==neighbors[i]->x) && (current->y==neighbors[i]->y) && (current->z==neighbors[i]->z) ){
-                    in_open = true;
-                }
-                
-                //Move on to search next node in list
-                current = current->next;
-                
-            }
-            if(in_open){
+            //check if in open_set
+            if(isNodeIn(neighbors[i], open_set) == true){
                 delete neighbors[i]; //delete temporary neighbor
                 num_news = num_news - 1;
                 continue; //skip this neighbor
             }
             
-            //Cycle Through CLOSED_SET and check if the neighbor is already in there (with lower f or does it matter here?)
-            bool search_c = true; //search flag
-            bool in_closed =  false; //flag indicating if neighbor is in CLOSED_SET
-            current = closed_set.first; //start at beginning
-            while(search_c){
-                
-                //Check if at end of list
-                if(current==nullptr){
-                    search_c = false;
-                    break;
-                }
-                
-                //Check x,y values in node
-                if( (current->x==neighbors[i]->x) && (current->y==neighbors[i]->y) && (current->z==neighbors[i]->z)){
-                    in_closed = true;
-                }
-                
-                //Move on to search next node in list
-                current = current->next;
-                
-            }
-            if(in_closed){
+            //check if in closed_set
+            if(isNodeIn(neighbors[i], closed_set)==true){
                 delete neighbors[i]; //delete what we've created!!!
                 num_news = num_news - 1;
                 continue; //skip this neighbor
@@ -685,15 +748,9 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
             
             //If we've made it to this point, it isn't in CLOSED or OPEN SET
             //ADD neighbor to OPEN_SET
-            neighbors[i]->next = nullptr; //indicate neighbor is at end of list
-            neighbors[i]->prev = open_set.last; //update neighbor who it's behind
-            if(open_set.last!=nullptr){open_set.last->next = neighbors[i];} //the (former) last item in list now points to neighbor
-            open_set.last = neighbors[i]; //the open_set is updated
-            if(open_set.first==nullptr){open_set.first= neighbors[i];}; //if this is the first item in open_set
-            
+            addNodeToSet(neighbors[i], &open_set);
             
         }//Done cycling through neighbors
-        
         
         ///////////////////////////////////////////////////
         //Now check if there are LADDERS on the tile
@@ -711,11 +768,8 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
                         //If it's the target, then we can stop
                         if( ladder_node->x == x2 && ladder_node->y == y2 && ladder_node->z == z2){
                             //ADD neighbor to CLOSED_SET
-                            ladder_node->next = nullptr; //indicate ladder_node is at end of list
-                            ladder_node->prev = closed_set.last; //update ladder_node with who it's behind
-                            if(closed_set.last!=nullptr){closed_set.last->next = ladder_node;} //the (former) last item in list now points to node
-                            closed_set.last = ladder_node; //the closed_set is updated
-                            if(closed_set.first==nullptr){closed_set.first= ladder_node;}; //if this is the first item in closed_set
+                            addNodeToSet(ladder_node, &closed_set);
+                            
                             search_main = false;
                             break;
                             
@@ -726,55 +780,15 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
                         ladder_node->h = abs(y2-(ladder_node->y)) + abs(x2-(ladder_node->x)) + abs(z2-(ladder_node->z));
                         ladder_node->f = ladder_node->g + ladder_node->h;
                         
-                        //Cycle Through OPEN_SET and check if the ladder_node is already in there
-                        bool search_o = true; //search flag
-                        bool in_open =  false; //flag indicating if ladder_node is in OPEN_SET
-                        current = open_set.first; //start at beginning
-                        while(search_o){
-                            
-                            //Check if at end of list
-                            if(current==nullptr){
-                                search_o = false;
-                                break;
-                            }
-                            
-                            //Check x,y,z values in node
-                            if( (current->x== ladder_node->x) && (current->y==ladder_node->y) && (current->z==ladder_node->z) ){
-                                in_open = true;
-                            }
-                            
-                            //Move on to search next node in list
-                            current = current->next;
-                            
-                        }
-                        if(in_open){
+                        //check if in open_set already
+                        if(isNodeIn(ladder_node, open_set) ==  true){
                             delete ladder_node; //delete temporary ladder_node
                             num_news = num_news - 1;
                             continue; //skip this ladder_node
                         }
                         
-                        //Cycle Through CLOSED_SET and check if the ladder_node is already in there
-                        bool search_c = true; //search flag
-                        bool in_closed =  false; //flag indicating if ladder_node is in CLOSED_SET
-                        current = closed_set.first; //start at beginning
-                        while(search_c){
-                            
-                            //Check if at end of list
-                            if(current==nullptr){
-                                search_c = false;
-                                break;
-                            }
-                            
-                            //Check x,y values in node
-                            if( (current->x==ladder_node->x) && (current->y==ladder_node->y) && (current->z==ladder_node->z)){
-                                in_closed = true;
-                            }
-                            
-                            //Move on to search next node in list
-                            current = current->next;
-                            
-                        }
-                        if(in_closed){
+                        //check if in closed_set already
+                        if(isNodeIn(ladder_node, closed_set) == true){
                             delete ladder_node; //delete what we've created!!!
                             num_news = num_news - 1;
                             continue; //skip this neighbor
@@ -782,11 +796,8 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
                         
                         //If we've made it to this point, it isn't in CLOSED or OPEN SET
                         //ADD ladder_node to OPEN_SET
-                        ladder_node->next = nullptr; //indicate ladder_node is at end of list
-                        ladder_node->prev = open_set.last; //update ladder_node who it's behind
-                        if(open_set.last!=nullptr){open_set.last->next = ladder_node;} //the (former) last item in list now points to ladder_node
-                        open_set.last = ladder_node; //the open_set is updated
-                        if(open_set.first==nullptr){open_set.first= ladder_node;}; //if this is the first item in open_set
+                        addNodeToSet(ladder_node, &open_set);
+
                         
                     } //for loop for up items
                 } //END LADDER GO UP
@@ -801,12 +812,16 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
                     
                     //If it's the target, then we can stop
                     if( ladder_node->x == x2 && ladder_node->y == y2 && ladder_node->z == z2){
+                        
                         //ADD neighbor to CLOSED_SET
-                        ladder_node->next = nullptr; //indicate ladder_node is at end of list
-                        ladder_node->prev = closed_set.last; //update ladder_node with who it's behind
-                        if(closed_set.last!=nullptr){closed_set.last->next = ladder_node;} //the (former) last item in list now points to node
-                        closed_set.last = ladder_node; //the closed_set is updated
-                        if(closed_set.first==nullptr){closed_set.first= ladder_node;}; //if this is the first item in closed_set
+                        addNodeToSet(ladder_node, &closed_set);
+                        
+//                        ladder_node->next = nullptr; //indicate ladder_node is at end of list
+//                        ladder_node->prev = closed_set.last; //update ladder_node with who it's behind
+//                        if(closed_set.last!=nullptr){closed_set.last->next = ladder_node;} //the (former) last item in list now points to node
+//                        closed_set.last = ladder_node; //the closed_set is updated
+//                        if(closed_set.first==nullptr){closed_set.first= ladder_node;}; //if this is the first item in closed_set
+                        
                         search_main = false;
                         break;
                         
@@ -817,55 +832,15 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
                     ladder_node->h = abs(y2-(ladder_node->y)) + abs(x2-(ladder_node->x)) + abs(z2-(ladder_node->z));
                     ladder_node->f = ladder_node->g + ladder_node->h;
                     
-                    //Cycle Through OPEN_SET and check if the ladder_node is already in there
-                    bool search_o = true; //search flag
-                    bool in_open =  false; //flag indicating if ladder_node is in OPEN_SET
-                    current = open_set.first; //start at beginning
-                    while(search_o){
-                        
-                        //Check if at end of list
-                        if(current==nullptr){
-                            search_o = false;
-                            break;
-                        }
-                        
-                        //Check x,y,z values in node
-                        if( (current->x== ladder_node->x) && (current->y==ladder_node->y) && (current->z==ladder_node->z) ){
-                            in_open = true;
-                        }
-                        
-                        //Move on to search next node in list
-                        current = current->next;
-                        
-                    }
-                    if(in_open){
+                    //check if in open_set
+                    if(isNodeIn(ladder_node, open_set)==true){
                         delete ladder_node; //delete temporary ladder_node
                         num_news = num_news - 1;
                         continue; //skip this ladder_node
                     }
                     
-                    //Cycle Through CLOSED_SET and check if the ladder_node is already in there
-                    bool search_c = true; //search flag
-                    bool in_closed =  false; //flag indicating if ladder_node is in CLOSED_SET
-                    current = closed_set.first; //start at beginning
-                    while(search_c){
-                        
-                        //Check if at end of list
-                        if(current==nullptr){
-                            search_c = false;
-                            break;
-                        }
-                        
-                        //Check x,y values in node
-                        if( (current->x==ladder_node->x) && (current->y==ladder_node->y) && (current->z==ladder_node->z)){
-                            in_closed = true;
-                        }
-                        
-                        //Move on to search next node in list
-                        current = current->next;
-                        
-                    }
-                    if(in_closed){
+                    //check if in closed_set
+                    if(isNodeIn(ladder_node, closed_set) == true){
                         delete ladder_node; //delete what we've created!!!
                         num_news = num_news - 1;
                         continue; //skip this neighbor
@@ -873,11 +848,7 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
                     
                     //If we've made it to this point, it isn't in CLOSED or OPEN SET
                     //ADD ladder_node to OPEN_SET
-                    ladder_node->next = nullptr; //indicate ladder_node is at end of list
-                    ladder_node->prev = open_set.last; //update ladder_node who it's behind
-                    if(open_set.last!=nullptr){open_set.last->next = ladder_node;} //the (former) last item in list now points to ladder_node
-                    open_set.last = ladder_node; //the open_set is updated
-                    if(open_set.first==nullptr){open_set.first = ladder_node;}; //if this is the first item in open_set
+                    addNodeToSet(ladder_node, &open_set);
                     
                     //Must do: Check if the above step is in CLOSED or OPEN Sets. (or if it's target)
                 }
@@ -887,16 +858,9 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
         ////////////////////////////////////////////////
         //End ladder search
         
-        
-
-        
         //And Now done with q and can go on to next step.
         //ADD q to CLOSED_SET
-        q->next = nullptr; //indicate q is at end of list
-        q->prev = closed_set.last; //update q who it's behind
-        if(closed_set.last!=nullptr){closed_set.last->next = q;} //the (former) last item in list now points to neighbor
-        closed_set.last= q; //the closed_set is updated
-        if(closed_set.first==nullptr){closed_set.first= q;}; //if this is the first item in open_set
+        addNodeToSet(q, &closed_set);
         
         //THIS MEANS WE HIT THE END OF OPEN_SET AND HAVENT FOUND TARGET
         //->DELETE EVERYTHING AND RETURN ERROR
