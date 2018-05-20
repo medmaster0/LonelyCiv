@@ -116,11 +116,17 @@ void Item::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture*
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { x*16, y*16, 16, 16 };
     SDL_Rect* clip = NULL;
+    //Drawing tile_p
+    //SDL_SetTextureAlphaMod( item_tiles_p[type], alpha_mod); //change the tile's alpha transparency'
     SDL_SetTextureColorMod( item_tiles_p[type], primColor.r, primColor.g, primColor.b); //modulate color, update to match the new one
     SDL_RenderCopy( gRenderer, item_tiles_p[type], clip, &renderQuad );//Render to screen
+    //SDL_SetTextureAlphaMod( item_tiles_p[type], 255); //change the tile's alpha transparency' back to normal
+    //drawing tile_s
     if(item_tiles_s[type] != (SDL_Texture*) 0x9999 ){
+        //SDL_SetTextureAlphaMod( item_tiles_s[type], alpha_mod); //change the tile's alpha transparency'
         SDL_SetTextureColorMod( item_tiles_s[type], secoColor.r, secoColor.g, secoColor.b); //modulate color, update to match the new one
         SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
+        //SDL_SetTextureAlphaMod( item_tiles_s[type], 255); //change the tile's alpha transparency' back to normal
     }
     
 }
@@ -130,8 +136,10 @@ void Item::draw(int in_x, int in_y, SDL_Renderer* gRenderer, SDL_Texture** item_
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { in_x*16, in_y*16, 16, 16 };
     SDL_Rect* clip = NULL;
+    //drawing tile_p
     SDL_SetTextureColorMod( item_tiles_p[type], primColor.r, primColor.g, primColor.b); //modulate color, update to match the new one
     SDL_RenderCopy( gRenderer, item_tiles_p[type], clip, &renderQuad );//Render to screen
+    //drawing tile_ss
     if(item_tiles_s[type] != (SDL_Texture*) 0x9999 ){
         SDL_SetTextureColorMod( item_tiles_s[type], secoColor.r, secoColor.g, secoColor.b); //modulate color, update to match the new one
         SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
@@ -326,15 +334,20 @@ Hat::Hat(int xpos, int ypos, int tile_type) : Item(xpos, ypos, tile_type){
 }
 
 //draw the hat ( slightly off grid )
-void Hat::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s ){
+void Hat::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, int alpha_mod ){
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { x*16, y*16-8, 16, 16 };
     SDL_Rect* clip = NULL;
+    printf("alpha_mod:%d\n", alpha_mod);
+    SDL_SetTextureAlphaMod( item_tiles_p[type], alpha_mod); //change the tile's alpha transparency'
     SDL_SetTextureColorMod( item_tiles_p[type], primColor.r, primColor.g, primColor.b); //modulate color, update to match the new one
     SDL_RenderCopy( gRenderer, item_tiles_p[type], clip, &renderQuad );//Render to screen
+    SDL_SetTextureAlphaMod( item_tiles_p[type], 255); //change the tile's alpha transparency' back to normal
     if(item_tiles_s[type] != (SDL_Texture*) 0x9999 ){
+        SDL_SetTextureAlphaMod( item_tiles_s[type], alpha_mod); //change the tile's alpha transparency'
         SDL_SetTextureColorMod( item_tiles_s[type], secoColor.r, secoColor.g, secoColor.b); //modulate color, update to match the new one
         SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
+        SDL_SetTextureAlphaMod( item_tiles_s[type], 255); //change the tile's alpha transparency' back to normal
     }
 }
 
@@ -352,16 +365,20 @@ Staff::Staff(int xpos, int ypos, int tile_type) : Item(xpos, ypos, tile_type){
 }
 
 //draw the staff ( slightly off grid )
-void Staff::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s ){
+void Staff::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, int alpha_mod ){
     
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { x*16, y*16, 16, 16 };
     SDL_Rect* clip = NULL;
+    SDL_SetTextureAlphaMod( item_tiles_p[type], alpha_mod); //change the tile's alpha transparency'
     SDL_SetTextureColorMod( item_tiles_p[type], primColor.r, primColor.g, primColor.b); //modulate color, update to match the new one
     SDL_RenderCopy( gRenderer, item_tiles_p[type], clip, &renderQuad );//Render to screen
+    SDL_SetTextureAlphaMod( item_tiles_p[type], 255); //change the tile's alpha transparency' back to normal
     if(item_tiles_s[type] != (SDL_Texture*) 0x9999 ){
+        SDL_SetTextureAlphaMod( item_tiles_s[type], alpha_mod); //change the tile's alpha transparency'
         SDL_SetTextureColorMod( item_tiles_s[type], secoColor.r, secoColor.g, secoColor.b); //modulate color, update to match the new one
         SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
+        SDL_SetTextureAlphaMod( item_tiles_s[type], 255); //change the tile's alpha transparency' back to normal
     }
 }
 
@@ -379,16 +396,20 @@ Light::Light(int xpos, int ypos, int tile_type) : Item(xpos, ypos, tile_type){
 }
 
 //draw the staff ( slightly off grid )
-void Light::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s ){
+void Light::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s , int alpha_mod){
     
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { x*16, y*16, 16, 16 };
     SDL_Rect* clip = NULL;
+    SDL_SetTextureAlphaMod( item_tiles_p[type], alpha_mod); //change the tile's alpha transparency'
     SDL_SetTextureColorMod( item_tiles_p[type], primColor.r, primColor.g, primColor.b); //modulate color, update to match the new one
     SDL_RenderCopy( gRenderer, item_tiles_p[type], clip, &renderQuad );//Render to screen
+    SDL_SetTextureAlphaMod( item_tiles_p[type], 255); //change the tile's alpha transparency' back to normal
     if(item_tiles_s[type] != (SDL_Texture*) 0x9999 ){
+        SDL_SetTextureAlphaMod( item_tiles_s[type], alpha_mod); //change the tile's alpha transparency'
         SDL_SetTextureColorMod( item_tiles_s[type], secoColor.r, secoColor.g, secoColor.b); //modulate color, update to match the new one
         SDL_RenderCopy( gRenderer, item_tiles_s[type], clip, &renderQuad );//Render to screen
+        SDL_SetTextureAlphaMod( item_tiles_s[type], 255); //change the tile's alpha transparency' back to normal
     }
 }
 

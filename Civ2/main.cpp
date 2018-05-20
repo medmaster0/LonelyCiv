@@ -555,7 +555,7 @@ void loadTiles(){
     item_tiles_p[338] = loadTexture("Civ2/Civ2/tiles/balcony/door2DPrim.png");
     item_tiles_s[338] = loadTexture("Civ2/Civ2/tiles/balcony/door2DSeco.png");
     item_tiles_t[338] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
-    item_tiles_p_balcony[338] = loadTexture("Civ2/Civ2/tiles/blacony/door2DPrim.png");
+    item_tiles_p_balcony[338] = loadTexture("Civ2/Civ2/tiles/balcony/door2DPrim.png");
     item_tiles_s_balcony[338] = loadTexture("Civ2/Civ2/tiles/balcony/door2DSeco.png");
     item_tiles_t_balcony[338] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
@@ -897,7 +897,7 @@ void draw_environment(Sprite* cre1){
     //Remember: draw_map_z is elevated up by draw_height/2 when Balcony View is first entered.
     if(isBalconyView == true){
 
-        //SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
+        //SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
         
         //Cycle through all of the drawn slices (starting with farthest behind first)
         for(int s = 15; s >= 0; s--){
@@ -1045,11 +1045,11 @@ void draw_environment(Sprite* cre1){
               
                if(map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
                   map_creatures[c].z < draw_map_z && map_creatures[c].z > draw_map_z - draw_map_height){ //do bounds checking
-                    map_creatures[c].draw_forward_pose_items(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
+                    map_creatures[c].draw_forward_pose_items(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony, alpha_mod);
                }
           
                if(cre1->y == draw_map_y){
-                    cre1->draw_forward_pose_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE's ITEMS
+                    cre1->draw_forward_pose_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony, alpha_mod); //DRAW MAIN CREATURE's ITEMS
                }
           }
 

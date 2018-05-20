@@ -248,54 +248,54 @@ void Sprite::draw_forward_pose(int at_x, int at_y, SDL_Texture** item_tiles_p, S
     //prev_y becomes at_y + (prev_y - y)
     //prev_x becomes at_x + (prev_x - x)
     
-    //DRAW STAFF
-    //the staff should flow behind cre so we need to calculate where that's at on the translated image
-    if(staff != nullptr){
-        staff->y = at_y;
-        staff->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
-        if(staff->x==at_x){staff->x=staff->x+1;} //make sure it doesn't block the creature though
-        staff->draw(gRenderer, item_tiles_p, item_tiles_s);
-    }
-    
-    //DRAW LIGHT
-    if(light != nullptr){
-        
-        //If has staff, then need to put candle on other side
-        if(staff!=nullptr){
-            
-            //Put it in the opposite position of staff
-            light->y = at_y;
-            light->x = at_x - (prev_x-x);
-            if(light->x==at_x){light->x=light->x-1;} //make sure it doesn't block the creature though
-            
-            
-//            if(prev_x<at_x){
-//                light->x = at_x + 1;
-//            }else{
-//                light->x = at_x - 1;
-//            }
-            
-        }else{
-            //Put it in the same position staff would be in
-            light->y = at_y;
-            light->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
-            if(light->x==at_x){light->x=light->x+1;} //make sure it doesn't block the creature though
-        }
-        
-        light->draw(gRenderer, item_tiles_p, item_tiles_s);
-    }
-    
-    //DRAW HAT
-    if(hat != nullptr){
-        hat->y = at_y; //move the hat to the right place
-        hat->x = at_x;
-        hat->draw(gRenderer, item_tiles_p, item_tiles_s);
-    }
+//    //DRAW STAFF
+//    //the staff should flow behind cre so we need to calculate where that's at on the translated image
+//    if(staff != nullptr){
+//        staff->y = at_y;
+//        staff->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
+//        if(staff->x==at_x){staff->x=staff->x+1;} //make sure it doesn't block the creature though
+//        staff->draw(gRenderer, item_tiles_p, item_tiles_s);
+//    }
+//
+//    //DRAW LIGHT
+//    if(light != nullptr){
+//
+//        //If has staff, then need to put candle on other side
+//        if(staff!=nullptr){
+//
+//            //Put it in the opposite position of staff
+//            light->y = at_y;
+//            light->x = at_x - (prev_x-x);
+//            if(light->x==at_x){light->x=light->x-1;} //make sure it doesn't block the creature though
+//
+//
+////            if(prev_x<at_x){
+////                light->x = at_x + 1;
+////            }else{
+////                light->x = at_x - 1;
+////            }
+//
+//        }else{
+//            //Put it in the same position staff would be in
+//            light->y = at_y;
+//            light->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
+//            if(light->x==at_x){light->x=light->x+1;} //make sure it doesn't block the creature though
+//        }
+//
+//        light->draw(gRenderer, item_tiles_p, item_tiles_s);
+//    }
+//
+//    //DRAW HAT
+//    if(hat != nullptr){
+//        hat->y = at_y; //move the hat to the right place
+//        hat->x = at_x;
+//        hat->draw(gRenderer, item_tiles_p, item_tiles_s);
+//    }
     
 }
 
 //draws the sprite's items to the screen at specific map coords, but items are side by side (considers prev location) FOR BALCONY VIEW
-void Sprite::draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s){
+void Sprite::draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, int alpha_mod){
     //    //Set rendering space and render to screen
     //    SDL_Rect renderQuad = { at_x*16, at_y*16, mWidth, mHeight };
     //    SDL_Rect* clip = NULL;
@@ -312,7 +312,7 @@ void Sprite::draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tile
     if(hat != nullptr){
         hat->y = at_y; //move the hat to the right place
         hat->x = at_x;
-        hat->draw(gRenderer, item_tiles_p, item_tiles_s);
+        hat->draw(gRenderer, item_tiles_p, item_tiles_s, alpha_mod);
     }
     
     //DRAW STAFF
@@ -321,7 +321,7 @@ void Sprite::draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tile
         staff->y = at_y;
         staff->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
         if(staff->x==at_x){staff->x=staff->x+1;} //make sure it doesn't block the creature though
-        staff->draw(gRenderer, item_tiles_p, item_tiles_s);
+        staff->draw(gRenderer, item_tiles_p, item_tiles_s, alpha_mod);
     }
     
     //DRAW LIGHT
@@ -349,7 +349,7 @@ void Sprite::draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tile
             if(light->x==at_x){light->x=light->x+1;} //make sure it doesn't block the creature though
         }
         
-        light->draw(gRenderer, item_tiles_p, item_tiles_s);
+        light->draw(gRenderer, item_tiles_p, item_tiles_s, alpha_mod);
     }
     
 }
