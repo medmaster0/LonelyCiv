@@ -862,7 +862,7 @@ void init_environment(){
     for(int g = 0 ; g<225; g++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
-        temp_tile = 315; //328 for flowers
+        temp_tile = 328; //328 for flowers
         //    Both Random Colors
         //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
         //    Pink / Green
@@ -1036,8 +1036,8 @@ void draw_environment(Sprite* cre1){
                 }
             }//End drawing top items
          
-          //Cycle through all creatures and draw their items...
-          for(int c = 0; c < map_creatures.size(); c++){
+            //Cycle through all creatures and draw their items...
+            for(int c = 0; c < map_creatures.size(); c++){
               
                if(map_creatures[c].y != draw_map_y){
                     continue; //skip to next one
@@ -1045,13 +1045,13 @@ void draw_environment(Sprite* cre1){
               
                if(map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
                   map_creatures[c].z < draw_map_z && map_creatures[c].z > draw_map_z - draw_map_height){ //do bounds checking
-                    map_creatures[c].draw_forward_pose_items(map_creatures[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony, alpha_mod);
+                    map_creatures[c].draw_forward_pose_items(map_creatures[c].x - draw_map_x, draw_map_z - map_creatures[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony, alpha_mod);
                }
-          
-               if(cre1->y == draw_map_y){
-                    cre1->draw_forward_pose_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony, alpha_mod); //DRAW MAIN CREATURE's ITEMS
-               }
-          }
+
+            }//end drawing creatures' itemes
+            if(cre1->y == draw_map_y){
+                cre1->draw_forward_pose_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE's ITEMS
+            }
 
          //AT END, DRAW THE CLOUDSSS
          for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim

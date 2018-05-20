@@ -338,7 +338,6 @@ void Hat::draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture*
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { x*16, y*16-8, 16, 16 };
     SDL_Rect* clip = NULL;
-    printf("alpha_mod:%d\n", alpha_mod);
     SDL_SetTextureAlphaMod( item_tiles_p[type], alpha_mod); //change the tile's alpha transparency'
     SDL_SetTextureColorMod( item_tiles_p[type], primColor.r, primColor.g, primColor.b); //modulate color, update to match the new one
     SDL_RenderCopy( gRenderer, item_tiles_p[type], clip, &renderQuad );//Render to screen
