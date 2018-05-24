@@ -337,11 +337,121 @@ void build_tower_NxN(vector<vector<Item>>* map_scenery_top, vector<vector<Item>>
     
 }
 
+//TOWER CLASS
+//A specific class used to keep track of tower dimensions and building
+
+//initialize and build a tower with the initial input parameters
+Tower::Tower(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int in_x, int in_y, int in_n, int in_num_floors, SDL_Color in_brick_col1, SDL_Color in_brick_col2, SDL_Color in_floor_col1 , SDL_Color in_floor_col2 , SDL_Color in_door_col1, SDL_Color in_ladder_col1, string in_street_name , int in_address_number ){
+    
+    x = in_x;
+    y = in_y;
+    n = in_n;
+    num_floors = 0; //start at zero (we will build up, later)
+    brick_col1 = in_brick_col1;
+    brick_col2 = in_brick_col2;
+    floor_col1 = in_floor_col1;
+    floor_col2 = in_floor_col2;
+    door_col1 = in_door_col1;
+    ladder_col1 = in_ladder_col1;
+    //decide where to put the ladder
+    //(find a random spot inside building)
+    ladder_x = x + 1 + rand()%(n - 2);
+    ladder_y = y + 1 + rand()%(n - 2);
+    
+    address = to_string(in_address_number) + " " + in_street_name;
+    
+    //Build ground floor
+    build_floor_inner(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height);
+    num_floors = num_floors + 1;
+    
+    //build the rest of the floors
+    for(int i = 0; i<in_num_floors; i++ ){
+        build_floor(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height);
+        num_floors = num_floors + 1;
+    }
+    
+}
+
+//build another floor on tower and increment num_floors counter
+void Tower::build_floor_inner(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height){
+    
+    //Need to unblock that region (of entire floor area)
+    set_square_clear(block_map, map_width, map_height, x-1, y-1, num_floors, n+2);
+    
+    //Build the box walls/doors
+    build_box_NxN_door(map_scenery_top, block_map, map_width, map_height, x, y, num_floors, n, brick_col1, brick_col2, door_col1);
+    
+    //build the floors within the box
+    build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, x+1, y+1, num_floors, n-2, floor_col1, floor_col2);
+    
+    //Put the ladder
+    Item temp_ladder = Item(ladder_x, ladder_y, 318, ladder_col1, {0,0,0,255});
+    map_scenery_top->at( (num_floors*map_height*map_width)  + ladder_y*map_width + ladder_x   ).push_back(temp_ladder);
+    
+}
 
 
+//builds a new floor at the top level of the tower
+void Tower::build_floor(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height){
+    
+//    //Need to unblock that region (of entire floor area)
+//    set_square_clear(block_map, map_width, map_height, x-1, y-1, num_floors, n+2);
+    
+//    //Build the box walls/doors
+//    build_box_NxN_door(map_scenery_top, block_map, map_width, map_height, x, y, num_floors, n, brick_col1, brick_col2, door_col1);
+
+//    //build the floors within the box
+//    build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, x+1, y+1, num_floors, n-2, floor_col1, floor_col2);
+//
+//    //Put the ladder
+//    Item temp_ladder = Item(ladder_x, ladder_y, 318, ladder_col1, {0,0,0,255});
+//    map_scenery_top->at( (num_floors*map_height*map_width)  + ladder_y*map_width + ladder_x   ).push_back(temp_ladder);
+    
+    //build the inside part of the floor
+    build_floor_inner(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height);
+    
+    //build a balcony (lay big box of floor - it will ignore area with floor tile already
+    build_floor_NxN(map_scenery_bottom, block_map, map_width, map_height, x-1, y-1, num_floors, n+2, floor_col1, floor_col2);
+    
+    //Create a railing
+    //Bottom railing
+    for(int b = 0; b < n+2; b++){
+        int r_x = x - 1 + b;
+        int r_y = y + n;
+        Item temp_railing = Item(r_x, r_y, 319, {0,0,0,255}, {0,0,0,255});
+        map_scenery_top->at( ((num_floors)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
+    }
+    
+    //Left railing
+    for(int b = 0; b < n+2; b++){
+        int r_x = x - 1;
+        int r_y = y - 1 + b;
+        Item temp_railing = Item(r_x, r_y, 320, {0,0,0,255}, {0,0,0,255});
+        map_scenery_top->at( ((num_floors)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
+    }
+    
+    //Right railing
+    for(int b = 0; b < n+2; b++){
+        int r_x = x + n;
+        int r_y = y - 1 + b;
+        Item temp_railing = Item(r_x, r_y, 321, {0,0,0,255}, {0,0,0,255});
+        map_scenery_top->at( ((num_floors)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
+    }
+        
+    //Top railing
+    for(int b = 0; b < n+2; b++){
+        int r_x = x - 1 + b;
+        int r_y = y - 2;
+        Item temp_railing = Item(r_x, r_y, 319, {0,0,0,255}, {0,0,0,255});
+        map_scenery_top->at( ((num_floors)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
+    }
+    
+    return;
+    
+}
 
 //Builds a circular structure of bricks
-//Uses Midpoint Circl Drawing Algorithm
+//Uses Midpoint Circle Drawing Algorithm
 //We only calculate one eigth of the circle (0 to 45 deg) - but we can draw the other sectors at the same time
 //Start at the right most pixel.
 //Keep Going until x > y --->>>> means we've entered next sector > 45 deg

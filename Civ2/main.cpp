@@ -744,6 +744,8 @@ void init_environment(){
     
     build_tower_NxN(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, 60, 60, 7, 3, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
+    Tower test_tower = Tower(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, 75, 60, 7, 3, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
+    
     //center two mazes
     build_maze(&map_scenery_top, block_map, map_width, map_height, 85, 71, 0, build_col_p, build_col_s);
     build_maze(&map_scenery_top, block_map, map_width, map_height, 85, 109, 0, build_col_p, build_col_s);

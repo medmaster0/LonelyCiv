@@ -14,9 +14,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2_image/SDL_image.h>
 #include <vector>
+#include <string>
+using namespace std;
 
 #include "Item.hpp"
 #include "story.hpp"
+#include "creature.hpp"
 
 //buildings
 void build_box_NxN(vector<vector<Item>>* map_scenery_top, bool* block_map, int map_width, int map_height, int x, int y, int z, int n, SDL_Color p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color s_col_in = {0,0,0,255}); //Builds an NxN enclosed box on the map out of standrad bricks
@@ -35,6 +38,28 @@ void build_floor_path(vector<vector<Item>>* map_scenery_bottom, bool* block_map,
 
 //Towers...
 void build_tower_NxN(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x, int y, int n, int num_floors, SDL_Color brick_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color brick_col2 = {0,0,0,255}, SDL_Color floor_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color floor_col2 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255},SDL_Color ladder_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}); //Builds an NxN enclosed box on the map out of standrad bricks, adds a door to one of the walls
+
+//TOWER CLASS
+//A specific class used to keep track of tower dimensions and building
+class Tower{
+public:
+    Tower(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x, int y, int n, int num_floors, SDL_Color brick_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color brick_col2 = {0,0,0,255}, SDL_Color floor_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color floor_col2 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255},SDL_Color ladder_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, string street_name = genStreetName(), int address_number = rand()%900); //initialize and build a tower with the initial input parameters
+    int x, y, n; //the location and dimensions of the tower
+    int ladder_x, ladder_y; //the location of the main ladder within the tower
+    int mailbox_x, mailbox_y; //the location of the tower's mailbox
+    int num_floors; //how tall the tower is
+    SDL_Color brick_col1;
+    SDL_Color brick_col2;
+    SDL_Color floor_col1;
+    SDL_Color floor_col2;
+    SDL_Color door_col1;
+    SDL_Color ladder_col1;
+    string address; //the name of the address
+    Sprite* owner; //the creature that own's the tower
+    void build_floor(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height); //build another floor on tower, and increment num_floors counter
+    void build_floor_inner(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height); //build another floor on tower and increment num_floors counter
+    
+};
 
 //misc
 bool is_square_clear(bool* block_map, int map_width, int map_height, int x, int y, int z, int n); //checks the block map to make sure nothing is blocking the current location
