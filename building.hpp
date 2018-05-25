@@ -46,6 +46,7 @@ public:
     Tower(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x, int y, int n, int num_floors, SDL_Color brick_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color brick_col2 = {0,0,0,255}, SDL_Color floor_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color floor_col2 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255},SDL_Color ladder_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, string street_name = genStreetName(), int address_number = rand()%900); //initialize and build a tower with the initial input parameters
     int x, y, n; //the location and dimensions of the tower
     int ladder_x, ladder_y; //the location of the main ladder within the tower
+    int door_x, door_y; //the location of the front door on the tower
     int mailbox_x, mailbox_y; //the location of the tower's mailbox
     int num_floors; //how tall the tower is
     SDL_Color brick_col1;
@@ -58,8 +59,11 @@ public:
     Sprite* owner; //the creature that own's the tower
     void build_floor(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height); //build another floor on tower, and increment num_floors counter
     void build_floor_inner(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height); //build another floor on tower and increment num_floors counter
+    void build_door(vector<vector<Item>>* map_scenery_top, bool* block_map, int map_width, int map_height, int floor, int position = 0); //clears the specified coordinate and puts a door there.
+    void build_mailbox(vector<vector<Item>>* map_scenery_top, bool* block_map, int map_width, int map_height, int position = 0, string description = "test"); //Puts a mailbox near the front door
     
 };
+
 
 //misc
 bool is_square_clear(bool* block_map, int map_width, int map_height, int x, int y, int z, int n); //checks the block map to make sure nothing is blocking the current location
@@ -67,10 +71,10 @@ bool is_circle_clear(bool* block_map, int map_width, int map_height, int x, int 
 void set_square_clear(bool* block_map, int map_width, int map_height, int x, int y, int z, int n); //makes the specified square's block_map FALSE
 
 //multi-building structures (facilities)
-void build_two_house_path(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color floor_p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color floor_s_col = {0,0,0,255}, SDL_Color brick_p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color brick_s_col = {0,0,0,255},
-    SDL_Color door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}); //builds two houses and puts a path between them
+//void build_two_house_path(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color floor_p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color floor_s_col = {0,0,0,255}, SDL_Color brick_p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color brick_s_col = {0,0,0,255},
+//    SDL_Color door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}); //builds two houses and puts a path between them
 
-void build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color brick_p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color brick_s_col = {0,0,0,255}, SDL_Color floor_p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color floor_s_col = {0,0,0,255},SDL_Color door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color ladder_col_p = {0,0,0,255} ); //builds a few rows of houses
+vector<Tower> build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color brick_p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color brick_s_col = {0,0,0,255}, SDL_Color floor_p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color floor_s_col = {0,0,0,255},SDL_Color door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color ladder_col_p = {0,0,0,255} ); //builds a few rows of houses
 
 void build_neighbor_grid(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color brick_p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color brick_s_col = {0,0,0,255}, SDL_Color floor_p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color floor_s_col = {0,0,0,255},SDL_Color door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color ladder_col_p = {0,0,0,255} ); //builds a giant grid of houses
 

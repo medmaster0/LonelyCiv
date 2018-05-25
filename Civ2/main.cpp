@@ -745,6 +745,7 @@ void init_environment(){
     build_tower_NxN(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, 60, 60, 7, 3, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
     Tower test_tower = Tower(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, 75, 60, 7, 3, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
+    test_tower.build_door(&map_scenery_top, block_map, map_width, map_height, 0, 1);
     
     //center two mazes
     build_maze(&map_scenery_top, block_map, map_width, map_height, 85, 71, 0, build_col_p, build_col_s);
@@ -781,10 +782,9 @@ void init_environment(){
     }
     
     
-//    build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
+    build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
-    build_neighbor_grid(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
-    
+//    build_neighbor_grid(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
     printf("Done with build aye\\\n");
     
@@ -2829,7 +2829,9 @@ int main( int argc, char* args[] ){
                         break;
                     
                     case SDLK_RETURN: //USED FOR READING A SIGN SINCE IT SPECIFICALLY LOOKS FOR 322
+                        //OR MAILBOX (325)
                         if(wKeyDown){ //Then look up
+                            
                             //check if a sign exists at that point (there's a function in Item.hpp for that)
                             if(isItemInList(map_scenery_top[ cre1->z*map_area + (cre1->y-1)*map_width + cre1->x  ], 322) == true){
                                 
@@ -2840,8 +2842,22 @@ int main( int argc, char* args[] ){
                                     }
                                 }
                             }
+                            
+                            //check if a mailbox exists at that point (there's a function in Item.hpp for that)
+                            if(isItemInList(map_scenery_top[ cre1->z*map_area + (cre1->y-1)*map_width + cre1->x  ], 325) == true){
+                                
+                                //Now cycle through the list, find which one is mailbox, 325, and write out it's contents to console
+                                for(int s = 0; s < map_scenery_top[ cre1->z*map_area + (cre1->y-1)*map_width + cre1->x  ].size() ; s++ ){
+                                    if(map_scenery_top[ cre1->z*map_area + (cre1->y-1)*map_width + cre1->x  ][s].type == 325){ //if it has the right type, then we have the right index, s. This is safe since a lot of items will be pouring into/out-of this tile
+                                        addToConsoleLog( map_scenery_top[ cre1->z*map_area + (cre1->y-1)*map_width + cre1->x][s].description );
+                                    }
+                                }
+                            }
+                            
+                            
                         }
                         if(sKeyDown){ //Then look down
+                            
                             //check if a sign exists at that point (there's a function in Item.hpp for that)
                             if(isItemInList(map_scenery_top[ cre1->z*map_area + (cre1->y+1)*map_width + cre1->x  ], 322) == true){
                                 
@@ -2852,6 +2868,20 @@ int main( int argc, char* args[] ){
                                     }
                                 }
                             }
+                            
+                            //check if a mailbox exists at that point (there's a function in Item.hpp for that)
+                            if(isItemInList(map_scenery_top[ cre1->z*map_area + (cre1->y+1)*map_width + cre1->x  ], 325) == true){
+                                
+                                //Now cycle through the list, find which one is mailbox, 325, and write out it's contents to console
+                                for(int s = 0; s < map_scenery_top[ cre1->z*map_area + (cre1->y+1)*map_width + cre1->x  ].size() ; s++ ){
+                                    if(map_scenery_top[ cre1->z*map_area + (cre1->y+1)*map_width + cre1->x  ][s].type == 325){ //if it has the right type, then we have the right index, s. This is safe since a lot of items will be pouring into/out-of this tile
+                                        addToConsoleLog( map_scenery_top[ cre1->z*map_area + (cre1->y+1)*map_width + cre1->x][s].description );
+                                    }
+                                }
+                            }
+                            
+                            
+                            
                         }
                         if(dKeyDown){ //Then look right
                             //check if a sign exists at that point (there's a function in Item.hpp for that)
@@ -2864,6 +2894,18 @@ int main( int argc, char* args[] ){
                                     }
                                 }
                             }
+                            
+                            //check if a mailbox exists at that point (there's a function in Item.hpp for that)
+                            if(isItemInList(map_scenery_top[ cre1->z*map_area + (cre1->y*map_width) + (cre1->x+1) ], 325) == true){
+                                
+                                //Now cycle through the list, find which one is mailbox 325, and write out it's contents to console
+                                for(int s = 0; s < map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x+1 ].size() ; s++ ){
+                                    if(map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x+1  ][s].type == 325){ //if it has the right type, then we have the right index, s. This is safe since a lot of items will be pouring into/out-of this tile
+                                        addToConsoleLog( map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x+1][s].description );
+                                    }
+                                }
+                            }
+                            
                         }
 
                         if(aKeyDown){ //Then look left
@@ -2877,6 +2919,18 @@ int main( int argc, char* args[] ){
                                     }
                                 }
                             }
+                            
+                            //check if a sign exists at that point (there's a function in Item.hpp for that)
+                            if(isItemInList(map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x-1  ], 325) == true){
+                                
+                                //Now cycle through the list, find which one is mailbox 325, and write out it's contents to console
+                                for(int s = 0; s < map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x-1 ].size() ; s++ ){
+                                    if(map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x-1  ][s].type == 325){ //if it has the right type, then we have the right index, s. This is safe since a lot of items will be pouring into/out-of this tile
+                                        addToConsoleLog( map_scenery_top[ cre1->z*map_area + cre1->y*map_width + cre1->x-1][s].description );
+                                    }
+                                }
+                            }
+                            
                         }
                         
                         break;
