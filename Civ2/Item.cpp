@@ -46,7 +46,7 @@ using namespace std;
 // 319 - RAILING (TOP/BOTTOM)
 // 320 - RAILING (LEFT)
 // 321 - RAILING (RIGHT)
-// 322 - SING
+// 322 - SIGN
 // 323 - TOPHAT
 // 324 - CROWN
 // 325 - MAILBOX
@@ -85,7 +85,7 @@ Item::Item(int xpos, int ypos, int tile_type, string in_desc){
     type = tile_type;
     primColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
     secoColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
-    tertColor = {0,0,0,255}; 
+    tertColor = {255,255,255,255}; 
     description = in_desc;
     
     //tilesPrim = new SDL_Texture * [1];

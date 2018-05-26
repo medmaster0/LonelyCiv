@@ -509,11 +509,11 @@ void Tower::build_mailbox(vector<vector<Item>>* map_scenery_top, bool* block_map
     //Find the correct coords for wall dependant on position code
     int tempx, tempy;
     switch (position) {
-        case 0: //from top row
+        case 0: //from top wall
             tempx = door_x + 2;
             tempy = door_y - 2;
             break;
-        case 1: //from bottom row
+        case 1: //from bottom wall
             tempx = door_x - 2;
             tempy = door_y + 2;
             break;
@@ -538,9 +538,44 @@ void Tower::build_mailbox(vector<vector<Item>>* map_scenery_top, bool* block_map
     Item temp_mailbox = Item(mailbox_x, mailbox_y, 325, description);
     map_scenery_top->at( temp_mailbox.y*map_width + temp_mailbox.x ).push_back(temp_mailbox);
     
-    
 }
 
+//calculate where the backyard is on Tower
+//Puts a mailbox near the front door
+//Position indicates where in the tower the door IS and where mailbox should be relative
+// 0 - top
+// 1 - bottom
+// 2 - left
+// 3 - right
+void Tower::assign_backyard(int position ){
+    
+    //Find the correct coords for wall dependant on position code
+    switch (position) {
+        case 0: //door on top wall
+            backyard_x = x + 1;
+            backyard_y = y + (n-2);
+            backyard_n = n - 2;
+            break;
+        case 1: //door bottom wall
+            backyard_x = x + 1;
+            backyard_y = y - (n-2);
+            backyard_n = n - 2;
+            break;
+        case 2: //door left wall
+            backyard_x = x + (n-2);
+            backyard_y = y + 1;
+            backyard_n = n - 2;
+            break;
+        case 3: //door right wall
+            backyard_x = x - (n-2);
+            backyard_y = y + 1;
+            backyard_n = n - 2;
+            break;
+        default:
+            break;
+    }
+    
+}
 
 //Builds a circular structure of bricks
 //Uses Midpoint Circle Drawing Algorithm
@@ -1132,6 +1167,9 @@ vector<Tower> build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<ve
         //build a mailbox.
         temp_tower.build_mailbox(map_scenery_top, block_map, map_width, map_height, 1, to_string(address_numer) + " " + street_name ); //position 1
         
+        //put the backyard
+        temp_tower.assign_backyard(1);
+        
         //now connect tower to road by path
         //first point is the step in front of door
         x2 = temp_tower.door_x;
@@ -1142,6 +1180,9 @@ vector<Tower> build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<ve
         
         //update address for next tower
         address_numer = address_numer + rand()%9 + 1;
+        
+        //add tower to running list
+        map_towers.push_back(temp_tower);
         
     }
     
@@ -1195,6 +1236,9 @@ vector<Tower> build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<ve
         //build a mailbox.
         temp_tower.build_mailbox(map_scenery_top, block_map, map_width, map_height, 0, to_string(address_numer) + " " + street_name); //position 0
         
+        //put the backyard
+        temp_tower.assign_backyard(0);
+        
         //now connect tower to road by path
         //first point is the step in front of door
         x2 = temp_tower.door_x;
@@ -1205,6 +1249,9 @@ vector<Tower> build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<ve
         
         //update address for next tower
         address_numer = address_numer + rand()%9 + 1;
+        
+        //add tower to running list
+        map_towers.push_back(temp_tower);
         
     }
     
@@ -1258,6 +1305,9 @@ vector<Tower> build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<ve
         //build a mailbox.
         temp_tower.build_mailbox(map_scenery_top, block_map, map_width, map_height, 2, to_string(address_numer) + " " + street_name); //position 2
         
+        //put the backyard
+        temp_tower.assign_backyard(2);
+        
         //now connect tower to road by path
         //first point is the step in front of door
         x2 = temp_tower.door_x-1;
@@ -1268,6 +1318,9 @@ vector<Tower> build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<ve
         
         //update address for next tower
         address_numer = address_numer + rand()%9 + 1;
+        
+        //add tower to running list
+        map_towers.push_back(temp_tower);
         
     }
     
@@ -1322,6 +1375,9 @@ vector<Tower> build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<ve
         //build a mailbox.
         temp_tower.build_mailbox(map_scenery_top, block_map, map_width, map_height, 3, to_string(address_numer) + " " + street_name); //position 3
         
+        //put the backyard
+        temp_tower.assign_backyard(3);
+        
         //now connect tower to road by path
         //first point is the step in front of door
         x2 = temp_tower.door_x+1;
@@ -1332,6 +1388,9 @@ vector<Tower> build_neighborhood(vector<vector<Item>>* map_scenery_top,vector<ve
         
         //update address for next tower
         address_numer = address_numer + rand()%9 + 1;
+        
+        //add tower to running list
+        map_towers.push_back(temp_tower);
         
     }
     

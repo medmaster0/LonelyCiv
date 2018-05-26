@@ -44,7 +44,7 @@ using namespace std;
 // 319 - RAILING (TOP/BOTTOM)
 // 320 - RAILING (LEFT)
 // 321 - RAILING (RIGHT)
-// 322 - SING
+// 322 - SIGN
 // 323 - TOPHAT
 // 324 - CROWN
 // 325 - MAILBOX

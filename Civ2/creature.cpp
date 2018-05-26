@@ -14,6 +14,7 @@
 #include <iostream>
 #include "med_algo.hpp"
 #include "story.hpp"
+#include "building.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2_ttf/SDL_ttf.h>
@@ -35,6 +36,7 @@ Sprite::Sprite(int xp, int yp)
     hat = nullptr;
     staff = nullptr;
     light = nullptr;
+    owned_tower = nullptr;
     x = xp;
     y = yp;
     z = 0;

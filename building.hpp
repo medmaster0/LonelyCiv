@@ -9,6 +9,8 @@
 #ifndef building_hpp
 #define building_hpp
 
+#include "building.hpp"
+
 #include <stdio.h>
 
 #include <SDL2/SDL.h>
@@ -48,6 +50,7 @@ public:
     int ladder_x, ladder_y; //the location of the main ladder within the tower
     int door_x, door_y; //the location of the front door on the tower
     int mailbox_x, mailbox_y; //the location of the tower's mailbox
+    int backyard_x, backyard_y, backyard_n; //the location and dimensions of the back yard of the tower (where rituals happen)
     int num_floors; //how tall the tower is
     SDL_Color brick_col1;
     SDL_Color brick_col2;
@@ -56,11 +59,12 @@ public:
     SDL_Color door_col1;
     SDL_Color ladder_col1;
     string address; //the name of the address
-    Sprite* owner; //the creature that own's the tower
+    bool isOwned = false; 
     void build_floor(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height); //build another floor on tower, and increment num_floors counter
     void build_floor_inner(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height); //build another floor on tower and increment num_floors counter
     void build_door(vector<vector<Item>>* map_scenery_top, bool* block_map, int map_width, int map_height, int floor, int position = 0); //clears the specified coordinate and puts a door there.
     void build_mailbox(vector<vector<Item>>* map_scenery_top, bool* block_map, int map_width, int map_height, int position = 0, string description = "test"); //Puts a mailbox near the front door
+    void assign_backyard(int position); //calculate where the backyard is on Tower
     
 };
 

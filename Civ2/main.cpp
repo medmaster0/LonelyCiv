@@ -80,6 +80,13 @@ vector<vector<Item>> map_clouds; //a list of clouds on the map. treated exactly 
 vector<Sprite> map_creatures; //a list of all creatures on map
 vector<Shroom> map_shrooms; //a list of all shroom sprites on map
 
+//Towers and Neighboorhood Stuff.
+vector<Tower> map_towers; //holds the list of all towers on the map
+struct TowerOwnership{ //A special structure used to pair owners and towers
+    Sprite* owner; //
+    Tower* tower;
+};
+
 //Effects Stuff
 vector<vector<Effect>> map_effects; //a list of list of effects on a tile. Index corresponds to [y*map_width + x]
 //Animation Stuff
@@ -559,6 +566,13 @@ void loadTiles(){
     item_tiles_s_balcony[338] = loadTexture("Civ2/Civ2/tiles/balcony/door2DSeco.png");
     item_tiles_t_balcony[338] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[339] = loadTexture("Civ2/Civ2/tiles/wandPrim.png");
+    item_tiles_s[339] = loadTexture("Civ2/Civ2/tiles/wandSeco.png");
+    item_tiles_t[339] = loadTexture("Civ2/Civ2/tiles/wandTert.png");
+    item_tiles_p_balcony[339] = loadTexture("Civ2/Civ2/tiles/wandPrim.png");
+    item_tiles_s_balcony[339] = loadTexture("Civ2/Civ2/tiles/wandSeco.png");
+    item_tiles_t_balcony[339] = loadTexture("Civ2/Civ2/tiles/wandTert.png");
+    
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
     misc_tiles[1] = loadTexture("Civ2/Civ2/tiles/zodiac/taurus.png");
@@ -781,8 +795,7 @@ void init_environment(){
         
     }
     
-    
-    build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
+    map_towers = build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
 //    build_neighbor_grid(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
     
@@ -807,7 +820,10 @@ void init_environment(){
         }
         //randomly give staffs (staves?)
         if(rand()%2==1){
-            Staff* temp_staff = new Staff(0,0,307); //a temp Item to be added to the cre's equip inventory
+            //"staff" item no.'s are  330, 331, 332, 315, 313, 314, 339
+            int staff_tiles[7] = {330,331,332,315,313,314,339};
+            //Staff* temp_staff = new Staff(0,0,staff_tiles[rand()%7]); //a temp Item to be added to the cre's equip inventory
+            Staff* temp_staff = new Staff(0,0,339); //DEBUG
             map_creatures.back().staff = temp_staff;
         }
 //        //randomly give lights
@@ -815,6 +831,23 @@ void init_environment(){
 //            Light* temp_light = new Light(0, 0, 308); //a temp Item to be added to the cre's equip inventory
 //            map_creatures.back().light = temp_light;
 //        }
+        
+        //randomly assign a Tower
+        while(true){ //in a while loop since we'll have to keep trying to find a valid candidate
+            
+            int temp_index = rand()%map_towers.size();//pick a random index for Tower to select to assign to creature
+            if(map_towers[temp_index].isOwned == false){ //make sure it isn't currently owned
+                
+                map_creatures.back().owned_tower = &map_towers[temp_index];
+                map_creatures.back().owned_tower->isOwned = true; //indicate that it is now owned
+                break;
+                
+            }
+            
+            
+        }
+        
+        
     }
     
 //    //LOVELYs
@@ -1621,11 +1654,6 @@ void free_path(Sprite cre){
 
 //a thread for wandering to a random place
 void wander_thread(Sprite* spr1){
-    //    for(int i = 0; i<401; i++){
-    //    //while(true){
-    //        //printf("%d", spr1.x );
-    //        printf("XXXXXXXX%dXXXXXXXX",spr1->x);
-    //    }
     
     //Standard movement timing stuff
     spr1->move_timer = SDL_GetTicks(); //start move timer
@@ -1926,6 +1954,11 @@ void walk_path_thread(Sprite* spr1){
 //spawns other threads (walkTo) and also handles isNeededByThread flag
 void perform_ritual_thread(Sprite* spr1){
     
+    //Firstly, indicate to the sprites that we need them...
+    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
+    //mainly used for OTHER creatures, outside thread...
+    spr1->isNeededByThread = true;
+    
     int loc_x, loc_y; //the location of ritual
     
     //determine random ritual location
@@ -1940,12 +1973,6 @@ void perform_ritual_thread(Sprite* spr1){
             break;
         }
     }
-    
-    
-    //Firstly, indicate to the sprites that we need them...
-    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
-    //mainly used for OTHER creatures, outside thread...
-    spr1->isNeededByThread = true;
     
     //START WALKING TO LOCATION
     
@@ -2024,6 +2051,7 @@ void perform_ritual_thread(Sprite* spr1){
     }
     
     //at this point, spr1 is elegible for new tasks and Animation is deleted
+    
     //We now want to create a new item in it's place
     //Pick random item from shroom recipe list
     //Create a basic dual-tone item based off shroom recipe resource list
@@ -2062,6 +2090,57 @@ void perform_ritual_thread(Sprite* spr1){
     
 }
 
+//A thread that makes the creature walk home
+void walk_home_thread(Sprite* spr1){
+    
+    //Firstly, indicate to the sprites that we need them...
+    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
+    //mainly used for OTHER creatures, outside thread...
+    spr1->isNeededByThread = true;
+    
+    //START WALKING TO LOCATION
+    
+    //Find a path to target
+    free_path(*spr1); //clear path on sprite for starters
+    if(spr1->path.empty()){ //if path is empty
+        spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, spr1->owned_tower->ladder_x, spr1->owned_tower->ladder_y, 0 );
+    }
+    
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, no wei home");
+        
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    
+    //Now start the thread that will actually walk the path to target
+    std::thread walkPathObj(walk_path_thread, spr1);
+    walkPathObj.detach();
+    
+    //Wait for spr1 to get to destination (walk_to_thread signals end by setting inThread to false)
+    while(true){
+        
+        //if done with walk_to_thread
+        if(spr1->inThread == false){
+            break; //break out of wait loop, indicating we reached destination
+        }
+        
+    }
+    
+    //We can NOW break out of this THREAD
+    //Turn off flags
+    spr1->inThread = false;
+    spr1->isNeededByThread = false;
+    
+    return;
+    
+    
+}
+
 //periodically gives a new task to creatures
 //This function starts threads and sets inThread flag = true
 //**Individual spawned threads are responsible for inThread flag = false again
@@ -2084,8 +2163,9 @@ void task_creatures_thread(){
                 free_path(map_creatures[i]);//clear old path, fuction to individually delete path
                 map_creatures[i].thread_timer = time(NULL);
                 map_creatures[i].inThread = true;
-                choice = rand()%3;
+                choice = rand()%4;
                 //choice = rand()%2 * 2;
+                //choice = 3;
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
@@ -2109,6 +2189,15 @@ void task_creatures_thread(){
                         ritualObj.detach();
                         break;
                     }
+                    case 3: {
+                        //this thread makes the creatures walk home
+                        map_creatures[i].task_status = "walk home";
+                        std::thread walkHomeObj(walk_home_thread, &map_creatures[i]);
+                        walkHomeObj.detach();
+                        break;
+                    }
+                        
+                        
                 }
             }
         }

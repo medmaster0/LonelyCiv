@@ -19,6 +19,10 @@
 #include "Item.hpp"
 //#endif
 
+//#ifndef building_hpp
+//#include "building.hpp"
+//#endif
+
 #include <vector>
 #include <string>
 #include <time.h>
@@ -32,6 +36,7 @@ extern SDL_Renderer* gRenderer;//The window renderer
 
 SDL_Texture* loadTexture( std::string path ); //loads a texture specified by string path name... gets implemented in main function since it requires a gRenderer to be declared
 
+class Tower; //defined else where
 class Sprite{
 public:
     Sprite(int xp, int yp);//Initializes variables
@@ -66,6 +71,7 @@ public:
     SDL_Texture* primTexture;//primary texture of the sprite
     SDL_Texture* secoTexture;//secondary texture of the sprite
     vector<Item> inventory; //list of items the sprite is carrying
+    Tower* owned_tower; //the creature's tower
     SDL_Color faveColor; //the sprite's favorite color
     SDL_Color faveColor2; //the sprite's alternative favorite color
     int zodiac_sign; //code for the creature's zodiac symbol
