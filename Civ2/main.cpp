@@ -224,12 +224,12 @@ SDL_Texture* loadTexture( std::string path )
 //Load in al the tiles used for the map
 void loadTiles(){
     
-    item_tiles_p = new SDL_Texture* [326];
-    item_tiles_s = new SDL_Texture* [326];
-    item_tiles_t = new SDL_Texture* [326];
-    item_tiles_p_balcony = new SDL_Texture* [326];
-    item_tiles_s_balcony = new SDL_Texture* [326];
-    item_tiles_t_balcony = new SDL_Texture* [326];
+    item_tiles_p = new SDL_Texture* [330];
+    item_tiles_s = new SDL_Texture* [330];
+    item_tiles_t = new SDL_Texture* [330];
+    item_tiles_p_balcony = new SDL_Texture* [330];
+    item_tiles_s_balcony = new SDL_Texture* [330];
+    item_tiles_t_balcony = new SDL_Texture* [330];
     misc_tiles = new SDL_Texture* [40];
     //world_colors = new SDL_Color [200];
     SDL_Color temp_col;
@@ -897,7 +897,7 @@ void init_environment(){
     for(int g = 0 ; g<225; g++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
-        temp_tile = 328; //328 for flowers
+        temp_tile = 339; //328 for flowers
         //    Both Random Colors
         //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
         //    Pink / Green
@@ -959,7 +959,7 @@ void draw_environment(Sprite* cre1){
                             SDL_SetTextureAlphaMod(item_tiles_s_balcony[map_scenery_bottom[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
                         }
                         if(item_tiles_t_balcony[map_scenery_bottom[map_index][k].type] != (SDL_Texture*) 0x9999){
-                            SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_scenery_bottom[map_index][k].type], 255-((s/6)*255) ); //temorarily set the global alpha mod of the tile we need to use to draw
+                            SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_scenery_bottom[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
                         }
                         
                         //call the draw function with location translated for this view
@@ -975,7 +975,7 @@ void draw_environment(Sprite* cre1){
                             SDL_SetTextureAlphaMod(item_tiles_s_balcony[map_items[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
                         }
                         if(item_tiles_t_balcony[map_items[map_index][k].type] != (SDL_Texture*) 0x9999){
-                            SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_items[map_index][k].type], 255-((s/6)*255) ); //temorarily set the global alpha mod of the tile we need to use to draw
+                            SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_items[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
                         }
                             
                         //call the draw function with location translated for this view
@@ -1000,7 +1000,7 @@ void draw_environment(Sprite* cre1){
                     SDL_SetTextureAlphaMod(map_shrooms[c].secoTexture, alpha_mod);
 
                     //Now call actual draw function
-                    map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
+                    map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, draw_map_z - map_shrooms[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony);
                     
                     //REturn the texture alpha level when done!!
                     SDL_SetTextureAlphaMod(map_shrooms[c].primTexture, 255);
@@ -1023,7 +1023,7 @@ void draw_environment(Sprite* cre1){
                     SDL_SetTextureAlphaMod(map_creatures[c].secoTexture, alpha_mod);
                     
                     //No call actual draw function
-                    map_creatures[c].draw_forward_pose(map_creatures[c].x - draw_map_x, draw_map_z - map_creatures[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony);
+                    map_creatures[c].draw_forward_pose(map_creatures[c].x - draw_map_x, draw_map_z - map_creatures[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony);
                     
                     //REturn the texture alpha level when done!!
                     SDL_SetTextureAlphaMod(map_creatures[c].primTexture, 255);
@@ -1032,7 +1032,7 @@ void draw_environment(Sprite* cre1){
             }//end drawing creatures
          
             if(cre1->y == draw_map_y){
-                cre1->draw_forward_pose(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE
+                cre1->draw_forward_pose(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony); //DRAW MAIN CREATURE
             }
          
             //Start drawing TOP Items
@@ -1051,7 +1051,7 @@ void draw_environment(Sprite* cre1){
                             SDL_SetTextureAlphaMod(item_tiles_s_balcony[map_scenery_top[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
                         }
                         if(item_tiles_t_balcony[map_scenery_top[map_index][k].type] != (SDL_Texture*) 0x9999){
-                            SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_scenery_top[map_index][k].type], 255-((s/6)*255) ); //temorarily set the global alpha mod of the tile we need to use to draw
+                            SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_scenery_top[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
                         }
                         
                         //call the draw function with location translated for this view
@@ -1080,12 +1080,12 @@ void draw_environment(Sprite* cre1){
               
                if(map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
                   map_creatures[c].z < draw_map_z && map_creatures[c].z > draw_map_z - draw_map_height){ //do bounds checking
-                    map_creatures[c].draw_forward_pose_items(map_creatures[c].x - draw_map_x, draw_map_z - map_creatures[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony, alpha_mod);
+                    map_creatures[c].draw_forward_pose_items(map_creatures[c].x - draw_map_x, draw_map_z - map_creatures[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony, alpha_mod);
                }
 
             }//end drawing creatures' itemes
             if(cre1->y == draw_map_y){
-                cre1->draw_forward_pose_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony); //DRAW MAIN CREATURE's ITEMS
+                cre1->draw_forward_pose_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony); //DRAW MAIN CREATURE's ITEMS
             }
 
          //AT END, DRAW THE CLOUDSSS
@@ -1148,7 +1148,7 @@ void draw_environment(Sprite* cre1){
         if (map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
             map_shrooms[c].y > draw_map_y && map_shrooms[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
             drawHorde(&map_shrooms[c], gRenderer, draw_map_x, draw_map_y, 4, item_tiles_p, item_tiles_s, item_tiles_t);
-            map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, map_shrooms[c].y - draw_map_y, item_tiles_p, item_tiles_s);
+            map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, map_shrooms[c].y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t);
         }
     }
     
@@ -1161,12 +1161,12 @@ void draw_environment(Sprite* cre1){
         
         if (map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
             map_creatures[c].y > draw_map_y && map_creatures[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
-            map_creatures[c].draw_movement(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s);
+            map_creatures[c].draw_movement(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t);
         }
     }
     
     if(cre1->z == draw_map_z){
-        cre1->draw_movement(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s); //DRAW MAIN CREATURE
+        cre1->draw_movement(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t); //DRAW MAIN CREATURE
     }
     
     //Draw all top items
@@ -1204,11 +1204,11 @@ void draw_environment(Sprite* cre1){
         
         if (map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
             map_creatures[c].y > draw_map_y && map_creatures[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
-            map_creatures[c].draw_movement_items(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s);
+            map_creatures[c].draw_movement_items(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t);
         }
     }
     if(cre1->z == draw_map_z){
-        cre1->draw_movement_items(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s); //DRAW MAIN CREATURE's Items
+        cre1->draw_movement_items(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t); //DRAW MAIN CREATURE's Items
     }
     
     //NOW FINALLY AT END DRAW THE CLOUDSS. THEY ARE ABOVE ALL
@@ -3261,7 +3261,7 @@ int main( int argc, char* args[] ){
         }
         if(statusDisplayOn){
             //show status (of creature)
-            displayStatus(map_creatures[creature_inventory_index], gRenderer, SCREEN_HEIGHT, item_tiles_p, item_tiles_s, misc_tiles);
+            displayStatus(map_creatures[creature_inventory_index], gRenderer, SCREEN_HEIGHT, item_tiles_p, item_tiles_s, item_tiles_t, misc_tiles);
         }
         if(shroomDepoDisplayOn){
             //display inventory of shroom

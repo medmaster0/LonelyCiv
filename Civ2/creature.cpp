@@ -99,25 +99,25 @@ void Sprite::draw(int in_x, int in_y, SDL_Texture** item_tiles_p, SDL_Texture** 
     if(hat != nullptr){
         hat->y = in_y; //move the hat to the right place
         hat->x = in_x;
-        hat->draw(gRenderer, item_tiles_p, item_tiles_s);
+        hat->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
     if(staff != nullptr){
         staff->y = in_y ;
         staff->x = in_x-1;
-        staff->draw(gRenderer, item_tiles_p, item_tiles_s);
+        staff->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
     if(light != nullptr){
         light->y = in_y ;
         light->x = in_x+1;
-        light->draw(gRenderer, item_tiles_p, item_tiles_s);
+        light->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
 }
 
 //draws the sprite to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
-void Sprite::draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s){
+void Sprite::draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t){
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { at_x*16, at_y*16, mWidth, mHeight };
     SDL_Rect* clip = NULL;
@@ -135,7 +135,7 @@ void Sprite::draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_T
     if(staff != nullptr){
         staff->y = at_y + (prev_y-y); //Apply the different between y and previous y to the new location
         staff->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
-        staff->draw(gRenderer, item_tiles_p, item_tiles_s);
+        staff->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
     //DRAW LIGHT
@@ -164,20 +164,20 @@ void Sprite::draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_T
             light->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
         }
         
-        light->draw(gRenderer, item_tiles_p, item_tiles_s);
+        light->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
     //DRAW HAT
     if(hat != nullptr){
         hat->y = at_y; //move the hat to the right place
         hat->x = at_x;
-        hat->draw(gRenderer, item_tiles_p, item_tiles_s);
+        hat->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
 }
 
 //draws the sprite's items to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
-void Sprite::draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s){
+void Sprite::draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t){
 //    //Set rendering space and render to screen
 //    SDL_Rect renderQuad = { at_x*16, at_y*16, mWidth, mHeight };
 //    SDL_Rect* clip = NULL;
@@ -194,7 +194,7 @@ void Sprite::draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p,
     if(hat != nullptr){
         hat->y = at_y; //move the hat to the right place
         hat->x = at_x;
-        hat->draw(gRenderer, item_tiles_p, item_tiles_s);
+        hat->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
     //DRAW STAFF
@@ -202,7 +202,7 @@ void Sprite::draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p,
     if(staff != nullptr){
         staff->y = at_y + (prev_y-y); //Apply the different between y and previous y to the new location
         staff->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
-        staff->draw(gRenderer, item_tiles_p, item_tiles_s);
+        staff->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
     //DRAW LIGHT
@@ -231,13 +231,13 @@ void Sprite::draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p,
             light->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
         }
         
-        light->draw(gRenderer, item_tiles_p, item_tiles_s);
+        light->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
 }
 
 //draws the sprite to the screen at specific map coords, but items are side by side creature (considers prev location) FOR BALCONY VIEW
-void Sprite::draw_forward_pose(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s){
+void Sprite::draw_forward_pose(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t){
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { at_x*16, at_y*16, mWidth, mHeight };
     SDL_Rect* clip = NULL;
@@ -297,7 +297,7 @@ void Sprite::draw_forward_pose(int at_x, int at_y, SDL_Texture** item_tiles_p, S
 }
 
 //draws the sprite's items to the screen at specific map coords, but items are side by side (considers prev location) FOR BALCONY VIEW
-void Sprite::draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, int alpha_mod){
+void Sprite::draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t, int alpha_mod){
     //    //Set rendering space and render to screen
     //    SDL_Rect renderQuad = { at_x*16, at_y*16, mWidth, mHeight };
     //    SDL_Rect* clip = NULL;
@@ -314,7 +314,7 @@ void Sprite::draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tile
     if(hat != nullptr){
         hat->y = at_y; //move the hat to the right place
         hat->x = at_x;
-        hat->draw(gRenderer, item_tiles_p, item_tiles_s, alpha_mod);
+        hat->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t, alpha_mod);
     }
     
     //DRAW STAFF
@@ -323,7 +323,7 @@ void Sprite::draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tile
         staff->y = at_y;
         staff->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
         if(staff->x==at_x){staff->x=staff->x+1;} //make sure it doesn't block the creature though
-        staff->draw(gRenderer, item_tiles_p, item_tiles_s, alpha_mod);
+        staff->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t, alpha_mod);
     }
     
     //DRAW LIGHT
@@ -351,7 +351,7 @@ void Sprite::draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tile
             if(light->x==at_x){light->x=light->x+1;} //make sure it doesn't block the creature though
         }
         
-        light->draw(gRenderer, item_tiles_p, item_tiles_s, alpha_mod);
+        light->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t, alpha_mod);
     }
     
 }
@@ -461,38 +461,38 @@ void Sprite::randomDance(){
 }
 
 //Draw the sprite's inventory
-void Sprite::drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s){
+void Sprite::drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t){
     for(int i = 0; i < inventory.size(); i++){
-        inventory[i].x = x;
-        inventory[i].y = y;
-        inventory[i].draw(gRenderer, item_tiles_p, item_tiles_s);
+        //inventory[i].x = x;
+        //inventory[i].y = y;
+        inventory[i].draw(x, y, gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
 }
 
 //Draw the sprite's hat
-void Sprite::drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s ){
+void Sprite::drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t ){
     
     if(hat != nullptr){
         hat->y = y; //move the hat to the right place
         hat->x = x;
-        hat->draw(gRenderer, item_tiles_p, item_tiles_s);
+        hat->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
 }
 
 //Draw the sprite's staff
-void Sprite::drawStaff(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s ){
+void Sprite::drawStaff(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t ){
     
     if(staff != nullptr){
         staff->y = prev_y;
         staff->x = prev_x;
-        staff->draw(gRenderer, item_tiles_p, item_tiles_s);
+        staff->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
 }
 
 //Draw the sprite's light
-void Sprite::drawLight(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s ){
+void Sprite::drawLight(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s , SDL_Texture** item_tiles_t ){
     
     if(light != nullptr){
         
@@ -519,7 +519,7 @@ void Sprite::drawLight(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_
             light->x = prev_x;
         }
         
-        light->draw(gRenderer, item_tiles_p, item_tiles_s);
+        light->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
 }
@@ -553,7 +553,7 @@ extern TTF_Font* font1; //item font
 SDL_Color status_font_clr = {255,255,255}; //color of font
 int status_texW = 650;//constants used in displaying fonts
 int status_texH = 0;//constants used in displaying fonts
-void displayStatus(Sprite spr1, SDL_Renderer* gRenderer, int SCREEN_HEIGHT , SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** misc_tiles){
+void displayStatus(Sprite spr1, SDL_Renderer* gRenderer, int SCREEN_HEIGHT , SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t, SDL_Texture** misc_tiles){
     string status_text = "                  Status of " + spr1.name; //Char buffer that is displayed
     //Blackout Box {x,y,w,h}
     SDL_Rect r = {0,0,160,112};
@@ -597,13 +597,13 @@ void displayStatus(Sprite spr1, SDL_Renderer* gRenderer, int SCREEN_HEIGHT , SDL
     SDL_RenderFillRect( gRenderer, &colR ); //copy box to renderer
     
     //Draw creature there as well
-    spr1.draw(2, 3, item_tiles_p, item_tiles_s);
+    spr1.draw(2, 3, item_tiles_p, item_tiles_s, item_tiles_t);
     
     //Draw inventory underneath
     for(int i = 0; i<spr1.inventory.size(); i++){
-        spr1.inventory[i].x = 1+i;
-        spr1.inventory[i].y = 4;
-        spr1.inventory[i].draw(gRenderer, item_tiles_p, item_tiles_s);
+        //spr1.inventory[i].x = 1+i;
+        //spr1.inventory[i].y = 4;
+        spr1.inventory[i].draw(1+i, 4, gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
     }
     
     //Draw zodiac symbol

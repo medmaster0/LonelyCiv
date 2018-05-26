@@ -44,20 +44,20 @@ public:
     bool loadFromFile(std::string path1,std::string path2, int w, int h);//Load a texture from file for the sprite
     void changePrimColor(SDL_Color new_col);//changes the primary color of the spirte
     void changeSecoColor(SDL_Color new_col);//changes the secondary color of the spirte
-    void draw(int in_x, int in_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t = NULL); //Draws the sprite to the screen at a specific MAP COORDS. Also draws items in "pose form"
-    void draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draws the sprite to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
-    void draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draws the sprite's items to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
+    void draw(int in_x, int in_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //Draws the sprite to the screen at a specific MAP COORDS. Also draws items in "pose form"
+    void draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //draws the sprite to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
+    void draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //draws the sprite's items to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
     //////////////////////////////////
     //SPECIAL BALCONY DRAW FUNCTIONS
-    void draw_forward_pose(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draws the sprite to the screen at specific map coords, but items are side by side creature (considers prev location) FOR BALCONY VIEW
-    void draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, int alpha_mod = 255); //draws the sprite's items to the screen at specific map coords, but items are side by side (considers prev location) FOR BALCONY VIEW
+    void draw_forward_pose(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //draws the sprite to the screen at specific map coords, but items are side by side creature (considers prev location) FOR BALCONY VIEW
+    void draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t, int alpha_mod = 255); //draws the sprite's items to the screen at specific map coords, but items are side by side (considers prev location) FOR BALCONY VIEW
     //END BALCONY DRAW FUNCTIONS
     //////////////////////////////////
-    void drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //Draw's the sprite's inventory
+    void drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //Draw's the sprite's inventory
     //These functions position the Creature's Items after movement
-    void drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the creature's hat (just moved up 8 px)
-    void drawStaff(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the creatures' staff (just moved  right 16 px)
-    void drawLight(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s); //draaws the creature' light (just moved opposite staff 16 px)
+    void drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //draaws the creature's hat (just moved up 8 px)
+    void drawStaff(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //draaws the creatures' staff (just moved  right 16 px)
+    void drawLight(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //draaws the creature' light (just moved opposite staff 16 px)
     void moveDown();
     void moveUp();
     void moveRight();
@@ -108,7 +108,7 @@ public:
 //MISC FUNCTIONS
 
 //Create a display window that prints out the status of a creature
-void displayStatus(Sprite spr1, SDL_Renderer* gRenderer, int SCREEN_HEIGHT , SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** misc_tiles);
+void displayStatus(Sprite spr1, SDL_Renderer* gRenderer, int SCREEN_HEIGHT , SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t, SDL_Texture** misc_tiles);
 void drawHorde(Sprite* spr1, SDL_Renderer* gRenderer, int draw_map_x, int draw_map_y, int display_n, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //draw's the sprites inventory in piles on the ground
 
 #endif /* creature_hpp */

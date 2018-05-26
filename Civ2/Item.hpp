@@ -60,6 +60,8 @@ using namespace std;
 // 335 - BRICK (OUTSIDE)
 // 336 - CROWN (BUNNY)
 // 337 - EYEPATCH (BUNNY)
+// 338 - DOOR
+// 339 - WAND
 
 //SDL_Texture* loadTexture( string path, SDL_Renderer* gRenderer );
 extern SDL_Renderer* gRenderer;//The window renderer
@@ -75,7 +77,7 @@ public:
     SDL_Color tertColor; //the tertiary color of the item (usually optional)
     int x,y,z; //I think we actually don't keep track of position here....
     int type; //specifies item type
-    void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s); //draws the item
+    //void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s); //draws the item
     void draw(int x, int y, SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //draws the item at a specific location
     string description; //A Description of the item
     
@@ -83,19 +85,19 @@ public:
 
 class Hat : public Item{
 public:
-    virtual void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s, int alpha_mod = 255); //draws the item
+    virtual void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p ,SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t, int alpha_mod = 255); //draws the item
     Hat(int xpos, int ypos, int tile_type);
 };
 
 class Staff : public Item{
 public:
-    virtual void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s, int alpha_mod = 255); //draws the item
+    virtual void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t, int alpha_mod = 255); //draws the item
     Staff(int xpos, int ypos, int tile_type);
 };
 
 class Light : public Item{
 public:
-    virtual void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s, int alpha_mod = 255); //draws the item
+    virtual void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t, int alpha_mod = 255); //draws the item
     Light(int xpos, int ypos, int tile_type);
 };
 
