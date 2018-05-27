@@ -553,21 +553,21 @@ void Tower::assign_backyard(int position ){
     switch (position) {
         case 0: //door on top wall
             backyard_x = x + 1;
-            backyard_y = y + (n-2);
+            backyard_y = y + (n-1);
             backyard_n = n - 2;
             break;
         case 1: //door bottom wall
             backyard_x = x + 1;
-            backyard_y = y - (n-2);
+            backyard_y = y - (n-1);
             backyard_n = n - 2;
             break;
         case 2: //door left wall
-            backyard_x = x + (n-2);
+            backyard_x = x + (n-1);
             backyard_y = y + 1;
             backyard_n = n - 2;
             break;
         case 3: //door right wall
-            backyard_x = x - (n-2);
+            backyard_x = x - (n-1);
             backyard_y = y + 1;
             backyard_n = n - 2;
             break;

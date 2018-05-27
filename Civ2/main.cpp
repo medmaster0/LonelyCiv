@@ -1100,7 +1100,14 @@ void draw_environment(Sprite* cre1){
                  for(int k = 0; k < map_clouds[ map_index ].size(); k++ ){
                      
                      //Ensure texture transparency is good
-                     SDL_SetTextureAlphaMod(item_tiles_p_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a); //temorarily set the global alpha mod of the tile we need to use to draw
+                     SDL_SetTextureAlphaMod(item_tiles_p_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0) );
+                     if(item_tiles_s_balcony[map_clouds[map_index][k].type] != (SDL_Texture*) 0x9999){
+                         SDL_SetTextureAlphaMod(item_tiles_s_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0)  ); //temorarily set the global alpha mod of the tile we need to use to draw
+                     }
+                     if(item_tiles_t_balcony[map_clouds[map_index][k].type] != (SDL_Texture*) 0x9999){
+                         SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0)  ); //temorarily set the global alpha mod of the tile we need to use to draw
+                     }
+                     
                      
                      map_clouds[map_index][k].draw( (map_clouds[map_index][k].x - draw_map_x) , (draw_map_z - j -1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony); //call the draw function. We draw the item at a location translated from the current draw_map
                  }//end clouds
@@ -1964,8 +1971,10 @@ void perform_ritual_thread(Sprite* spr1){
     //determine random ritual location
     while(true){
         //TODO: Make sure location isn't blocked or have an animation on currently
-        loc_x = 1+(rand()%(map_width-2));
-        loc_y = 1+(rand()%(map_height-2));
+//        loc_x = 1+(rand()%(map_width-2));
+//        loc_y = 1+(rand()%(map_height-2));
+        loc_x = spr1->owned_tower->backyard_x + rand()%spr1->owned_tower->backyard_n + 1;
+        loc_y = spr1->owned_tower->backyard_y + rand()%spr1->owned_tower->backyard_n;
         //Check to make sure location isn't blocked or has an animation on it currently
         if( (block_map[(loc_y*map_width)+loc_x]==true) || map_animations[(loc_y*map_width)+loc_x].size() > 0){
             continue;
@@ -1979,7 +1988,7 @@ void perform_ritual_thread(Sprite* spr1){
     //Find a path to target
     free_path(*spr1); //clear path on sprite for starters
     if(spr1->path.empty()){ //if path is empty
-        spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, loc_x+1, loc_y, 0 );
+        spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, loc_x, loc_y, 0 );
     }
 
     //Check if the search failed (error code (9999,9999)
@@ -2012,7 +2021,12 @@ void perform_ritual_thread(Sprite* spr1){
             
             //Start a fire Animation (standard protocol)
             int list[4] = {22, 23, 24, 25};
-            loc_x = spr1->x - 1;
+            //we'll need to give extra space if creature is wielding an item
+            if(spr1->staff!=nullptr){
+                loc_x = spr1->x - 2;
+            }else{
+                loc_x = spr1->x - 1;
+            }
             loc_y = spr1->y;
             Animation temp_animation = Animation(loc_x, loc_y, list);
             map_animations[ ( temp_animation.y * map_width ) + (temp_animation.x) ].push_back(temp_animation);
@@ -2590,7 +2604,7 @@ int main( int argc, char* args[] ){
     cre1->staff = &temp_staff;
 
     //Give cre1 a light
-    Light temp_light = Light(0,0,308);//a temp Item to be added to the cre's equip inventory
+    Light temp_light = Light(0,0,339);//a temp Item to be added to the cre's equip inventory
     cre1->light = &temp_light;
     
     //STORY TEST
