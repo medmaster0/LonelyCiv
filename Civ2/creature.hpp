@@ -92,7 +92,7 @@ public:
     double move_speed; //how many tiles to move per 1 second
     //For signalling from other threads
     bool isNeededByThread; //indicates sprite is needed in another thread (so not to schedule it another task)
-private:
+//private:
     int r,g,b; //colors of the sprite
     //Some vars for movement timing
 };
@@ -108,8 +108,11 @@ public:
 class Sprite2x2: public Sprite{
 public:
     Sprite2x2(int xp, int yp); //Initializes variables
-    SDL_Texture* tertTexture; //These will also have a third texture
+    SDL_Texture* tertTexture = nullptr; //These will also have a third texture
+    bool loadFromFile(std::string path1,std::string path2,std::string path3, int w, int h);//Load a texture from file for the sprite
     void draw(int x, int y); //Draws the Big Creature at the coordinates, taking into consideration spatial issues
+//private:
+    int r2,g2,b2; //seco colors of sprite 
 };
 
 

@@ -75,7 +75,6 @@ bool Sprite::loadFromFile( std::string path1, std::string path2, int w, int h )
     mWidth = w;
     mHeight = h;
     return primTexture != NULL;
-    
 }
 //changes the primary color of the spirte
 void Sprite::changePrimColor(SDL_Color new_col){
@@ -542,6 +541,40 @@ Shroom::Shroom(int tx, int ty) : Sprite(tx, ty){
     recipe_list.push_back(Recipe(1, resource_list[1], resource_list[3]));  //create a recipe, with the proper resources
     recipe_list.push_back(Recipe(2, resource_list[4], resource_list[3]));  //create a recipe, with the proper resources
     recipe_list.push_back(Recipe(3, resource_list[3], resource_list[4]));  //create a recipe, with the proper resources
+    
+}
+
+//SPRITE2x2 CLASS - OVERSIZED SPRITE
+Sprite2x2::Sprite2x2(int tx, int ty) : Sprite(tx, ty){
+    
+    name = genDemonName(); //a demon's name instead of standard names
+    
+    r2 = rand() %255;
+    g2 = rand() %255;
+    b2 = rand() %255;
+    
+}
+//Load a texture from file for the sprite
+bool Sprite2x2::loadFromFile( std::string path1, std::string path2,std::string path3, int w, int h )
+{
+    primTexture = loadTexture(path1);
+    secoTexture = loadTexture(path2);
+    tertTexture = loadTexture(path3);
+    SDL_SetTextureColorMod( primTexture, r, g, b); //modulate color, update to match the new one
+    SDL_SetTextureColorMod( secoTexture, r2, g2, b2); //modulate color, update to match the new one
+    mWidth = w;
+    mHeight = h;
+    return primTexture != NULL;
+}
+//Draws the Big Creature at the coordinates, taking into consideration spatial issues
+void Sprite2x2::draw(int in_x, int in_y){
+    
+    //Set rendering space and render to screen
+    SDL_Rect renderQuad = { in_x*16, (in_y-1)*16, mWidth, mHeight };
+    SDL_Rect* clip = NULL;
+    SDL_RenderCopy( gRenderer, primTexture, clip, &renderQuad );//Render to screen
+    SDL_RenderCopy( gRenderer, secoTexture, clip, &renderQuad );//Render to screen
+    SDL_RenderCopy( gRenderer, tertTexture, clip, &renderQuad );//Render to screen
     
 }
 

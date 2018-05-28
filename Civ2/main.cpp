@@ -79,6 +79,7 @@ vector<vector<Item>> map_clouds; //a list of clouds on the map. treated exactly 
 //Creatures Stuff
 vector<Sprite> map_creatures; //a list of all creatures on map
 vector<Shroom> map_shrooms; //a list of all shroom sprites on map
+vector<Sprite2x2> map_demons; //a list of all demon sprites on map
 
 //Towers and Neighboorhood Stuff.
 vector<Tower> map_towers; //holds the list of all towers on the map
@@ -863,7 +864,6 @@ void init_environment(){
             
         }
         
-        
     }
     
 //    //LOVELYs
@@ -898,6 +898,24 @@ void init_environment(){
                 Shroom temp_shroom = Shroom(tx,ty); //create new shroom
                 temp_shroom.loadFromFile("Civ2/Civ2/tiles/shroomPrim.png","Civ2/Civ2/tiles/shroomSeco.png", 16, 16);
                 map_shrooms.push_back(temp_shroom);
+                break;
+            }
+        }
+    }
+    
+    //Demons
+    int num_demons = 5; //How many ddemons are on the map
+    for(int i = 0 ; i < num_demons; i++){
+        int tx, ty;
+        while(true){
+         
+            tx = rand()%(map_width-1);
+            ty = rand()%(map_height-1);
+            if(block_map[(ty*map_width)+tx]==false && block_map[(ty*map_width)+tx + 1]==false){ //if adjacent is NOT blocked
+                Sprite2x2 temp_demon = Sprite2x2(tx, ty); //create new demon
+                temp_demon.loadFromFile("Civ2/Civ2/tiles/demonPrim.png", "Civ2/Civ2/tiles/demonSeco.png", "Civ2/Civ2/tiles/demonTert.png", 32, 32);
+                map_demons.push_back(temp_demon);
+                cout << temp_demon.name << "\n";
                 break;
             }
         }
@@ -1040,6 +1058,33 @@ void draw_environment(Sprite* cre1){
                     SDL_SetTextureAlphaMod(map_shrooms[c].secoTexture, 255);
                 }
             }//end drawing shrooms
+            
+            //Cycle through all demons and draw
+            for(int c = 0; c < map_demons.size(); c++){
+                
+                if(map_demons[c].y != draw_map_y){ //if not on current y-dim slice
+                    continue; //skip to next one
+                }
+                
+                if(map_demons[c].x > draw_map_x && map_demons[c].x < draw_map_x + draw_map_width &&
+                   map_demons[c].z < draw_map_z && map_demons[c].z > draw_map_z - draw_map_height){ //do bounds checking so we don't draw out of screen
+                 
+                    //Apply proper Alpha Modifier based on layer distance
+                    SDL_SetTextureAlphaMod(map_demons[c].primTexture, alpha_mod);
+                    SDL_SetTextureAlphaMod(map_demons[c].secoTexture, alpha_mod);
+                    SDL_SetTextureAlphaMod(map_demons[c].tertTexture, alpha_mod);
+                    
+                    //Now call actual draw function
+                    map_demons[c].draw(map_demons[c].x - draw_map_x, draw_map_z - map_demons[c].z - 1);
+                    
+                    //Apply proper Alpha Modifier based on layer distance
+                    SDL_SetTextureAlphaMod(map_demons[c].primTexture, 255);
+                    SDL_SetTextureAlphaMod(map_demons[c].secoTexture, 255);
+                    SDL_SetTextureAlphaMod(map_demons[c].tertTexture, 255);
+                    
+                }
+                
+            }//end drawing demons
          
             //Cycle through all creatures and draw...
             for(int c = 0; c < map_creatures.size(); c++){
@@ -1117,35 +1162,63 @@ void draw_environment(Sprite* cre1){
                }
 
             }//end drawing creatures' itemes
+            //draw main creature
             if(cre1->y == draw_map_y){
                 cre1->draw_forward_pose_items(cre1->x - draw_map_x, draw_map_z - cre1->z - 1, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony); //DRAW MAIN CREATURE's ITEMS
-            }
+            }//end drawing main creature
 
-         //AT END, DRAW THE CLOUDSSS
-         for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
-             if(i >= map_width || i < 0){continue;} //bounds checking
-             for(int j = draw_map_z; j >= 0; j--){ //cycle through the z-dim
-                 if( j >= map_floors || j < 0){continue;} //bounds checking
-         
-                 int map_index = (j*map_area) + (draw_map_y*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
-                 
-                 //Cycle through all the items in the map_cloud list at that location
-                 for(int k = 0; k < map_clouds[ map_index ].size(); k++ ){
+            //Cycle through all demons and draw
+            for(int c = 0; c < map_demons.size(); c++){
+                
+                if(map_demons[c].y != draw_map_y){ //if not on current y-dim slice
+                    continue; //skip to next one
+                }
+                
+                if(map_demons[c].x > draw_map_x && map_demons[c].x < draw_map_x + draw_map_width &&
+                   map_demons[c].z < draw_map_z && map_demons[c].z > draw_map_z - draw_map_height){ //do bounds checking so we don't draw out of screen
+                    
+                    //Apply proper Alpha Modifier based on layer distance
+                    SDL_SetTextureAlphaMod(map_demons[c].primTexture, alpha_mod);
+                    SDL_SetTextureAlphaMod(map_demons[c].secoTexture, alpha_mod);
+                    SDL_SetTextureAlphaMod(map_demons[c].tertTexture, alpha_mod);
+                    
+                    //Now call actual draw function
+                    map_demons[c].draw(map_demons[c].x - draw_map_x, draw_map_z - map_demons[c].z - 1);
+                    
+                    //Apply proper Alpha Modifier based on layer distance
+                    SDL_SetTextureAlphaMod(map_demons[c].primTexture, 255);
+                    SDL_SetTextureAlphaMod(map_demons[c].secoTexture, 255);
+                    SDL_SetTextureAlphaMod(map_demons[c].tertTexture, 255);
+                    
+                }
+                
+            }//end drawing demons
+    
+            //AT END, DRAW THE CLOUDSSS
+            for(int i = draw_map_x ; i < draw_map_x + draw_map_width; i++ ){ //cycle through the x-dim
+                if(i >= map_width || i < 0){continue;} //bounds checking
+                    for(int j = draw_map_z; j >= 0; j--){ //cycle through the z-dim
+                     if( j >= map_floors || j < 0){continue;} //bounds checking
+
+                     int map_index = (j*map_area) + (draw_map_y*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
                      
-                     //Ensure texture transparency is good
-                     SDL_SetTextureAlphaMod(item_tiles_p_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0) );
-                     if(item_tiles_s_balcony[map_clouds[map_index][k].type] != (SDL_Texture*) 0x9999){
-                         SDL_SetTextureAlphaMod(item_tiles_s_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0)  ); //temorarily set the global alpha mod of the tile we need to use to draw
-                     }
-                     if(item_tiles_t_balcony[map_clouds[map_index][k].type] != (SDL_Texture*) 0x9999){
-                         SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0)  ); //temorarily set the global alpha mod of the tile we need to use to draw
-                     }
-                     
-                     
-                     map_clouds[map_index][k].draw( (map_clouds[map_index][k].x - draw_map_x) , (draw_map_z - j -1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony); //call the draw function. We draw the item at a location translated from the current draw_map
-                 }//end clouds
-             }
-         } //End drawing CLOUDDSS
+                     //Cycle through all the items in the map_cloud list at that location
+                     for(int k = 0; k < map_clouds[ map_index ].size(); k++ ){
+                         
+                         //Ensure texture transparency is good
+                         SDL_SetTextureAlphaMod(item_tiles_p_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0) );
+                         if(item_tiles_s_balcony[map_clouds[map_index][k].type] != (SDL_Texture*) 0x9999){
+                             SDL_SetTextureAlphaMod(item_tiles_s_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0)  ); //temorarily set the global alpha mod of the tile we need to use to draw
+                         }
+                         if(item_tiles_t_balcony[map_clouds[map_index][k].type] != (SDL_Texture*) 0x9999){
+                             SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0)  ); //temorarily set the global alpha mod of the tile we need to use to draw
+                         }
+                         
+                         
+                         map_clouds[map_index][k].draw( (map_clouds[map_index][k].x - draw_map_x) , (draw_map_z - j -1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony); //call the draw function. We draw the item at a location translated from the current draw_map
+                     }//end clouds
+                }
+            } //End drawing CLOUDDSS
     
             
             ///END DRAWING A SINGLE SLICE
@@ -1250,6 +1323,20 @@ void draw_environment(Sprite* cre1){
     if(cre1->z == draw_map_z){
         cre1->draw_movement_items(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t); //DRAW MAIN CREATURE's Items
     }
+    
+    //Cycle through all demons and draw...
+    for(int c = 0 ; c < map_demons.size(); c++){
+        
+        if(map_demons[c].z != draw_map_z){ //if not on currently drawn floor
+            continue; //skip to next one
+        }
+        
+        if (map_demons[c].x > draw_map_x && map_demons[c].x < draw_map_x + draw_map_width &&
+            map_demons[c].y > draw_map_y && map_demons[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+            drawHorde(&map_demons[c], gRenderer, draw_map_x, draw_map_y, 4, item_tiles_p, item_tiles_s, item_tiles_t);
+            map_demons[c].draw(map_demons[c].x - draw_map_x, map_demons[c].y - draw_map_y);
+        }
+    }//done draw demons
     
     //NOW FINALLY AT END DRAW THE CLOUDSS. THEY ARE ABOVE ALL
     for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
