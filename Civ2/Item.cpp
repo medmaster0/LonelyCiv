@@ -85,7 +85,7 @@ Item::Item(int xpos, int ypos, int tile_type, string in_desc){
     type = tile_type;
     primColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
     secoColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
-    tertColor = {255,255,255,255}; 
+    tertColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
     description = in_desc;
     
     //tilesPrim = new SDL_Texture * [1];
@@ -106,6 +106,7 @@ Item::Item(int xpos, int ypos, int tile_type, SDL_Color primo, SDL_Color seco, s
     primColor = primo;
     secoColor = seco;
     tertColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)}; //give random tert color
+    //tertColor = tert;
     description = in_desc;
     
     //tilesPrim = new SDL_Texture * [1];
@@ -269,6 +270,16 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
             item_name = "    writing";
         }else if(item_list[item_index].type==328){ //Then it's a stone
             item_name = "    flower";
+        }else if(item_list[item_index].type==329){ //Then it's a stone
+            item_name = "    perfume";
+        }else if(item_list[item_index].type==330){ //Then it's a stone
+            item_name = "    quill";
+        }else if(item_list[item_index].type==331){ //Then it's a stone
+            item_name = "    dagger";
+        }else if(item_list[item_index].type==332){ //Then it's a stone
+            item_name = "    bomb";
+        }else if(item_list[item_index].type==339){ //Then it's a stone
+            item_name = "    wand";
         }
     
         //Determine Color

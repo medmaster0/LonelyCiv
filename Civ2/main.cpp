@@ -705,7 +705,7 @@ void init_environment(){
     int temp_tile; //temporarily stores random tile index
 
     //for dispersing random items on map
-    for(int b = 0 ; b<125; b++){
+    for(int b = 0 ; b<225; b++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
         if(rand()%2 == 1){
@@ -1265,10 +1265,27 @@ void pickUpItem(Sprite* sprite, int xpos, int ypos, int index){
     if(index>=num_items){return;} //bounds check
     
     Item temp_item = Item(999,999, map_items[(ypos*map_width)+xpos][index].type, map_items[(ypos*map_width)+xpos][index].primColor, map_items[(ypos*map_width)+xpos][index].secoColor);
+    //temp_item.tertColor = map_items[(ypos*map_width)+xpos][index].tertColor;
     sprite->inventory.push_back(temp_item);
     map_items[(ypos*map_width) + xpos].erase(map_items[(ypos*map_width) + xpos].begin() + index);
-        
+}
 
+//put down item
+//put's the item from the creature's inventory (specified at index), donw on the floor at their feet and out ouf inventory
+void putDownItem(Sprite* sprite, int xpos, int ypos, int zpos, int index){
+ 
+    if(index>=sprite->inventory.size()){printf("putdownboundsfailed");return;} //bounds check
+    
+    //otherwise, create new Item and add to tile item list
+    Item temp_item = Item(xpos,ypos, sprite->inventory[index].type, sprite->inventory[index].primColor, sprite->inventory[index].secoColor);
+    temp_item.z = zpos;
+    temp_item.tertColor = sprite->inventory[index].tertColor;
+    map_items[ zpos*map_area + ypos*map_width + xpos].push_back(temp_item);
+    
+    //Also erase item from creature inventory
+    sprite->inventory.erase(sprite->inventory.begin() + index);
+    
+    
 }
 
 //Helper function for below search routine
@@ -1430,10 +1447,13 @@ vector<vector<int>> faveColorSearch(Sprite* cre, int diff_threshold){
                 }
             }
         }
+        
         k = k+1;
         if(k > 400){ //if we've been searching too long, give up
             k = search_q.size(); //just go to end of queue so we can return error code
         }
+        
+        
     
     }//Broke out of while loop means we found target
     
@@ -1453,6 +1473,268 @@ vector<vector<int>> faveColorSearch(Sprite* cre, int diff_threshold){
             //check if it's a step in the right direction (AND ONLY 1 unit away from last step)
             if(   ((abs(temp[0]-path2target.back()[0])==1)&&(abs(temp[1]-path2target.back()[1])==0)) || //check if x diff is 1
                ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==1)) ){ //check if y diff is 1
+                path2target.push_back(temp);
+            }
+            
+        }
+        
+    }
+    
+    //return search_q;
+    //reverse(path2target.begin(), path2target.end());
+    cre->path = path2target;
+    
+    return path2target; //return the list backwards so you can pop_back to get the next step needed
+    
+}
+
+//Helper function for below search routine
+//returns true if element node e is in node list v
+//is aware of z dimensions
+bool isNodeIn_Z(vector<int> e, vector<vector<int>> v){
+    
+    vector<int> temp; //used to hold the nodes...
+    for(int i = 0; i<v.size(); i++){ //cycle through all elements of v
+        if(e[0] == v[i][0] && e[1] == v[i][1] && e[2] == v[i][2]){
+            return true;//means we found a match!
+        }
+    }
+    return false; //means we cycled list and couldn't find match
+}
+
+//searches for an item that is similar enough for a given color
+//Flood searches from a given sprite's position for item that fits criteria
+//(Flood search is a good choice here since we don't have a fixed destination we are trying to get to)
+//Searches each tile on map_items - each tile has a stack of items that will be searched
+//input: Sprite who will be searching
+//        diff_threshold - the maximum difference in color acceptable
+//output: steps from sprite to target
+//        returns {{9999,9999}} error code if not found soon enough
+//        steps returned as nodes: <xpos, ypos, steps_from_dest>
+//        function returns a list of those nodes
+//others: also sets target data on Sprite*
+//THIS FUNCTION IS AWARE OF Z LEVELS
+vector<vector<int>> faveColorSearch_Z(Sprite* cre, int diff_threshold){
+    
+    vector<vector<int>> search_q; //the main "list"
+    int k = 0; //the main counter used to keep track of where we are in the list
+    
+    //NODES are of the form (x,y,z, distance from source)
+    vector<int> node; //The current node on the list we are looking at
+    vector<int> temp; //Temp node used to push new nodes onto queues and later in filtering out irrelevant steps
+    
+    //Add starting node to search queue
+    node = {cre->x, cre->y, cre->z, 0}; //initialization
+    search_q.push_back(node); //add first element to list
+    bool findingTarget = true; //a flag signalling if we're still searching for target (and populating search_q)
+    while(findingTarget){
+        
+        if(k<search_q.size()){ //bounds chhecking
+            node = search_q[k]; //pull the next node <xpos, ypos, distance_from_start>
+        }else{ //if we've got to the end of list
+            //couldn't find targ
+            cre->path = {{9999,9999,0}}; //set the path to indicate error code
+            return {{9999,9999,0}} ; //didn't find / couldn't reach / searching too long
+        }
+        
+        
+        //Look at all nodes adjacent to the current node
+        //LEFT
+        if(node[0]-1 > 0){ //bounds checking
+            if(block_map[ node[2]*map_area + ((node[1])*map_width) + (node[0]-1)]==false){ //if adjacent is NOT blocked
+                for(int i = 0; i < map_items[ node[2]*map_area + ((node[1])*map_width) + (node[0]-1)].size() ; i++){ //iterate through all items on the adjacent node
+                    if( (color_diff( map_items[ node[2]*map_area + ((node[1])*map_width) + (node[0]-1)][i].primColor , cre->faveColor) < diff_threshold)
+                       || ( color_diff( map_items[ node[2]*map_area + ((node[1])*map_width) + (node[0]-1)][i].primColor , cre->faveColor2) < diff_threshold ) ){
+                        //We found target!
+                        temp = {node[0]-1, node[1], node[2], node[3]+1}; //temporary
+                        search_q.push_back(temp); //add to search_q
+                        findingTarget = false;
+                        break;
+                    }
+                }//end for
+            }
+            
+            if(findingTarget==false){break;} //?right???????
+            
+            //Otherwise, add node to search_q (if eligible, ofc)
+            
+            if(block_map[ node[2]*map_area + ((node[1])*map_width)+(node[0]-1)]==false){ //if adjacent is NOT blocked
+                //we also gotta make sure node isn't in queue with lower distance already...
+                //cycle through the list and check for every lower distance...
+                if(!isNodeIn_Z({node[0]-1,node[1],node[2],0}, search_q)){
+                    temp = {node[0]-1, node[1], node[2], node[3]+1};
+                    search_q.push_back(temp);
+                }
+            }
+        }
+        //RIGHT
+        if(node[0]+1 < map_width){ //bounds checking
+            if(block_map[ node[2]*map_area + ((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
+                for(int i = 0; i < map_items[ node[2]*map_area + ((node[1])*map_width)+(node[0]+1)].size() ; i++){ //iterate through all items on the adjacent node
+                    if( color_diff( map_items[ node[2]*map_area + ((node[1])*map_width)+(node[0]+1)][i].primColor , cre->faveColor) < diff_threshold
+                       || ( color_diff( map_items[ node[2]*map_area + ((node[1])*map_width)+(node[0]+1)][i].primColor , cre->faveColor2) < diff_threshold )  ){
+                        //We found target!
+                        temp = {node[0]+1, node[1], node[2], node[3]+1}; //temporary
+                        search_q.push_back(temp); //add to search_q
+                        findingTarget = false;
+                        break;
+                    }
+                }//end for
+            }
+            
+            if(findingTarget==false){break;} //?right???????
+            
+            //Otherwise, add node to search_q (if eligible, ofc)
+            
+            if(block_map[ node[2]*map_area + ((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
+                //we also gotta make sure node isn't in queue with lower distance already...
+                //cycle through the list and check for every lower distance...
+                if(!isNodeIn({node[0]+1,node[1],node[2],0}, search_q)){
+                    temp = {node[0]+1, node[1], node[2], node[3]+1};
+                    search_q.push_back(temp);
+                }
+            }
+        }
+        //UP
+        if(node[1]-1 > 0){ //bounds checking
+            if(block_map[ node[2]*map_area + ((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+                for(int i = 0; i < map_items[ node[2]*map_area + ((node[1]-1)*map_width)+(node[0])].size() ; i++){ //iterate through all items on the adjacent node
+                    if( color_diff( map_items[ node[2]*map_area + ((node[1]-1)*map_width)+(node[0])][i].primColor , cre->faveColor) < diff_threshold
+                       ||  (color_diff( map_items[ node[2]*map_area + ((node[1]-1)*map_width)+(node[0])][i].primColor , cre->faveColor2) < diff_threshold) ){
+                        //We found target!
+                        temp = {node[0], node[1]-1, node[2], node[3]+1}; //temporary
+                        search_q.push_back(temp); //add to search_q
+                        findingTarget = false;
+                        break;
+                    }
+                }//end for
+            }
+            
+            if(findingTarget==false){break;} //?right???????
+            
+            //Otherwise, add node to search_q (if eligible, ofc)
+            
+            if(block_map[ node[2]*map_area + ((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+                //we also gotta make sure node isn't in queue with lower distance already...
+                //cycle through the list and check for every lower distance...
+                if(!isNodeIn({node[0],node[1]-1,node[2],0}, search_q)){
+                    temp = {node[0], node[1]-1, node[2], node[3]+1};
+                    search_q.push_back(temp);
+                }
+            }
+        }
+        //DOWN
+        if(node[1]+1 < map_height){ //bounds checking
+            if(block_map[ node[2]*map_area + ((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+                for(int i = 0; i < map_items[ node[2]*map_area + ((node[1]+1)*map_width)+(node[0])].size() ; i++){ //iterate through all items on the adjacent node
+                    if( color_diff( map_items[ node[2]*map_area + ((node[1]+1)*map_width)+(node[0])][i].primColor , cre->faveColor) < diff_threshold
+                       ||  (color_diff( map_items[ node[2]*map_area + ((node[1]+1)*map_width)+(node[0])][i].primColor , cre->faveColor2) < diff_threshold) ){
+                        //We found target!
+                        temp = {node[0], node[1]+1, node[2], node[3]+1}; //temporary
+                        search_q.push_back(temp); //add to search_q
+                        findingTarget = false;
+                        break;
+                    }
+                }//end for
+            }
+            
+            if(findingTarget==false){break;} //?right???????
+            
+            //Otherwise, add node to search_q (if eligible, ofc)
+            
+            if(block_map[ node[2]*map_area + ((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+                //we also gotta make sure node isn't in queue with lower distance already...
+                //cycle through the list and check for every lower distance...
+                if(!isNodeIn({node[0],node[1]+1,node[2],0}, search_q)){
+                    temp = {node[0], node[1]+1,node[2], node[3]+1};
+                    search_q.push_back(temp);
+                }
+            }
+        }
+        
+        //ALSO NEED TO CHECK LADDERSs
+        //UP LADDER
+        if( isItemInList( map_scenery_top[node[2]*map_area + node[1]*map_width + node[0] ] , 318) == true &&
+           isItemInList( map_scenery_top[ (node[2]+1)*map_area + node[1]*map_width + node[0] ] , 318) == true ){
+            
+            //iterate through all items on the adjacent node
+            for(int i = 0; i < map_items[ (node[2]+1)*map_area + node[1]*map_width+node[0]].size() ; i++){
+                if( color_diff( map_items[ (node[2]+1)*map_area + node[1]*map_width+node[0]][i].primColor , cre->faveColor) < diff_threshold
+                   ||  (color_diff( map_items[ (node[2]+1)*map_area + node[1]*map_width+node[0]][i].primColor , cre->faveColor2) < diff_threshold) ){
+                    //We found target!
+                    temp = {node[0], node[1], node[2]+1, node[3]+1}; //temporary
+                    search_q.push_back(temp); //add to search_q
+                    findingTarget = false;
+                    break;
+                }
+                
+            }//end for, done iterating through items, didn't find fave color...
+            
+            //if that wasn't a find, then we need to (potentially) add it to list
+            //we also gotta make sure node isn't in queue with lower distance already...
+            //cycle through the list and check for every lower distance...
+            if(!isNodeIn({node[0],node[1],node[2]+1,0}, search_q)){
+                temp = {node[0], node[1],node[2]+1, node[3]+1};
+                search_q.push_back(temp);
+            }
+        }
+        
+        //DOWN LADDER
+        if( isItemInList( map_scenery_top[node[2]*map_area + node[1]*map_width + node[0] ] , 318) == true &&
+           isItemInList( map_scenery_top[ (node[2]-1)*map_area + node[1]*map_width + node[0] ] , 318) == true ){
+            
+            //iterate through all items on the adjacent node
+            for(int i = 0; i < map_items[ (node[2]-1)*map_area + node[1]*map_width+node[0]].size() ; i++){
+                if( color_diff( map_items[ (node[2]-1)*map_area + node[1]*map_width+node[0]][i].primColor , cre->faveColor) < diff_threshold
+                   ||  (color_diff( map_items[ (node[2]-1)*map_area + node[1]*map_width+node[0]][i].primColor , cre->faveColor2) < diff_threshold) ){
+                    //We found target!
+                    temp = {node[0], node[1], node[2]-1, node[3]+1}; //temporary
+                    search_q.push_back(temp); //add to search_q
+                    findingTarget = false;
+                    break;
+                }
+                
+            }//end for, done iterating through items, didn't find fave color...
+            
+            //if that wasn't a find, then we need to (potentially) add it to list
+            //we also gotta make sure node isn't in queue with lower distance already...
+            //cycle through the list and check for every lower distance...
+            if(!isNodeIn({node[0],node[1],node[2]-1,0}, search_q)){
+                temp = {node[0], node[1],node[2]-1, node[3]+1};
+                search_q.push_back(temp);
+            }
+        }
+        
+        
+        if(findingTarget==false){break;} //?right???????
+        
+        k = k+1;
+        if(k > 400){ //if we've been searching too long, give up
+            k = search_q.size(); //just go to end of queue so we can return error code
+        }
+        
+    }//Broke out of while loop means we found target
+    
+    //Now we need to go down the list (popping) and only keep nodes that apply to the CORRECT PATH
+    //We create a list goind BACKWARD from target to current
+    vector<vector<int>> path2target;//the list of nodes leading from target
+    temp = search_q.back(); //get last element from list
+    search_q.pop_back(); //now remove that element since we won't need it in list
+    path2target.push_back(temp);//Add first node to path
+    while(true){
+        temp = search_q.back();
+        search_q.pop_back(); //Get last value out of search queue
+        if(temp[3] == 0){ //means 0 steps left and we found original node (our starting position
+            break;
+        }
+        if(temp[3] == path2target.back()[3]- 1){ //if current node is actually a step closer
+            //check if it's a step in the right direction (AND ONLY 1 unit away from last step)
+            if( ((abs(temp[0]-path2target.back()[0])==1)&&(abs(temp[1]-path2target.back()[1])==0)&&(abs(temp[2]-path2target.back()[2])==0))
+               || //check if x diff is 1
+               ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==1)&&(abs(temp[2]-path2target.back()[2])==0))
+               || //check if y diff is 1
+               ((abs(temp[0]-path2target.back()[0])==1)&&(abs(temp[1]-path2target.back()[1])==0)&&(abs(temp[2]-path2target.back()[2])==1))
+               ){ //check if z diff is 1
                 path2target.push_back(temp);
             }
             
@@ -1696,6 +1978,7 @@ void wander_thread(Sprite* spr1){
             if(spr1->path.size()>1){ //if the path list is non-empty
                 //Need to register the skipped steps in "prev values"
                 spr1->moveTo(spr1->path[spr1->path.size()-1][0], spr1->path[spr1->path.size()-1][1]);
+                spr1->z = spr1->path[spr1->path.size()-1][2];
                 spr1->path.pop_back(); //pop off the last element (skip it)
             }
         }
@@ -1703,6 +1986,7 @@ void wander_thread(Sprite* spr1){
         vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
         //Now actually move
         spr1->moveTo(next_step[0], next_step[1]);
+        spr1->z = next_step[2];
         //pop off the step from path
         spr1->path.pop_back();
         
@@ -1715,6 +1999,156 @@ void wander_thread(Sprite* spr1){
         
     }
     return;
+}
+
+//A thread that moves the input sprite along it's stored path
+//Thread is timed to reflect Sprite's movement speed
+//The sprite should have it's path set before starting this thread (or else it does nothing)
+//THe sprite's inThread flag is set to false when this thread finishes running
+void walk_path_thread(Sprite* spr1){
+    
+    //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
+    spr1->move_timer = SDL_GetTicks(); //start move timer
+    int steps_to_pop = 0; //how many steps need to be popped off path
+    int carry_over = 0; //how many ticks were rounded off
+    
+    //Check to make sure path is non-empty
+    if(spr1->path.size() <= 0){
+        spr1->inThread = false;
+        return;
+    }
+    
+    while( true ){
+        //Determine how many steps have to be moved while time has passed
+        steps_to_pop = ( (SDL_GetTicks() - spr1->move_timer)*(spr1->move_speed/1000.0) ); // (elapsed time * movement speed) / 1000 ms
+        if(steps_to_pop <= 0){
+            continue; //no steps need to be taken, continue
+        }
+        //Now pop off that many steps
+        for(int j = 0 ; j < steps_to_pop-1 ; j++){
+            if(spr1->path.size()>1){ //if the path list is non-empty (and has at least 1 element, which will be saved for actual movement)
+                //Need to register the skipped steps in "prev values"
+                spr1->moveTo(spr1->path[spr1->path.size()-1][0], spr1->path[spr1->path.size()-1][1]);
+                spr1->z = spr1->path[spr1->path.size()-1][2]; //also set correct floor
+                spr1->path.pop_back(); //pop off the last element (skip it)
+            }
+        }
+        
+        vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
+        //Now actually move
+        spr1->moveTo(next_step[0], next_step[1]);
+        spr1->z = next_step[2];
+        //pop off the step from path
+        spr1->path.pop_back();
+        
+        //Check if done with path
+        if(spr1->path.size()<1){ //then it's empty
+            spr1->inThread = false;
+            break;
+        }
+        
+        //update timer
+        //First, determine how much carry-over we need to keep (time we haven't accounted for due to rounding
+        carry_over = (SDL_GetTicks() - spr1->move_timer); //How much time we have on timer, total
+        carry_over = carry_over - (steps_to_pop*1000.0/spr1->move_speed); //now subtract how much time we've accounted for
+        //carry_over now has how many ticks we haven't updated for
+        spr1->move_timer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
+    }
+    
+    free_path(*spr1); //clear old path
+    return;
+    
+}
+
+//Walks to the specified position and drops item
+//calls walkPathObj and waits for it to set inThread = false
+void position_depo_thread(Sprite* spr1, int xpos, int ypos, int zpos){
+    
+    //Firstly, indicate to the sprites that we need them...
+    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
+    //mainly used for OTHER creatures, outside thread...
+    //later, walk_path thread will temporarily set inThread = false, momentarily allowing the creature to be scheduled a new task
+    //this flag prevents that from happening
+    //WE NEED TO SET THIS SINCE WE CALL ANOTHER THREAD INSIDE THIS THREAD
+    //spr1->isNeededByThread = true;
+    
+    //Find a path to target
+    free_path(*spr1); //clear path on sprite for starters
+    if(spr1->path.empty()){ //if path is empty
+        spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, xpos, ypos, zpos );
+    }
+    
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, no path to ritual");
+        
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    
+    //Now start the thread that will actually walk the path to target
+    std::thread walkPathObj(walk_path_thread, spr1);
+    walkPathObj.detach();
+    //walkPathObj.join(); //block (wait for it to complete)
+    
+    //Wait for spr1 to get to destination (walk_to_thread signals end by setting inThread to false)
+    while(true){
+        
+        //if done with walk_to_thread
+        if(spr1->inThread == false){
+            
+            putDownItem(spr1, xpos, ypos, zpos, spr1->inventory.size()-1); //put down last item
+            
+            //get ready to exit thread and be put up for new tasks
+            //spr1->isNeededByThread = false;
+            //spr1->inThread = false;
+            return;
+            
+        }
+        
+    }
+    
+}
+
+//makes the creature travel home and deposit their item on an empty space
+void home_depo_thread(Sprite* spr1){
+    
+    //Firstly, indicate to the sprites that we need them...
+    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
+    //mainly used for OTHER creatures, outside thread...
+    //later, walk_path thread will temporarily set inThread = false, momentarily allowing the creature to be scheduled a new task
+    //this flag prevents that from happening
+    //WE NEED TO SET THIS SINCE WE CALL ANOTHER THREAD INSIDE THIS THREAD
+    spr1->isNeededByThread = true;
+    
+    printf("chose to depo at home");
+    
+    //Find an empty space in creature's tower
+    int loc_x = spr1->owned_tower->x + rand()%(spr1->owned_tower->n-2) + 1;
+    int loc_y = spr1->owned_tower->y + rand()%(spr1->owned_tower->n-2) + 1;
+    int loc_z = rand()%spr1->owned_tower->num_floors;
+    
+    //Now spawn a thread to tells creature to deposit at house
+    std::thread positionDepoObj(position_depo_thread, spr1, loc_x, loc_y, loc_z);
+    positionDepoObj.detach();
+    
+    //Wait for spr1 to get to destination (walk_to_thread - which is called by  signals end by setting inThread to false)
+    while(true){
+        
+        //if done with walk_to_thread
+        if(spr1->inThread == false){
+            
+            //get ready to exit thread and be put up for new tasks
+            spr1->isNeededByThread = false;
+            spr1->inThread = false;
+            return;
+        }
+        
+    }
+    
 }
 
 //A thread for finding the nearest shroom depot
@@ -1817,7 +2251,7 @@ void gather_thread(Sprite* spr1){
 
         //find a new target path
         if(spr1->path.empty()){ //if path is empty
-            faveColorSearch(spr1, color_thresh);
+            faveColorSearch_Z(spr1, color_thresh);
             //itemTypeSearch(spr1, search_item);
         }
 
@@ -1843,6 +2277,8 @@ void gather_thread(Sprite* spr1){
             if(spr1->path.size()>1){ //if the path list is non-empty
                 //Need to register the skipped steps in "prev values"
                 spr1->moveTo(spr1->path[spr1->path.size()-1][0], spr1->path[spr1->path.size()-1][1]);
+                spr1->z = spr1->path[spr1->path.size()-1][2];
+                
                 spr1->path.pop_back(); //pop off the last element (skip it)
             }
         }
@@ -1851,8 +2287,7 @@ void gather_thread(Sprite* spr1){
         vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
         //Now actually move
         spr1->moveTo(next_step[0], next_step[1]);
-        //        spr1->x = next_step[0];
-        //        spr1->y = next_step[1];
+        spr1->z = next_step[2];
         //pop off the step from path
         spr1->path.pop_back();
 
@@ -1867,22 +2302,42 @@ void gather_thread(Sprite* spr1){
 
                     pickUpItem(spr1, spr1->x, spr1->y, i); //then pick up the item
 
-                    //Start trek to shroom depot...
+                    //Start trek to shroom depot... or possibly deposit in house
                     //we're going to transfer it to another thread...
                     free_path(*spr1); //clear old path
                     //spr1->inThread = false; //we can keep the status as true since we're changing threads.( normally have to set this flag)
-                    //This thread makes the creature go to shroom
-                    //std::thread shroomDepoObj(shroom_depo_thread, spr1);
-                    std::thread shroomDepoObj(shroom_depo_thread, spr1);
-                    shroomDepoObj.detach();
-                    if(spr1->isNeededByThread){printf("is neeeded'\n");}
+                    
+                    //Decide if we want to deposit to shroom or home
+                    int choice = rand()%2;
+                    choice = 1;
+                    switch(choice){
+                        case 0: {
+                            //This thread makes the creature go to shroom
+                            std::thread shroomDepoObj(shroom_depo_thread, spr1);
+                            shroomDepoObj.detach();
+                            break;
+                        }
+                        case 1: {
+                            //This thread makes the creature go to home and depo
+                            std::thread homeDepoObj(home_depo_thread, spr1);
+                            homeDepoObj.detach();
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
+                    }
+                    
+
+                    
+                    
                     return;
 
                 }
 
             }
 
-            //break;
+            break;
         }
 
         //STANDARD MOVEMENT TIMER UPDATE SEQUENCE
@@ -1896,65 +2351,6 @@ void gather_thread(Sprite* spr1){
     }
     spr1->inThread = false; //if it reaches here and exits ,then clear flag
     return;
-}
-
-//A thread that moves the input sprite along it's stored path
-//Thread is timed to reflect Sprite's movement speed
-//The sprite should have it's path set before starting this thread (or else it does nothing)
-//THe sprite's inThread flag is set to false when this thread finishes running
-void walk_path_thread(Sprite* spr1){
-    
-    //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
-    spr1->move_timer = SDL_GetTicks(); //start move timer
-    int steps_to_pop = 0; //how many steps need to be popped off path
-    int carry_over = 0; //how many ticks were rounded off
-    
-    //Check to make sure path is non-empty
-    if(spr1->path.size() <= 0){
-        spr1->inThread = false;
-        return;
-    }
-    
-    while( true ){
-        //Determine how many steps have to be moved while time has passed
-        steps_to_pop = ( (SDL_GetTicks() - spr1->move_timer)*(spr1->move_speed/1000.0) ); // (elapsed time * movement speed) / 1000 ms
-        if(steps_to_pop <= 0){
-            continue; //no steps need to be taken, continue
-        }
-        //Now pop off that many steps
-        for(int j = 0 ; j < steps_to_pop-1 ; j++){
-            if(spr1->path.size()>1){ //if the path list is non-empty (and has at least 1 element, which will be saved for actual movement)
-                //Need to register the skipped steps in "prev values"
-                spr1->moveTo(spr1->path[spr1->path.size()-1][0], spr1->path[spr1->path.size()-1][1]);
-                spr1->z = spr1->path[spr1->path.size()-1][2]; //also set correct floor
-                spr1->path.pop_back(); //pop off the last element (skip it)
-            }
-        }
-        
-        vector<int> next_step = spr1->path[spr1->path.size()-1]; //the last element of array/vector
-        //Now actually move
-        spr1->moveTo(next_step[0], next_step[1]);
-        spr1->z = next_step[2];
-        //pop off the step from path
-        spr1->path.pop_back();
-        
-        //Check if done with path
-        if(spr1->path.size()<1){ //then it's empty
-            spr1->inThread = false;
-            break;
-        }
-        
-        //update timer
-        //First, determine how much carry-over we need to keep (time we haven't accounted for due to rounding
-        carry_over = (SDL_GetTicks() - spr1->move_timer); //How much time we have on timer, total
-        carry_over = carry_over - (steps_to_pop*1000.0/spr1->move_speed); //now subtract how much time we've accounted for
-        //carry_over now has how many ticks we haven't updated for
-        spr1->move_timer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
-    }
-    
-    free_path(*spr1); //clear old path
-    return;
-    
 }
 
 //Thread that performs a ritual
@@ -1973,7 +2369,7 @@ void perform_ritual_thread(Sprite* spr1){
         //TODO: Make sure location isn't blocked or have an animation on currently
 //        loc_x = 1+(rand()%(map_width-2));
 //        loc_y = 1+(rand()%(map_height-2));
-        loc_x = spr1->owned_tower->backyard_x + rand()%spr1->owned_tower->backyard_n + 1;
+        loc_x = spr1->owned_tower->backyard_x + rand()%spr1->owned_tower->backyard_n + 2;
         loc_y = spr1->owned_tower->backyard_y + rand()%spr1->owned_tower->backyard_n;
         //Check to make sure location isn't blocked or has an animation on it currently
         if( (block_map[(loc_y*map_width)+loc_x]==true) || map_animations[(loc_y*map_width)+loc_x].size() > 0){
@@ -2010,11 +2406,6 @@ void perform_ritual_thread(Sprite* spr1){
     
     //Wait for spr1 to get to destination (walk_to_thread signals end by setting inThread to false)
     while(true){
-        
-//        //Check if spr1 reached the proper desitnation??
-//        if( (spr1->x-1 == loc_x) && (spr1->y == loc_y) ){
-//            printf("got there\n");
-//        }
         
         //if done with walk_to_thread
         if(spr1->inThread == false){
@@ -2152,8 +2543,9 @@ void walk_home_thread(Sprite* spr1){
     
     return;
     
-    
 }
+
+
 
 //periodically gives a new task to creatures
 //This function starts threads and sets inThread flag = true
@@ -2179,7 +2571,7 @@ void task_creatures_thread(){
                 map_creatures[i].inThread = true;
                 choice = rand()%4;
                 //choice = rand()%2 * 2;
-                //choice = 3;
+                //choice = 0;
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
@@ -2859,6 +3251,12 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_SPACE:{
+                        if(shiftDown==true){
+                            printf("putting down item%d", cre1->inventory.size()-1);
+                            putDownItem(cre1, cre1->x, cre1->y, cre1->z, cre1->inventory.size()-1);//put down last object in inventory
+                            break;
+                        }
+                        pickUpItem(cre1, cre1->x, cre1->y );
                         break;
                     }
                         
