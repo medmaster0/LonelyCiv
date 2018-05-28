@@ -62,6 +62,8 @@ using namespace std;
 // 337 - EYEPATCH (BUNNY)
 // 338 - DOOR
 // 339 - WAND
+// 340 - CHALICE
+// 341 - BANDANA
 
 //SDL_Texture* loadTexture( string path, SDL_Renderer* gRenderer );
 extern SDL_Renderer* gRenderer;//The window renderer

@@ -573,6 +573,20 @@ void loadTiles(){
     item_tiles_s_balcony[339] = loadTexture("Civ2/Civ2/tiles/wandSeco.png");
     item_tiles_t_balcony[339] = loadTexture("Civ2/Civ2/tiles/wandTert.png");
     
+    item_tiles_p[340] = loadTexture("Civ2/Civ2/tiles/chalicePrim.png");
+    item_tiles_s[340] = loadTexture("Civ2/Civ2/tiles/chaliceSeco.png");
+    item_tiles_t[340] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[340] = loadTexture("Civ2/Civ2/tiles/chalicePrim.png");
+    item_tiles_s_balcony[340] = loadTexture("Civ2/Civ2/tiles/chaliceSeco.png");
+    item_tiles_t_balcony[340] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[341] = loadTexture("Civ2/Civ2/tiles/bandanaPrim.png");
+    item_tiles_s[341] = loadTexture("Civ2/Civ2/tiles/bandanaSeco.png");
+    item_tiles_t[341] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[341] = loadTexture("Civ2/Civ2/tiles/bandanaPrim.png");
+    item_tiles_s_balcony[341] = loadTexture("Civ2/Civ2/tiles/bandanaSeco.png");
+    item_tiles_t_balcony[341] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
     misc_tiles[1] = loadTexture("Civ2/Civ2/tiles/zodiac/taurus.png");
@@ -814,16 +828,18 @@ void init_environment(){
         //randomly give hats
         if(rand()%8<5){
             //hat item no.'s are 305,306,323,324, 326
-            int hat_tiles[5] = {305,306,323,324, 326};
-            Hat* temp_hat = new Hat(0, 0, hat_tiles[rand()%5] ); //a temp Item to be added to cre's inventory
+            int hat_tiles[6] = {305,306,323,324, 326, 341};
+            Hat* temp_hat = new Hat(0, 0, hat_tiles[rand()%6] ); //a temp Item to be added to cre's inventory
             map_creatures.back().hat = temp_hat;
         }
         //randomly give staffs (staves?)
         if(rand()%2==1){
             //"staff" item no.'s are  330, 331, 332, 315, 313, 314, 339
-            int staff_tiles[7] = {330,331,332,315,313,314,339};
-            //Staff* temp_staff = new Staff(0,0,staff_tiles[rand()%7]); //a temp Item to be added to the cre's equip inventory
-            Staff* temp_staff = new Staff(0,0,339); //DEBUG
+            //int staff_tiles[8] = {330,331,332,315,313,314,339,340};
+            //Staff* temp_staff = new Staff(0,0,staff_tiles[rand()%8]); //a temp Item to be added to the cre's equip inventory
+            int staff_tiles[6] = {315,330,331,332,339,340}; //315 - coin, 331 - dagger, 339 - wand, 340 - cup
+            Staff* temp_staff = new Staff(0,0,staff_tiles[rand()%6]); //a temp Item to be added to the cre's equip inventory
+            //Staff* temp_staff = new Staff(0,0,340); //DEBUG
             map_creatures.back().staff = temp_staff;
         }
 //        //randomly give lights
@@ -897,7 +913,7 @@ void init_environment(){
     for(int g = 0 ; g<225; g++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
-        temp_tile = 339; //328 for flowers
+        temp_tile = 328; //328 for flowers
         //    Both Random Colors
         //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
         //    Pink / Green
@@ -910,6 +926,23 @@ void init_environment(){
         map_items[ (tempz*map_area) + (tempy*map_width)+tempx].push_back(temp_item);
     }
     
+//    //create random items (from the randomly generated assets)
+//    for(int g = 0 ; g<225; g++){
+//        tempx = rand()%(map_width);
+//        tempy = rand()%(map_height);
+//        temp_tile = 340; //328 for flowers
+//        //    Both Random Colors
+//        //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
+//        //    Pink / Green
+//        //Item temp_item = Item(tempx, tempy , temp_tile, generate_pink(), generate_green()); //temporary item (scenery)
+//        //    Random Color / Greens
+//        //Item temp_item = Item(tempx, tempy , temp_tile, {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, generate_green()); //temporary item (scenery)
+//        //    Both Random WOLRDZ COLORZ
+//        Item temp_item = Item(tempx, tempy , temp_tile, world_colors[rand()%world_colors.size()], world_colors[rand()%world_colors.size()]); //temporary item (scenery)
+//        //temp_item.tertColor = generate_golden(); //since item is perfume, apply gold to it's third color
+//        map_items[ (tempz*map_area) + (tempy*map_width)+tempx].push_back(temp_item);
+//    }
+//
     
 }
 

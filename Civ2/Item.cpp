@@ -63,6 +63,9 @@ using namespace std;
 // 336 - CROWN (BUNNY)
 // 337 - EYEPATCH (BUNNY)
 // 338 - DOOR
+// 339 - WAND
+// 340 - CHALICE
+// 341 - BANDANA
 
 
 //static variable constructor
@@ -279,7 +282,9 @@ void displayItemList(vector<Item> item_list, SDL_Renderer* gRenderer, int SCREEN
         }else if(item_list[item_index].type==332){ //Then it's a stone
             item_name = "    bomb";
         }else if(item_list[item_index].type==339){ //Then it's a stone
-            item_name = "    wand";
+            item_name = "    staff";
+        }else if(item_list[item_index].type==340){ //Then it's a stone
+            item_name = "    chalice";
         }
     
         //Determine Color

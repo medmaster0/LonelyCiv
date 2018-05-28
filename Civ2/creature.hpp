@@ -104,6 +104,14 @@ public:
     vector<Recipe> recipe_list; //Shrooms keep track of a list of Recipes
 };
 
+//An Oversized Sprite 2x2
+class Sprite2x2: public Sprite{
+public:
+    Sprite2x2(int xp, int yp); //Initializes variables
+    SDL_Texture* tertTexture; //These will also have a third texture
+    void draw(int x, int y); //Draws the Big Creature at the coordinates, taking into consideration spatial issues
+};
+
 
 //MISC FUNCTIONS
 
