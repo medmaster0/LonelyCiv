@@ -588,6 +588,13 @@ void loadTiles(){
     item_tiles_s_balcony[341] = loadTexture("Civ2/Civ2/tiles/bandanaSeco.png");
     item_tiles_t_balcony[341] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[342] = loadTexture("Civ2/Civ2/tiles/hoodPrim.png");
+    item_tiles_s[342] = loadTexture("Civ2/Civ2/tiles/hoodSeco.png");
+    item_tiles_t[342] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[342] = loadTexture("Civ2/Civ2/tiles/hoodPrim.png");
+    item_tiles_s_balcony[342] = loadTexture("Civ2/Civ2/tiles/hoodSeco.png");
+    item_tiles_t_balcony[342] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
     misc_tiles[1] = loadTexture("Civ2/Civ2/tiles/zodiac/taurus.png");
@@ -829,8 +836,8 @@ void init_environment(){
         //randomly give hats
         if(rand()%8<5){
             //hat item no.'s are 305,306,323,324, 326
-            int hat_tiles[6] = {305,306,323,324, 326, 341};
-            Hat* temp_hat = new Hat(0, 0, hat_tiles[rand()%6] ); //a temp Item to be added to cre's inventory
+            int hat_tiles[7] = {305,306,323,324, 326, 341, 342};
+            Hat* temp_hat = new Hat(0, 0, hat_tiles[rand()%7] ); //a temp Item to be added to cre's inventory
             map_creatures.back().hat = temp_hat;
         }
         //randomly give staffs (staves?)
@@ -1408,205 +1415,205 @@ void putDownItem(Sprite* sprite, int xpos, int ypos, int zpos, int index){
     
 }
 
-//Helper function for below search routine
-//returns true if element node e is in node list v
-bool isNodeIn(vector<int> e, vector<vector<int>> v){
-    
-    vector<int> temp; //used to hold the nodes...
-    for(int i = 0; i<v.size(); i++){ //cycle through all elements of v
-        if(e[0] == v[i][0] && e[1] == v[i][1]){
-            return true;//means we found a match!
-        }
-    }
-    return false; //means we cycled list and couldn't find match
-}
+////Helper function for below search routine
+////returns true if element node e is in node list v
+//bool isNodeIn(vector<int> e, vector<vector<int>> v){
+//
+//    vector<int> temp; //used to hold the nodes...
+//    for(int i = 0; i<v.size(); i++){ //cycle through all elements of v
+//        if(e[0] == v[i][0] && e[1] == v[i][1]){
+//            return true;//means we found a match!
+//        }
+//    }
+//    return false; //means we cycled list and couldn't find match
+//}
 
-//searches for an item that is similar enough for a given color
-//Flood searches from a given sprite's position for item that fits criteria
-//(Flood search is a good choice here since we don't have a fixed destination we are trying to get to)
-//Searches each tile on map_items - each tile has a stack of items that will be searched
-//input: Sprite who will be searching
-//        diff_threshold - the maximum difference in color acceptable
-//output: steps from sprite to target
-//        returns {{9999,9999}} error code if not found soon enough
-//        steps returned as nodes: <xpos, ypos, steps_from_dest>
-//        function returns a list of those nodes
-//others: also sets target data on Sprite*
-vector<vector<int>> faveColorSearch(Sprite* cre, int diff_threshold){
-    
-    vector<vector<int>> search_q; //the main "list"
-    int k = 0; //the main counter used to keep track of where we are in the list
-    vector<int> node; //The current node on the list we are looking at
-    vector<int> temp; //Temp node used to push new nodes onto queues and later in filtering out irrelevant steps
-    
-    //Add starting node to search queue
-    node = {cre->x, cre->y, 0}; //initialization
-    search_q.push_back(node); //add first element to list
-    bool findingTarget = true; //a flag signalling if we're still searching for target (and populating search_q)
-    while(findingTarget){
-        
-        if(k<search_q.size()){ //bounds chhecking
-            node = search_q[k]; //pull the next node <xpos, ypos, distance_from_start>
-        }else{ //if we've got to the end of list
-            //couldn't find targ
-            cre->path = {{9999,9999}}; //set the path to indicate error code
-            return {{9999,9999}} ; //didn't find / couldn't reach / searching too long
-        }
-        
-        
-        //Look at all nodes adjacent to the current node
-        //LEFT
-        if(node[0]-1 > 0){ //bounds checking
-             if(block_map[((node[1])*map_width)+(node[0]-1)]==false){ //if adjacent is NOT blocked
-                for(int i = 0; i < map_items[((node[1])*map_width)+(node[0]-1)].size() ; i++){ //iterate through all items on the adjacent node
-                    if( (color_diff( map_items[((node[1])*map_width)+(node[0]-1)][i].primColor , cre->faveColor) < diff_threshold)
-                       || ( color_diff( map_items[((node[1])*map_width)+(node[0]-1)][i].primColor , cre->faveColor2) < diff_threshold ) ){
-                        //We found target!
-                        temp = {node[0]-1, node[1], node[2]+1}; //temporary
-                        search_q.push_back(temp); //add to search_q
-                        findingTarget = false;
-                        break;
-                    }
-                }//end for
-             }
-            
-            if(findingTarget==false){break;} //?right???????
-                
-            //Otherwise, add node to search_q (if eligible, ofc)
-            
-            if(block_map[((node[1])*map_width)+(node[0]-1)]==false){ //if adjacent is NOT blocked
-                //we also gotta make sure node isn't in queue with lower distance already...
-                //cycle through the list and check for every lower distance...
-                if(!isNodeIn({node[0]-1,node[1],0}, search_q)){
-                    temp = {node[0]-1, node[1], node[2]+1};
-                    search_q.push_back(temp);
-                }
-            }
-        }
-        //RIGHT
-        if(node[0]+1 < map_width){ //bounds checking
-            if(block_map[((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
-                for(int i = 0; i < map_items[((node[1])*map_width)+(node[0]+1)].size() ; i++){ //iterate through all items on the adjacent node
-                    if( color_diff( map_items[((node[1])*map_width)+(node[0]+1)][i].primColor , cre->faveColor) < diff_threshold
-                       || ( color_diff( map_items[((node[1])*map_width)+(node[0]+1)][i].primColor , cre->faveColor2) < diff_threshold )  ){
-                        //We found target!
-                        temp = {node[0]+1, node[1], node[2]+1}; //temporary
-                        search_q.push_back(temp); //add to search_q
-                        findingTarget = false;
-                        break;
-                    }
-                }//end for
-            }
-            
-            if(findingTarget==false){break;} //?right???????
-            
-            //Otherwise, add node to search_q (if eligible, ofc)
-            
-            if(block_map[((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
-                //we also gotta make sure node isn't in queue with lower distance already...
-                //cycle through the list and check for every lower distance...
-                if(!isNodeIn({node[0]+1,node[1],0}, search_q)){
-                    temp = {node[0]+1, node[1], node[2]+1};
-                    search_q.push_back(temp);
-                }
-            }
-        }
-        //UP
-        if(node[1]-1 > 0){ //bounds checking
-            if(block_map[((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
-                for(int i = 0; i < map_items[((node[1]-1)*map_width)+(node[0])].size() ; i++){ //iterate through all items on the adjacent node
-                    if( color_diff( map_items[((node[1]-1)*map_width)+(node[0])][i].primColor , cre->faveColor) < diff_threshold
-                       ||  (color_diff( map_items[((node[1]-1)*map_width)+(node[0])][i].primColor , cre->faveColor2) < diff_threshold) ){
-                        //We found target!
-                        temp = {node[0], node[1]-1, node[2]+1}; //temporary
-                        search_q.push_back(temp); //add to search_q
-                        findingTarget = false;
-                        break;
-                    }
-                }//end for
-            }
-            
-            if(findingTarget==false){break;} //?right???????
-            
-            //Otherwise, add node to search_q (if eligible, ofc)
-            
-            if(block_map[((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
-                //we also gotta make sure node isn't in queue with lower distance already...
-                //cycle through the list and check for every lower distance...
-                if(!isNodeIn({node[0],node[1]-1,0}, search_q)){
-                    temp = {node[0], node[1]-1, node[2]+1};
-                    search_q.push_back(temp);
-                }
-            }
-        }
-        //DOWN
-        if(node[1]+1 < map_height){ //bounds checking
-            if(block_map[((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
-                for(int i = 0; i < map_items[((node[1]+1)*map_width)+(node[0])].size() ; i++){ //iterate through all items on the adjacent node
-                    if( color_diff( map_items[((node[1]+1)*map_width)+(node[0])][i].primColor , cre->faveColor) < diff_threshold
-                       ||  (color_diff( map_items[((node[1]+1)*map_width)+(node[0])][i].primColor , cre->faveColor2) < diff_threshold) ){
-                        //We found target!
-                        temp = {node[0], node[1]+1, node[2]+1}; //temporary
-                        search_q.push_back(temp); //add to search_q
-                        findingTarget = false;
-                        break;
-                    }
-                }//end for
-            }
-            
-            if(findingTarget==false){break;} //?right???????
-            
-            //Otherwise, add node to search_q (if eligible, ofc)
-            
-            if(block_map[((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
-                //we also gotta make sure node isn't in queue with lower distance already...
-                //cycle through the list and check for every lower distance...
-                if(!isNodeIn({node[0],node[1]+1,0}, search_q)){
-                    temp = {node[0], node[1]+1, node[2]+1};
-                    search_q.push_back(temp);
-                }
-            }
-        }
-        
-        k = k+1;
-        if(k > 400){ //if we've been searching too long, give up
-            k = search_q.size(); //just go to end of queue so we can return error code
-        }
-        
-        
-    
-    }//Broke out of while loop means we found target
-    
-    //Now we need to go down the list (popping) and only keep nodes that apply to the CORRECT PATH
-    //We create a list goind BACKWARD from target to current
-    vector<vector<int>> path2target;//the list of nodes leading from target
-    temp = search_q.back(); //get last element from list
-    search_q.pop_back(); //now remove that element since we won't need it in list
-    path2target.push_back(temp);//Add first node to path
-    while(true){
-        temp = search_q.back();
-        search_q.pop_back(); //Get last value out of search queue
-        if(temp[2] == 0){ //means 0 steps left and we found original node (our starting position
-            break;
-        }
-        if(temp[2] == path2target.back()[2]- 1){ //if current node is actually a step closer
-            //check if it's a step in the right direction (AND ONLY 1 unit away from last step)
-            if(   ((abs(temp[0]-path2target.back()[0])==1)&&(abs(temp[1]-path2target.back()[1])==0)) || //check if x diff is 1
-               ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==1)) ){ //check if y diff is 1
-                path2target.push_back(temp);
-            }
-            
-        }
-        
-    }
-    
-    //return search_q;
-    //reverse(path2target.begin(), path2target.end());
-    cre->path = path2target;
-    
-    return path2target; //return the list backwards so you can pop_back to get the next step needed
-    
-}
+////searches for an item that is similar enough for a given color
+////Flood searches from a given sprite's position for item that fits criteria
+////(Flood search is a good choice here since we don't have a fixed destination we are trying to get to)
+////Searches each tile on map_items - each tile has a stack of items that will be searched
+////input: Sprite who will be searching
+////        diff_threshold - the maximum difference in color acceptable
+////output: steps from sprite to target
+////        returns {{9999,9999}} error code if not found soon enough
+////        steps returned as nodes: <xpos, ypos, steps_from_dest>
+////        function returns a list of those nodes
+////others: also sets target data on Sprite*
+//vector<vector<int>> faveColorSearch(Sprite* cre, int diff_threshold){
+//
+//    vector<vector<int>> search_q; //the main "list"
+//    int k = 0; //the main counter used to keep track of where we are in the list
+//    vector<int> node; //The current node on the list we are looking at
+//    vector<int> temp; //Temp node used to push new nodes onto queues and later in filtering out irrelevant steps
+//
+//    //Add starting node to search queue
+//    node = {cre->x, cre->y, 0}; //initialization
+//    search_q.push_back(node); //add first element to list
+//    bool findingTarget = true; //a flag signalling if we're still searching for target (and populating search_q)
+//    while(findingTarget){
+//
+//        if(k<search_q.size()){ //bounds chhecking
+//            node = search_q[k]; //pull the next node <xpos, ypos, distance_from_start>
+//        }else{ //if we've got to the end of list
+//            //couldn't find targ
+//            cre->path = {{9999,9999}}; //set the path to indicate error code
+//            return {{9999,9999}} ; //didn't find / couldn't reach / searching too long
+//        }
+//
+//
+//        //Look at all nodes adjacent to the current node
+//        //LEFT
+//        if(node[0]-1 > 0){ //bounds checking
+//             if(block_map[((node[1])*map_width)+(node[0]-1)]==false){ //if adjacent is NOT blocked
+//                for(int i = 0; i < map_items[((node[1])*map_width)+(node[0]-1)].size() ; i++){ //iterate through all items on the adjacent node
+//                    if( (color_diff( map_items[((node[1])*map_width)+(node[0]-1)][i].primColor , cre->faveColor) < diff_threshold)
+//                       || ( color_diff( map_items[((node[1])*map_width)+(node[0]-1)][i].primColor , cre->faveColor2) < diff_threshold ) ){
+//                        //We found target!
+//                        temp = {node[0]-1, node[1], node[2]+1}; //temporary
+//                        search_q.push_back(temp); //add to search_q
+//                        findingTarget = false;
+//                        break;
+//                    }
+//                }//end for
+//             }
+//
+//            if(findingTarget==false){break;} //?right???????
+//
+//            //Otherwise, add node to search_q (if eligible, ofc)
+//
+//            if(block_map[((node[1])*map_width)+(node[0]-1)]==false){ //if adjacent is NOT blocked
+//                //we also gotta make sure node isn't in queue with lower distance already...
+//                //cycle through the list and check for every lower distance...
+//                if(!isNodeIn({node[0]-1,node[1],0}, search_q)){
+//                    temp = {node[0]-1, node[1], node[2]+1};
+//                    search_q.push_back(temp);
+//                }
+//            }
+//        }
+//        //RIGHT
+//        if(node[0]+1 < map_width){ //bounds checking
+//            if(block_map[((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
+//                for(int i = 0; i < map_items[((node[1])*map_width)+(node[0]+1)].size() ; i++){ //iterate through all items on the adjacent node
+//                    if( color_diff( map_items[((node[1])*map_width)+(node[0]+1)][i].primColor , cre->faveColor) < diff_threshold
+//                       || ( color_diff( map_items[((node[1])*map_width)+(node[0]+1)][i].primColor , cre->faveColor2) < diff_threshold )  ){
+//                        //We found target!
+//                        temp = {node[0]+1, node[1], node[2]+1}; //temporary
+//                        search_q.push_back(temp); //add to search_q
+//                        findingTarget = false;
+//                        break;
+//                    }
+//                }//end for
+//            }
+//
+//            if(findingTarget==false){break;} //?right???????
+//
+//            //Otherwise, add node to search_q (if eligible, ofc)
+//
+//            if(block_map[((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
+//                //we also gotta make sure node isn't in queue with lower distance already...
+//                //cycle through the list and check for every lower distance...
+//                if(!isNodeIn({node[0]+1,node[1],0}, search_q)){
+//                    temp = {node[0]+1, node[1], node[2]+1};
+//                    search_q.push_back(temp);
+//                }
+//            }
+//        }
+//        //UP
+//        if(node[1]-1 > 0){ //bounds checking
+//            if(block_map[((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+//                for(int i = 0; i < map_items[((node[1]-1)*map_width)+(node[0])].size() ; i++){ //iterate through all items on the adjacent node
+//                    if( color_diff( map_items[((node[1]-1)*map_width)+(node[0])][i].primColor , cre->faveColor) < diff_threshold
+//                       ||  (color_diff( map_items[((node[1]-1)*map_width)+(node[0])][i].primColor , cre->faveColor2) < diff_threshold) ){
+//                        //We found target!
+//                        temp = {node[0], node[1]-1, node[2]+1}; //temporary
+//                        search_q.push_back(temp); //add to search_q
+//                        findingTarget = false;
+//                        break;
+//                    }
+//                }//end for
+//            }
+//
+//            if(findingTarget==false){break;} //?right???????
+//
+//            //Otherwise, add node to search_q (if eligible, ofc)
+//
+//            if(block_map[((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+//                //we also gotta make sure node isn't in queue with lower distance already...
+//                //cycle through the list and check for every lower distance...
+//                if(!isNodeIn({node[0],node[1]-1,0}, search_q)){
+//                    temp = {node[0], node[1]-1, node[2]+1};
+//                    search_q.push_back(temp);
+//                }
+//            }
+//        }
+//        //DOWN
+//        if(node[1]+1 < map_height){ //bounds checking
+//            if(block_map[((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+//                for(int i = 0; i < map_items[((node[1]+1)*map_width)+(node[0])].size() ; i++){ //iterate through all items on the adjacent node
+//                    if( color_diff( map_items[((node[1]+1)*map_width)+(node[0])][i].primColor , cre->faveColor) < diff_threshold
+//                       ||  (color_diff( map_items[((node[1]+1)*map_width)+(node[0])][i].primColor , cre->faveColor2) < diff_threshold) ){
+//                        //We found target!
+//                        temp = {node[0], node[1]+1, node[2]+1}; //temporary
+//                        search_q.push_back(temp); //add to search_q
+//                        findingTarget = false;
+//                        break;
+//                    }
+//                }//end for
+//            }
+//
+//            if(findingTarget==false){break;} //?right???????
+//
+//            //Otherwise, add node to search_q (if eligible, ofc)
+//
+//            if(block_map[((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+//                //we also gotta make sure node isn't in queue with lower distance already...
+//                //cycle through the list and check for every lower distance...
+//                if(!isNodeIn({node[0],node[1]+1,0}, search_q)){
+//                    temp = {node[0], node[1]+1, node[2]+1};
+//                    search_q.push_back(temp);
+//                }
+//            }
+//        }
+//
+//        k = k+1;
+//        if(k > 400){ //if we've been searching too long, give up
+//            k = search_q.size(); //just go to end of queue so we can return error code
+//        }
+//
+//
+//
+//    }//Broke out of while loop means we found target
+//
+//    //Now we need to go down the list (popping) and only keep nodes that apply to the CORRECT PATH
+//    //We create a list goind BACKWARD from target to current
+//    vector<vector<int>> path2target;//the list of nodes leading from target
+//    temp = search_q.back(); //get last element from list
+//    search_q.pop_back(); //now remove that element since we won't need it in list
+//    path2target.push_back(temp);//Add first node to path
+//    while(true){
+//        temp = search_q.back();
+//        search_q.pop_back(); //Get last value out of search queue
+//        if(temp[2] == 0){ //means 0 steps left and we found original node (our starting position
+//            break;
+//        }
+//        if(temp[2] == path2target.back()[2]- 1){ //if current node is actually a step closer
+//            //check if it's a step in the right direction (AND ONLY 1 unit away from last step)
+//            if(   ((abs(temp[0]-path2target.back()[0])==1)&&(abs(temp[1]-path2target.back()[1])==0)) || //check if x diff is 1
+//               ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==1)) ){ //check if y diff is 1
+//                path2target.push_back(temp);
+//            }
+//
+//        }
+//
+//    }
+//
+//    //return search_q;
+//    //reverse(path2target.begin(), path2target.end());
+//    cre->path = path2target;
+//
+//    return path2target; //return the list backwards so you can pop_back to get the next step needed
+//
+//}
 
 //Helper function for below search routine
 //returns true if element node e is in node list v
@@ -1709,7 +1716,7 @@ vector<vector<int>> faveColorSearch_Z(Sprite* cre, int diff_threshold){
             if(block_map[ node[2]*map_area + ((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
                 //we also gotta make sure node isn't in queue with lower distance already...
                 //cycle through the list and check for every lower distance...
-                if(!isNodeIn({node[0]+1,node[1],node[2],0}, search_q)){
+                if(!isNodeIn_Z({node[0]+1,node[1],node[2],0}, search_q)){
                     temp = {node[0]+1, node[1], node[2], node[3]+1};
                     search_q.push_back(temp);
                 }
@@ -1737,7 +1744,7 @@ vector<vector<int>> faveColorSearch_Z(Sprite* cre, int diff_threshold){
             if(block_map[ node[2]*map_area + ((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
                 //we also gotta make sure node isn't in queue with lower distance already...
                 //cycle through the list and check for every lower distance...
-                if(!isNodeIn({node[0],node[1]-1,node[2],0}, search_q)){
+                if(!isNodeIn_Z({node[0],node[1]-1,node[2],0}, search_q)){
                     temp = {node[0], node[1]-1, node[2], node[3]+1};
                     search_q.push_back(temp);
                 }
@@ -1765,7 +1772,7 @@ vector<vector<int>> faveColorSearch_Z(Sprite* cre, int diff_threshold){
             if(block_map[ node[2]*map_area + ((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
                 //we also gotta make sure node isn't in queue with lower distance already...
                 //cycle through the list and check for every lower distance...
-                if(!isNodeIn({node[0],node[1]+1,node[2],0}, search_q)){
+                if(!isNodeIn_Z({node[0],node[1]+1,node[2],0}, search_q)){
                     temp = {node[0], node[1]+1,node[2], node[3]+1};
                     search_q.push_back(temp);
                 }
@@ -1793,7 +1800,7 @@ vector<vector<int>> faveColorSearch_Z(Sprite* cre, int diff_threshold){
             //if that wasn't a find, then we need to (potentially) add it to list
             //we also gotta make sure node isn't in queue with lower distance already...
             //cycle through the list and check for every lower distance...
-            if(!isNodeIn({node[0],node[1],node[2]+1,0}, search_q)){
+            if(!isNodeIn_Z({node[0],node[1],node[2]+1,0}, search_q)){
                 temp = {node[0], node[1],node[2]+1, node[3]+1};
                 search_q.push_back(temp);
             }
@@ -1819,7 +1826,7 @@ vector<vector<int>> faveColorSearch_Z(Sprite* cre, int diff_threshold){
             //if that wasn't a find, then we need to (potentially) add it to list
             //we also gotta make sure node isn't in queue with lower distance already...
             //cycle through the list and check for every lower distance...
-            if(!isNodeIn({node[0],node[1],node[2]-1,0}, search_q)){
+            if(!isNodeIn_Z({node[0],node[1],node[2]-1,0}, search_q)){
                 temp = {node[0], node[1],node[2]-1, node[3]+1};
                 search_q.push_back(temp);
             }
@@ -1853,7 +1860,7 @@ vector<vector<int>> faveColorSearch_Z(Sprite* cre, int diff_threshold){
                || //check if x diff is 1
                ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==1)&&(abs(temp[2]-path2target.back()[2])==0))
                || //check if y diff is 1
-               ((abs(temp[0]-path2target.back()[0])==1)&&(abs(temp[1]-path2target.back()[1])==0)&&(abs(temp[2]-path2target.back()[2])==1))
+               ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==0)&&(abs(temp[2]-path2target.back()[2])==1))
                ){ //check if z diff is 1
                 path2target.push_back(temp);
             }
@@ -1881,7 +1888,7 @@ vector<vector<int>> faveColorSearch_Z(Sprite* cre, int diff_threshold){
 //        steps returned as nodes: <xpos, ypos, steps_from_dest>
 //        function returns a list of those nodes
 //others: also sets target data on Sprite*
-vector<vector<int>> itemTypeSearch(Sprite* cre, int item_type){
+vector<vector<int>> itemTypeSearch_Z(Sprite* cre, int item_type){
 
     vector<vector<int>> search_q; //the main "list"
     int k = 0; //the main counter used to keep track of where we are in the list
@@ -1889,7 +1896,7 @@ vector<vector<int>> itemTypeSearch(Sprite* cre, int item_type){
     vector<int> temp; //Temp node used to push new nodes onto queues and later in filtering out irrelevant steps
 
     //Add starting node to search queue
-    node = {cre->x, cre->y, 0}; //initialization
+    node = {cre->x, cre->y, cre->z, 0}; //initialization
     search_q.push_back(node); //add first element to list
     bool findingTarget = true; //a flag signalling if we're still searching for target (and populating search_q)
     while(findingTarget){
@@ -1898,19 +1905,19 @@ vector<vector<int>> itemTypeSearch(Sprite* cre, int item_type){
             node = search_q[k]; //pull the next node <xpos, ypos, distance_from_start>
         }else{ //if we've got to the end of list
             //couldn't find targ
-            cre->path = {{9999,9999}}; //set the path to indicate error code
-            return {{9999,9999}} ; //didn't find / couldn't reach / searching too long
+            cre->path = {{9999,9999,0}}; //set the path to indicate error code
+            return {{9999,9999,0}} ; //didn't find / couldn't reach / searching too long
         }
 
 
         //Look at all nodes adjacent to the current node
         //LEFT
         if(node[0]-1 > 0){ //bounds checking
-            if(block_map[((node[1])*map_width)+(node[0]-1)]==false){ //if adjacent is NOT blocked
-                for(int i = 0; i < map_items[((node[1])*map_width)+(node[0]-1)].size() ; i++){ //iterate through all items on the adjacent node
-                    if( map_items[((node[1])*map_width)+(node[0]-1)][i].type == item_type ){
+            if(block_map[ node[2]*map_area + ((node[1])*map_width)+(node[0]-1)]==false){ //if adjacent is NOT blocked
+                for(int i = 0; i < map_items[ node[2]*map_area + ((node[1])*map_width)+(node[0]-1)].size() ; i++){ //iterate through all items on the adjacent node
+                    if( map_items[ node[2]*map_area + ((node[1])*map_width)+(node[0]-1)][i].type == item_type ){
                         //We found target!
-                        temp = {node[0]-1, node[1], node[2]+1}; //temporary
+                        temp = {node[0]-1, node[1], node[2], node[3]+1}; //temporary
                         search_q.push_back(temp); //add to search_q
                         findingTarget = false;
                         break;
@@ -1922,22 +1929,22 @@ vector<vector<int>> itemTypeSearch(Sprite* cre, int item_type){
 
             //Otherwise, add node to search_q (if eligible, ofc)
 
-            if(block_map[((node[1])*map_width)+(node[0]-1)]==false){ //if adjacent is NOT blocked
+            if(block_map[ node[2]*map_area + ((node[1])*map_width)+(node[0]-1)]==false){ //if adjacent is NOT blocked
                 //we also gotta make sure node isn't in queue with lower distance already...
                 //cycle through the list and check for every lower distance...
-                if(!isNodeIn({node[0]-1,node[1],0}, search_q)){
-                    temp = {node[0]-1, node[1], node[2]+1};
+                if(!isNodeIn_Z({node[0]-1,node[1],node[2],0}, search_q)){
+                    temp = {node[0]-1, node[1], node[2], node[3]+1};
                     search_q.push_back(temp);
                 }
             }
         }
         //RIGHT
         if(node[0]+1 < map_width){ //bounds checking
-            if(block_map[((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
-                for(int i = 0; i < map_items[((node[1])*map_width)+(node[0]+1)].size() ; i++){ //iterate through all items on the adjacent node
-                    if( map_items[((node[1])*map_width)+(node[0]+1)][i].type == item_type){
+            if(block_map[ node[2]*map_area + ((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
+                for(int i = 0; i < map_items[ node[2]*map_area + ((node[1])*map_width)+(node[0]+1)].size() ; i++){ //iterate through all items on the adjacent node
+                    if( map_items[ node[2]*map_area + ((node[1])*map_width)+(node[0]+1)][i].type == item_type){
                         //We found target!
-                        temp = {node[0]+1, node[1], node[2]+1}; //temporary
+                        temp = {node[0]+1, node[1],node[2], node[3]+1}; //temporary
                         search_q.push_back(temp); //add to search_q
                         findingTarget = false;
                         break;
@@ -1949,22 +1956,22 @@ vector<vector<int>> itemTypeSearch(Sprite* cre, int item_type){
 
             //Otherwise, add node to search_q (if eligible, ofc)
 
-            if(block_map[((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
+            if(block_map[ node[2]*map_area + ((node[1])*map_width)+(node[0]+1)]==false){ //if adjacent is NOT blocked
                 //we also gotta make sure node isn't in queue with lower distance already...
                 //cycle through the list and check for every lower distance...
-                if(!isNodeIn({node[0]+1,node[1],0}, search_q)){
-                    temp = {node[0]+1, node[1], node[2]+1};
+                if(!isNodeIn_Z({node[0]+1,node[1],node[2],0}, search_q)){
+                    temp = {node[0]+1, node[1],node[2], node[3]+1};
                     search_q.push_back(temp);
                 }
             }
         }
         //UP
         if(node[1]-1 > 0){ //bounds checking
-            if(block_map[((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
-                for(int i = 0; i < map_items[((node[1]-1)*map_width)+(node[0])].size() ; i++){ //iterate through all items on the adjacent node
-                    if( map_items[((node[1]-1)*map_width)+(node[0])][i].type == item_type){
+            if(block_map[ node[2]*map_area + ((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+                for(int i = 0; i < map_items[ node[2]*map_area + ((node[1]-1)*map_width)+(node[0])].size() ; i++){ //iterate through all items on the adjacent node
+                    if( map_items[ node[2]*map_area + ((node[1]-1)*map_width)+ node[0] ][i].type == item_type){
                         //We found target!
-                        temp = {node[0], node[1]-1, node[2]+1}; //temporary
+                        temp = {node[0], node[1]-1,node[2], node[3]+1}; //temporary
                         search_q.push_back(temp); //add to search_q
                         findingTarget = false;
                         break;
@@ -1976,22 +1983,22 @@ vector<vector<int>> itemTypeSearch(Sprite* cre, int item_type){
 
             //Otherwise, add node to search_q (if eligible, ofc)
 
-            if(block_map[((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+            if(block_map[ node[2]*map_area + ((node[1]-1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
                 //we also gotta make sure node isn't in queue with lower distance already...
                 //cycle through the list and check for every lower distance...
-                if(!isNodeIn({node[0],node[1]-1,0}, search_q)){
-                    temp = {node[0], node[1]-1, node[2]+1};
+                if(!isNodeIn_Z({node[0],node[1]-1,node[2],0}, search_q)){
+                    temp = {node[0], node[1]-1, node[2],node[3]+1};
                     search_q.push_back(temp);
                 }
             }
         }
         //DOWN
         if(node[1]+1 < map_height){ //bounds checking
-            if(block_map[((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
-                for(int i = 0; i < map_items[((node[1]+1)*map_width)+(node[0])].size() ; i++){ //iterate through all items on the adjacent node
-                    if( map_items[((node[1]+1)*map_width)+(node[0])][i].type == item_type){
+            if(block_map[ node[2]*map_area + ((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+                for(int i = 0; i < map_items[ node[2]*map_area + ((node[1]+1)*map_width)+(node[0])].size() ; i++){ //iterate through all items on the adjacent node
+                    if( map_items[ node[2]*map_area + ((node[1]+1)*map_width)+(node[0])][i].type == item_type){
                         //We found target!
-                        temp = {node[0], node[1]+1, node[2]+1}; //temporary
+                        temp = {node[0], node[1]+1,node[2], node[3]+1}; //temporary
                         search_q.push_back(temp); //add to search_q
                         findingTarget = false;
                         break;
@@ -2003,11 +2010,11 @@ vector<vector<int>> itemTypeSearch(Sprite* cre, int item_type){
 
             //Otherwise, add node to search_q (if eligible, ofc)
 
-            if(block_map[((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
+            if(block_map[ node[2]*map_area + ((node[1]+1)*map_width)+(node[0])]==false){ //if adjacent is NOT blocked
                 //we also gotta make sure node isn't in queue with lower distance already...
                 //cycle through the list and check for every lower distance...
-                if(!isNodeIn({node[0],node[1]+1,0}, search_q)){
-                    temp = {node[0], node[1]+1, node[2]+1};
+                if(!isNodeIn_Z({node[0],node[1]+1,node[2],0}, search_q)){
+                    temp = {node[0], node[1]+1,node[2], node[3]+1};
                     search_q.push_back(temp);
                 }
             }
@@ -2028,13 +2035,17 @@ vector<vector<int>> itemTypeSearch(Sprite* cre, int item_type){
     while(true){
         temp = search_q.back();
         search_q.pop_back(); //Get last value out of search queue
-        if(temp[2] == 0){ //means 0 steps left and we found original node (our starting position
+        if(temp[3] == 0){ //means 0 steps left and we found original node (our starting position
             break;
         }
-        if(temp[2] == path2target.back()[2]- 1){ //if current node is actually a step closer
+        if(temp[3] == path2target.back()[3]- 1){ //if current node is actually a step closer
             //check if it's a step in the right direction (AND ONLY 1 unit away from last step)
-            if(   ((abs(temp[0]-path2target.back()[0])==1)&&(abs(temp[1]-path2target.back()[1])==0)) || //check if x diff is 1
-               ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==1)) ){ //check if y diff is 1
+            if( ((abs(temp[0]-path2target.back()[0])==1)&&(abs(temp[1]-path2target.back()[1])==0)&&(abs(temp[2]-path2target.back()[2])==0))
+               || //check if x diff is 1
+               ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==1)&&(abs(temp[2]-path2target.back()[2])==0))
+               || //check if y diff is 1
+               ((abs(temp[0]-path2target.back()[0])==0)&&(abs(temp[1]-path2target.back()[1])==0)&&(abs(temp[2]-path2target.back()[2])==1))
+               ){ //check if z diff is 1
                 path2target.push_back(temp);
             }
 
@@ -2060,6 +2071,9 @@ void free_path(Sprite cre){
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //THREADS - ACTIONS ////////////////////////////////////////////////////////////////////////////////////
+//
+// Creatures won't be scheduled a new task uless the two flags: inThread and isNeededByThread are equal to false
+// In all of these threads, inThread is used as a flag to indicate done with movement.
 
 //a thread for wandering to a random place
 void wander_thread(Sprite* spr1){
@@ -2184,6 +2198,8 @@ void walk_path_thread(Sprite* spr1){
 //calls walkPathObj and waits for it to set inThread = false
 void position_depo_thread(Sprite* spr1, int xpos, int ypos, int zpos){
     
+    if(spr1->inThread == true){   printf("reach position thread and it's true");}
+    
     //Firstly, indicate to the sprites that we need them...
     //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
     //mainly used for OTHER creatures, outside thread...
@@ -2201,16 +2217,17 @@ void position_depo_thread(Sprite* spr1, int xpos, int ypos, int zpos){
     //Check if the search failed (error code (9999,9999)
     if(spr1->path[0][0] == 9999){
         spr1->path.pop_back();
-        printf("search failed, no path to ritual");
+        printf("search failed, no path to position");
         
         //Just exit and try something else
         spr1->inThread = false;
         spr1->isNeededByThread = false;
-        return; //search failed, try again....
+        return; //search failed, return....
     }
     
     //Now start the thread that will actually walk the path to target
     std::thread walkPathObj(walk_path_thread, spr1);
+    spr1->inThread = true;
     walkPathObj.detach();
     //walkPathObj.join(); //block (wait for it to complete)
     
@@ -2253,6 +2270,7 @@ void home_depo_thread(Sprite* spr1){
     
     //Now spawn a thread to tells creature to deposit at house
     std::thread positionDepoObj(position_depo_thread, spr1, loc_x, loc_y, loc_z);
+    spr1->inThread = true;
     positionDepoObj.detach();
     
     //Wait for spr1 to get to destination (walk_to_thread - which is called by  signals end by setting inThread to false)
@@ -2260,6 +2278,8 @@ void home_depo_thread(Sprite* spr1){
         
         //if done with walk_to_thread
         if(spr1->inThread == false){
+            
+            printf("done at home");
             
             //get ready to exit thread and be put up for new tasks
             spr1->isNeededByThread = false;
@@ -2350,6 +2370,96 @@ void shroom_depo_thread(Sprite* spr1){
     return;
     
 }
+
+//a thread for picking up the specified item
+//Call the itemSearch algorithm
+//Travels to proper tile
+//picks up item (if it's still there)
+void gather_item_thread(Sprite* spr1, int item_type){
+    
+    //DEBUG
+    printf("starting a new gathet item thread");
+    
+    //Firstly, indicate to the sprites that we need them...
+    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
+    //mainly used for OTHER creatures, outside thread...
+    spr1->isNeededByThread = true;
+    
+    //Find a path to target
+    free_path(*spr1); //clear path on sprite for starters
+    if(spr1->path.empty()){ //if path is empty
+        spr1->path = itemTypeSearch_Z(spr1, item_type);
+    }
+    
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, no path to ritual");
+        
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    
+    //Now start the thread that will actually walk the path to target
+    std::thread walkPathObj(walk_path_thread, spr1);
+    walkPathObj.detach();
+    //walkPathObj.join(); //block (wait for it to complete)
+    
+    //Wait for spr1 to get to destination (walk_to_thread signals end by setting inThread to false)
+    while(true){
+        
+        //if done with walk_to_thread
+        if(spr1->inThread == false){
+            
+            //now look on tile and check if item is still there and pick up
+            for(int i = 0; i < map_items[(spr1->y*map_width)+spr1->x].size(); i++){
+                if(map_items[(spr1->y*map_width)+spr1->x][i].type == item_type){
+                    
+                    pickUpItem(spr1, spr1->x, spr1->y, i); //then pick up the item
+                    
+                    //Start trek to shroom depot... or possibly deposit in house
+                    //we're going to transfer it to another thread...
+                    free_path(*spr1); //clear old path
+                    
+                    //Decide if we want to deposit to shroom or home
+                    int choice = rand()%2;
+                    choice = 1;
+                    switch(choice){
+                        case 0: {
+                            //This thread makes the creature go to shroom
+                            std::thread shroomDepoObj(shroom_depo_thread, spr1);
+                            shroomDepoObj.detach();
+                            break;
+                        }
+                        case 1: {
+                            //This thread makes the creature go to home and depo
+                            std::thread homeDepoObj(home_depo_thread, spr1);
+                            homeDepoObj.detach();
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
+                    }
+                    
+                    return; //return since transferred thread
+                    
+                }
+                
+            }//end for loop checking tiles
+            
+            //if still haven't found, just exit
+            //free_path(*spr1); //clear old path
+            spr1->inThread = false; //if it reaches here and exits ,then clear flag
+            spr1->isNeededByThread = false;
+            return;
+            
+        }//end done walking to thread
+    }
+}
+
 
 //a thread for picking up items of your favorite color
 //Call the faveColorSearch algorithm
@@ -2689,9 +2799,9 @@ void task_creatures_thread(){
                 free_path(map_creatures[i]);//clear old path, fuction to individually delete path
                 map_creatures[i].thread_timer = time(NULL);
                 map_creatures[i].inThread = true;
-                choice = rand()%4;
+                choice = rand()%5;
                 //choice = rand()%2 * 2;
-                //choice = 0;
+                //choice = 4;
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
@@ -2720,6 +2830,13 @@ void task_creatures_thread(){
                         map_creatures[i].task_status = "walk home";
                         std::thread walkHomeObj(walk_home_thread, &map_creatures[i]);
                         walkHomeObj.detach();
+                        break;
+                    }
+                    case 4: {
+                        //this thread makes the creatures walk home
+                        map_creatures[i].task_status = "pick flowers";
+                        std::thread pickFlowerObj(gather_item_thread, &map_creatures[i], 328);
+                        pickFlowerObj.detach();
                         break;
                     }
                         
@@ -2900,7 +3017,23 @@ void regen_weedz_thread(){
                 SDL_Delay(5000);
                 
             }
-        }
+        }//end  check if blocked if pair
+        
+        //pick a random spot
+        x = rand()%map_width;
+        y = rand()%map_height;
+        
+        if(!block_map[y*map_width+x]){ //check if bloecked
+            if(map_items[y*map_width+x].size()<2){ //if tile doesn't have too many items on it
+                
+                Item temp_flower = Item(x, y, 328 ); //temporary item
+                map_items[y*map_width+x].push_back(temp_flower);
+                
+            }
+        } //end chec if block
+        
+        
+        
         
     }
     

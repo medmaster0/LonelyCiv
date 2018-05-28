@@ -64,6 +64,7 @@ using namespace std;
 // 339 - WAND
 // 340 - CHALICE
 // 341 - BANDANA
+// 342 - HOOD
 
 //SDL_Texture* loadTexture( string path, SDL_Renderer* gRenderer );
 extern SDL_Renderer* gRenderer;//The window renderer

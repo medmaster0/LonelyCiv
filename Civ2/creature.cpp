@@ -657,17 +657,22 @@ void displayStatus(Sprite spr1, SDL_Renderer* gRenderer, int SCREEN_HEIGHT , SDL
     
     //Draw zodiac element
     renderQuad = {5*16, 3*16, 16,16};
+    SDL_Color blendColor = color_blend(spr1.faveColor, spr1.faveColor2); //the color of icon is blend of favorite colors
     switch(spr1.zodiac_element){
         case 1:
+            SDL_SetTextureColorMod( misc_tiles[15], blendColor.r, blendColor.g, blendColor.b); //modulate color, update to match the new one
             SDL_RenderCopy( gRenderer, misc_tiles[15], clip, &renderQuad );//Swords/Air signs
             break;
         case 2:
+            SDL_SetTextureColorMod( misc_tiles[16], blendColor.r, blendColor.g, blendColor.b); //modulate color, update to match the new one
             SDL_RenderCopy( gRenderer, misc_tiles[16], clip, &renderQuad );//Wands/Fire
             break;
         case 3:
+            SDL_SetTextureColorMod( misc_tiles[17], blendColor.r, blendColor.g, blendColor.b); //modulate color, update to match the new one
             SDL_RenderCopy( gRenderer, misc_tiles[17], clip, &renderQuad );//Cups/Water
             break;
         case 4:
+            SDL_SetTextureColorMod( misc_tiles[18], blendColor.r, blendColor.g, blendColor.b); //modulate color, update to match the new one
             SDL_RenderCopy( gRenderer, misc_tiles[18], clip, &renderQuad );//Pentacles/Earth
             break;
             
