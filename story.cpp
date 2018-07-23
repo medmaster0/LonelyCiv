@@ -144,6 +144,101 @@ string genAnagram(string in_word){
     return anagram;
 }
 
+//generates the name of an old person
+string genOldName(){
+    
+    char consonants[] = "bcdfghjklmnpqrstvwxyz";
+    char vowels[] = "aeiou";
+    
+    string first_name = ""; //the strnig to be returned containing the built up first name
+    string last_name = ""; //the strnig to be returned containing the built up first name
+    
+    //FIRST NAME
+    //Possibly add a consonant as the first letter
+    if(rand()%2 == 1){first_name += consonants[rand()%21];}
+    
+    //Start building up the rest of the syllables
+    while(true){
+        first_name += vowels[rand()%5];
+        first_name += consonants[rand()%21];
+        
+        if(rand()%2 == 1){break;} //possibly continue or break
+    }
+    
+    //now add that last -us for some spice!
+    first_name += consonants[rand()%21];
+    first_name += "us";
+    //make sure first letter is capitalized
+    first_name.at(0) = toupper(first_name.at(0));
+    
+    //LAST NAME
+    //Possibly add a consonant as the first letter
+    if(rand()%2 == 1){last_name += consonants[rand()%21];}
+    
+    //Start building up the rest of the syllables
+    while(true){
+        last_name += vowels[rand()%5];
+        last_name += consonants[rand()%21];
+        
+        if(rand()%5 == 1){break;} //possibly continue or break (smaller chance than first name)
+    }
+    
+    //now add that last -us for some spice!
+    last_name += consonants[rand()%21];
+    last_name += "us";
+    //make sure first letter is capitalized
+    last_name.at(0) = toupper(last_name.at(0));
+    
+    string name = "";
+    name = name + first_name;
+    name = name + " ";
+    name = name + last_name;
+    return name;
+    
+}
+
+//generates Heroku-like names
+string genHerokuName(){
+    vector<string> adjectives = {
+    "autumn", "hidden", "bitter", "misty", "silent", "empty", "dry", "dark", "summer",
+    "icy", "delicate", "quiet", "white", "cool", "spring", "winter", "patient",
+    "twilight", "dawn", "crimson", "wispy", "weathered", "blue", "billowing",
+    "broken", "cold", "damp", "falling", "frosty", "green", "long", "late", "lingering",
+    "bold", "little", "morning", "muddy", "old", "red", "rough", "still", "small",
+    "sparkling", "throbbing", "shy", "wandering", "withered", "wild", "black",
+    "young", "holy", "solitary", "fragrant", "aged", "snowy", "proud", "floral",
+    "restless", "divine", "polished", "ancient", "purple", "lively", "nameless"
+    };
+    
+    vector<string> nouns = {
+    "waterfall", "river", "breeze", "moon", "rain", "wind", "sea", "morning",
+    "snow", "lake", "sunset", "pine", "shadow", "leaf", "dawn", "glitter", "forest",
+    "hill", "cloud", "meadow", "sun", "glade", "bird", "brook", "butterfly",
+    "bush", "dew", "dust", "field", "fire", "flower", "firefly", "feather", "grass",
+    "haze", "mountain", "night", "pond", "darkness", "snowflake", "silence",
+    "sound", "sky", "shape", "surf", "thunder", "violet", "water", "wildflower",
+    "wave", "water", "resonance", "sun", "wood", "dream", "cherry", "tree", "fog",
+    "frost", "voice", "paper", "frog", "smoke", "star"
+    };
+    
+    string first_name = "";
+    first_name += adjectives[rand()%adjectives.size()];
+    //make sure first letter is capitalized
+    first_name.at(0) = toupper(first_name.at(0));
+    
+    string last_name = "";
+    last_name += nouns[rand()%nouns.size()];
+    //make sure first letter is capitalized
+    last_name.at(0) = toupper(last_name.at(0));
+    
+    string name = "";
+    name += first_name;
+    name += " ";
+    name += last_name;
+    return name;
+    
+}
+
 //generates a radom cuss
 string genCuss(){
     int letters = (rand()%10)+1;

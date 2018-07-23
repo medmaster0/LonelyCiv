@@ -91,6 +91,7 @@ Item::Item(int xpos, int ypos, int tile_type, string in_desc){
     secoColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
     tertColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
     description = in_desc;
+    move_speed = 3.0;
     
     //tilesPrim = new SDL_Texture * [1];
     
@@ -112,7 +113,7 @@ Item::Item(int xpos, int ypos, int tile_type, SDL_Color primo, SDL_Color seco, s
     tertColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)}; //give random tert color
     //tertColor = tert;
     description = in_desc;
-    
+    move_speed = 3.0;
     //tilesPrim = new SDL_Texture * [1];
     
 }

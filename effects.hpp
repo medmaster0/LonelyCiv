@@ -52,7 +52,6 @@ public:
     void draw(int at_x, int at_y, SDL_Renderer* gRenderer, SDL_Texture** misc_tiles); //Draws the sprite to the screen at specified map coords, changes the tile periodically
     int x,y,z; //the location of the animation
     //SDL_Color color1; //the color of the effect
-    
 private:
     int mWidth;//Image dimensions - pixels
     int mHeight;//Image dimensions - pixels
@@ -61,6 +60,21 @@ private:
     int animate_index; //the current index in the tile_list that we are displaying
     unsigned int animate_timer; //a timer used in animation
     
+};
+
+//A BIGGER ANIMATION CLASS
+class Animation_Big{
+public:
+    Animation_Big(int xp, int yp, int tile_list_in[]); //constructor; input xy-pos and a list of tiles to follow
+    void draw(int at_x, int at_y, SDL_Renderer* gRenderer, SDL_Texture** misc_tiles); //Draws the sprite to the screen at specified map
+    int x,y,z; //the location of the animation
+private:
+    int mWidth; //Image dimenstions - pixels
+    int mHeight;//Image dimensions - pixels
+    int r,g,b; //colors of the sprite
+    int tile_list[4]; //a list of tiles to sequence through in animation (indices for "misc_tiles")
+    int animate_index; //the current index in the tile_list that we are displaying
+    unsigned int animate_timer; //a timer used in animation
 };
 
 

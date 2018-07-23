@@ -28,12 +28,13 @@ string genLatinSentence(); //generates a random latin sentence
 string genLatinSentence(int punctuation); //generates random latin sentence, allows you to specify which punctuation index to use
 
 string genAnagram(string in_word); //generates an anagram of the input word
+string genOldName(); //Generate the name of an old person ex. Alabus Dubuladorus
+string genHerokuName(); //Generates  Heroku-like combo... ripped from: https://github.com/usmanbashir/haikunator/blob/master/lib/haikunator.rb
 string genCuss(); //generates a random cuss
 
 string genSaintName(); //generates a saint's name (simply picks one off the list)
 string genDemonName(); //generates a demon name by taking anagram of a Saint's name
 string genDemonName(string name); //generates a demon name by taking anagram of input name (more practical)
-
 
 string roman_numerals(int number); //returns the roman numeral equivalent of an entered value
 

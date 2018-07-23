@@ -25,6 +25,7 @@ void printMaze(vector<vector<short>> maze); //prints out a maze to console, simp
 vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x1, int y1, int x2, int y2); //An even better A*, gash damn! not reliant on vector (but will return one for convenience)
 
 vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery_top, int map_width, int map_height, int x1, int y1, int z1, int x2, int y2, int z2); //An even better A*, gash damn! not reliant on vector (but will return one for convenience)
+vector<vector<int>> A_Star_Free_Fall(bool block_map[], int map_width, int map_height, int x1, int y1, int z1, int x2, int y2, int z2); //An even A* algorithm that will path over any unblocked area (without needing a ladder)
 
 //COLOR ALGORITHMS!
 int color_diff(SDL_Color col1, SDL_Color col2); //computes the "difference of colors"

@@ -84,7 +84,13 @@ public:
     //void draw(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s); //draws the item
     void draw(int x, int y, SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p,SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //draws the item at a specific location
     string description; //A Description of the item
-    
+    //For movement
+    vector<vector<int>> path; //a path to whatever target it has
+    //For threads
+    bool inThread;
+    //For Movement
+    int move_timer; //keeps track of SDL_GetTicks() for last movement
+    double move_speed; //how many tiles to move per 1 second
 };
 
 class Hat : public Item{

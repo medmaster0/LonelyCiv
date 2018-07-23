@@ -954,6 +954,362 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
     
 }
 
+//An even A* algorithm that will path over any unblocked area (without needing a ladder)
+vector<vector<int>> A_Star_Free_Fall(bool block_map[], int map_width, int map_height, int x1, int y1, int z1, int x2, int y2, int z2){
+    
+    //Check if target is blocked, so we don't have to bother searching the whole map
+    if(block_map[ (z2*map_height*map_width) + (y2*map_width) + x2 ] ==  true){
+        printf("A_star_z can't find target...\n");
+        return {{9999,9999,0}};
+    }
+    
+    
+    //DEBUG
+    int num_news = 0; //keeps track of calls to new
+    
+    list open_set = {nullptr,nullptr}; //the start of the open_set
+    list closed_set = {nullptr,nullptr};; //the start of the closed_set
+    
+    num_news = num_news + 1;
+    //create first node
+    list_node* temp = new list_node;
+    *temp = {nullptr, nullptr, nullptr, x1, y1, z1, 0, 0, 0};
+    
+    //add it to open_set
+    open_set.first = temp;
+    open_set.last = temp;
+    
+    bool search_main = true; //flag to indicate searching - turns off when target is reached
+    //while open_set isn't empty, keep picking off the node with the smallest f
+    while( (open_set.first!=nullptr)  && (search_main)){
+        
+        //find node in open_set with least f, make it q
+        ///////////////////////////////////
+        bool search_f = true;
+        list_node* lowest_f = nullptr; //points to the node with lowest f
+        int least_f = 999999; //start with high number
+        list_node* current = open_set.first; //points to the current node, we're searching
+        while(search_f){
+            
+            if(current == nullptr){
+                break;
+            }
+            
+            if(current->f<=least_f){ //if, it has a lesser f, point to it... THIS ALSO ENSURES THE LAST ONE POPPED ON GETS PICKED
+                lowest_f = current;
+                least_f = lowest_f->f;
+            }
+            if(current==open_set.last){ //if cuurently pointing to last nodee, then stop search
+                search_f = false;
+            }else{
+                current = current->next;
+            }
+        }
+        //when done with search, lowest_f should point to node with lowest f
+        
+        //Find lowest_f node in open_set and call it q
+        ////////////////////////////
+        list_node* q = lowest_f; //q has the lowest f
+        
+        //POPping off q from OPEN_SET
+        ////////////////////////
+        if(q->prev!=nullptr){ //if lowest_f is not FIRST in list
+            (q->prev)->next = q->next; //update the previous node in list
+        }else{ //if lowest_f is first in list
+            open_set.first = q->next; //update the open_set struct
+        }
+        if(q->next!=nullptr){ //if lowest_f is NOT LAST in list
+            (q->next)->prev = q->prev; //update the next node in list
+        }else{ //if lowest_f is last in list
+            open_set.last = q->prev; //update the open_set struct
+        }
+        //open_set (and it's elements) are correct and up to date
+        
+        num_news = num_news + 6;
+        list_node* neighbors[6]; //The SIX neighbors
+        neighbors[0] = new list_node;
+        *neighbors[0] = {nullptr, nullptr, q, (q->x)-1 , q->y, q->z, 9999, 9999, 9999};
+        neighbors[1] = new list_node;
+        *neighbors[1] = {nullptr, nullptr, q, (q->x)+1 , q->y, q->z, 9999, 9999, 9999};
+        neighbors[2] = new list_node;
+        *neighbors[2] = {nullptr, nullptr, q, q->x , (q->y)-1, q->z, 9999, 9999, 9999};
+        neighbors[3] = new list_node;
+        *neighbors[3] = {nullptr, nullptr, q, q->x , (q->y)+1, q->z, 9999, 9999, 9999};
+        neighbors[4] = new list_node;
+        *neighbors[4] = {nullptr, nullptr, q, q->x , q->y, (q->z)+1, 9999, 9999, 9999};
+        neighbors[5] = new list_node;
+        *neighbors[5] = {nullptr, nullptr, q, q->x , q->y, (q->z)-1, 9999, 9999, 9999};
+        
+        //For each neighbor/successor
+        for(int i = 0; i<6; i++){
+            
+            //Check to make sure we aren't at an impossibly high level (and endlessly getting higher)
+            //put a limit to the level of floor you can search.
+            //if(neighbors[i]->z > 10){ printf("floor too hgih\n"); continue;}
+            
+            //if neighbor is out of bounds then we can throw it away
+            if( (neighbors[i]->y < 0) || (neighbors[i]->x < 0) || (neighbors[i]->x >= map_width) || (neighbors[i]->y >= map_height) ||
+               (neighbors[i]->z < 0) ){
+                delete neighbors[i]; //delete what we've created!!!
+                num_news = num_news - 1;
+                continue; //move on to next neighbor
+            }
+            
+            //if neighbor tile is blocked then we can stop
+            if(block_map[ (neighbors[i]->z*map_width*map_height) + ((neighbors[i]->y)*map_width) + neighbors[i]->x]==true){
+                delete neighbors[i]; //delete what we've created!!!
+                num_news = num_news - 1;
+                continue; //move on to next neighbor
+            }
+            
+            //if neighbor is TARGET, then we can stop (and must delete rest of neighbors)
+            if((neighbors[i]->x==x2)&&(neighbors[i]->y==y2)&&(neighbors[i]->z==z2)){
+                
+                //ADD neighbor to CLOSED_SET
+                addNodeToSet(neighbors[i], &closed_set);
+                
+                //we also need to delete the rest of the neighbors that we've created but haven't had a chance to process
+                int j = i + 1;
+                while(j<4){
+                    delete neighbors[j];
+                    num_news = num_news - 1;
+                    j = j + 1;
+                }
+                
+                search_main = false;
+                break;
+            }
+            
+            //Calculate The 3 Values: f, g, h
+            neighbors[i]->g = q->g + 1;
+            neighbors[i]->h = abs(y2-(neighbors[i]->y)) + abs(x2-(neighbors[i]->x)) + abs(z2-(neighbors[i]->z));
+            neighbors[i]->f = neighbors[i]->g + neighbors[i]->h;
+            
+            //check if in open_set
+            if(isNodeIn(neighbors[i], open_set) == true){
+                delete neighbors[i]; //delete temporary neighbor
+                num_news = num_news - 1;
+                continue; //skip this neighbor
+            }
+            
+            //check if in closed_set
+            if(isNodeIn(neighbors[i], closed_set)==true){
+                delete neighbors[i]; //delete what we've created!!!
+                num_news = num_news - 1;
+                continue; //skip this neighbor
+            }
+            
+            //If we've made it to this point, it isn't in CLOSED or OPEN SET
+            //ADD neighbor to OPEN_SET
+            addNodeToSet(neighbors[i], &open_set);
+            
+        }//Done cycling through neighbors
+        
+//        ///////////////////////////////////////////////////
+//        //Now check if there are LADDERS on the tile
+//        //
+//        for(int i = 0; i < map_scenery_top->at( q->z*(map_height*map_width) + q->y*map_width + q->x ).size(); i++ ){
+//            if( map_scenery_top->at( q->z*(map_height*map_width) + q->y*map_width + q->x ).at(i).type == 318){ //check if a ladder is on tile.
+//
+//                //check if ladder can go up
+//                for(int j = 0; j < map_scenery_top->at( (q->z+1)*(map_height*map_width) + q->y*map_width + q->x ).size() ; j++){ //for looop for up items
+//                    if(map_scenery_top->at( (q->z+1)*(map_height*map_width) + q->y*map_width + q->x ).at(j).type == 318){
+//                        //create temporary node
+//                        list_node* ladder_node = new list_node;
+//                        *ladder_node = {nullptr, nullptr, q, q->x , q->y, q->z + 1, 9999, 9999, 9999};
+//
+//                        //If it's the target, then we can stop
+//                        if( ladder_node->x == x2 && ladder_node->y == y2 && ladder_node->z == z2){
+//                            //ADD neighbor to CLOSED_SET
+//                            addNodeToSet(ladder_node, &closed_set);
+//
+//                            search_main = false;
+//                            break;
+//
+//                        }
+//
+//                        //Calculate The 3 Values: f, g, h
+//                        ladder_node->g = q->g + 1;
+//                        ladder_node->h = abs(y2-(ladder_node->y)) + abs(x2-(ladder_node->x)) + abs(z2-(ladder_node->z));
+//                        ladder_node->f = ladder_node->g + ladder_node->h;
+//
+//                        //check if in open_set already
+//                        if(isNodeIn(ladder_node, open_set) ==  true){
+//                            delete ladder_node; //delete temporary ladder_node
+//                            num_news = num_news - 1;
+//                            continue; //skip this ladder_node
+//                        }
+//
+//                        //check if in closed_set already
+//                        if(isNodeIn(ladder_node, closed_set) == true){
+//                            delete ladder_node; //delete what we've created!!!
+//                            num_news = num_news - 1;
+//                            continue; //skip this neighbor
+//                        }
+//
+//                        //If we've made it to this point, it isn't in CLOSED or OPEN SET
+//                        //ADD ladder_node to OPEN_SET
+//                        addNodeToSet(ladder_node, &open_set);
+//
+//
+//                    } //for loop for up items
+//                } //END LADDER GO UP
+//
+//                //check if ladder can go down (bounds check first)
+//                if(q->z <= 0)continue; //BOUNDS CHECK!!!!!!
+//                if(map_scenery_top->at( (q->z-1)*(map_height*map_width) + q->y*map_width + q->x ).at(i).type == 318){
+//                    //create temporary node
+//                    //create temporary node
+//                    list_node* ladder_node = new list_node;
+//                    *ladder_node = {nullptr, nullptr, q, q->x , q->y, q->z - 1, 9999, 9999, 9999};
+//
+//                    //If it's the target, then we can stop
+//                    if( ladder_node->x == x2 && ladder_node->y == y2 && ladder_node->z == z2){
+//
+//                        //ADD neighbor to CLOSED_SET
+//                        addNodeToSet(ladder_node, &closed_set);
+//
+//                        //                        ladder_node->next = nullptr; //indicate ladder_node is at end of list
+//                        //                        ladder_node->prev = closed_set.last; //update ladder_node with who it's behind
+//                        //                        if(closed_set.last!=nullptr){closed_set.last->next = ladder_node;} //the (former) last item in list now points to node
+//                        //                        closed_set.last = ladder_node; //the closed_set is updated
+//                        //                        if(closed_set.first==nullptr){closed_set.first= ladder_node;}; //if this is the first item in closed_set
+//
+//                        search_main = false;
+//                        break;
+//
+//                    }
+//
+//                    //Calculate The 3 Values: f, g, h
+//                    ladder_node->g = q->g + 1;
+//                    ladder_node->h = abs(y2-(ladder_node->y)) + abs(x2-(ladder_node->x)) + abs(z2-(ladder_node->z));
+//                    ladder_node->f = ladder_node->g + ladder_node->h;
+//
+//                    //check if in open_set
+//                    if(isNodeIn(ladder_node, open_set)==true){
+//                        delete ladder_node; //delete temporary ladder_node
+//                        num_news = num_news - 1;
+//                        continue; //skip this ladder_node
+//                    }
+//
+//                    //check if in closed_set
+//                    if(isNodeIn(ladder_node, closed_set) == true){
+//                        delete ladder_node; //delete what we've created!!!
+//                        num_news = num_news - 1;
+//                        continue; //skip this neighbor
+//                    }
+//
+//                    //If we've made it to this point, it isn't in CLOSED or OPEN SET
+//                    //ADD ladder_node to OPEN_SET
+//                    addNodeToSet(ladder_node, &open_set);
+//
+//                    //Must do: Check if the above step is in CLOSED or OPEN Sets. (or if it's target)
+//                }
+//
+//            }
+//        }
+//        ////////////////////////////////////////////////
+//        //End ladder search
+        
+        //And Now done with q and can go on to next step.
+        //ADD q to CLOSED_SET
+        addNodeToSet(q, &closed_set);
+        
+        //THIS MEANS WE HIT THE END OF OPEN_SET AND HAVENT FOUND TARGET
+        //->DELETE EVERYTHING AND RETURN ERROR
+        if(open_set.first == nullptr){
+            
+            
+            //DELETIION
+            //Delete out the closed and open_sets
+            //...the closed set
+            bool erasing = true;
+            list_node* cur = closed_set.first; //the current node we mpointing at
+            while(erasing){
+                if(cur==nullptr){
+                    erasing = false;
+                    break;
+                }
+                list_node* temp = cur; //Fo deletion
+                cur = cur->next;
+                delete temp; //Also fo deletion
+                num_news = num_news - 1;
+            }
+            //...the open set
+            erasing = true;
+            cur = open_set.first;
+            while(erasing){
+                if(cur==nullptr){
+                    erasing = false;
+                    break;
+                }
+                list_node* temp = cur; //fo deletion
+                cur = cur->next;
+                delete temp; //also fo deletion
+                num_news = num_news - 1;
+                
+            }
+            
+            printf("A_star_z can't find target...\n");
+            return {{9999,9999,0}};
+        }
+        
+        
+    }//end open_list empty, time to move on to a new STEP and navigating from there (finding neighbors, searching for ladders, etc.)
+    
+    
+    //CCONSTRUCT VECTOR TO RETURN BY TRAVERSING THE CLOSED LIST
+    vector<vector<int>> search_q; //the main "list", could really be turned into what ever datat type you wantx
+    vector<int> coord; //a temp coord to add to the search_q.
+    list_node* travel = closed_set.last; //temp pointer for traversing the lists
+    //First, need to add final step manually?
+    coord = {x2,y2,z2}; //destination coordinate
+    search_q.push_back(coord);
+    //Now cycle through everything else
+    while(true){
+        coord = {travel->x,travel->y,travel->z};
+        search_q.push_back(coord);
+        travel = travel->parent; //move on to the parent
+        if(travel == nullptr){ //if at end of list
+            break; //bust outta the while loop
+        }
+    }
+    
+    
+    //DELETIION
+    //Print out the closed and open_sets
+    //...the closed set
+    bool printing = true;
+    list_node* current = closed_set.first;
+    while(printing){
+        if(current==nullptr){
+            printing = false;
+            break;
+        }
+        list_node* temp = current; //Fo deletion
+        current = current->next;
+        delete temp; //Also fo deletion
+        num_news = num_news - 1;
+        
+    }
+    //...the open set
+    printing = true;
+    current = open_set.first;
+    while(printing){
+        if(current==nullptr){
+            printing = false;
+            break;
+        }
+        list_node* temp = current; //fo deletion
+        current = current->next;
+        delete temp; //also fo deletion
+        num_news = num_news - 1;
+        
+    }
+    
+    return search_q;
+}
+
 //COLOR ALGORITHMS!
 
 //Compute the difference in colors
@@ -1139,7 +1495,6 @@ SDL_Color redNoise(SDL_Color redHue){
     
     //if current_red is out of the spectrum, initialize at a default red_shade
     if(redHue.g < 75 || redHue.b > 125 || redHue.r < redHue.g+50){
-        printf("adjusted red. \n");
         temp_red = {200,76,91,255 } ;
     }
     
