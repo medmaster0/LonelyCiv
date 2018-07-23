@@ -2909,6 +2909,11 @@ void drop_mint_thread(Sprite* spr1){
         
     }
     
+    //TEMPORARILY store values of drop site...
+    int loc_x, loc_y;
+    loc_x = spr1->x-1;
+    loc_y = spr1->y;
+    
     //We didn't find a can so just exit
     //We can NOW break out of this THREAD
     //Turn off flags
@@ -2921,8 +2926,10 @@ void drop_mint_thread(Sprite* spr1){
     while(true){
         
         if(SDL_GetTicks() > mint_timer+10000){ //waiting 10 seconds
-            if(map_effects[((spr1->y)*map_width)+spr1->x-1].size() > 0){
-                map_effects[((spr1->y)*map_width)+spr1->x-1].erase(map_effects[((spr1->y)*map_width)+spr1->x-1].begin());
+            if(map_effects[ ((loc_y)*map_width)+loc_x].size() > 0){
+                //map_effects[((spr1->y)*map_width)+spr1->x-1].erase(map_effects[((spr1->y)*map_width)+spr1->x-1].begin());
+                map_effects[ ((loc_y)*map_width)+loc_x].pop_back();
+                printf("popped\n");
             }
             break;
         }
