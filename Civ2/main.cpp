@@ -77,6 +77,7 @@ vector<vector<Item>> map_scenery_bottom; //a list of list of scenery on a tile. 
                                     //This version will be the first to be drawn on screen
 vector<vector<Item>> map_clouds; //a list of clouds on the map. treated exactly like the previous item lists but needed to be kept separate for drawing (and updating) cloud physics.
 vector<Item> moving_items; //a 1d list of moving items that will be drawn spearately from map_items
+vector<Cloud> moving_clouds; //a 1d list of clouds that move around the map
 
 //Creatures Stuff
 vector<Sprite> map_creatures; //a list of all creatures on map
@@ -810,10 +811,10 @@ void init_environment(){
 //    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, true, true);
 //    flower_spray(&map_scenery_bottom, block_map, map_width, map_height, 100, 100, 0, false, false);
 
-    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 110, 4, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
-    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 120, 2, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
-    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 110, 5, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
-    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 120, 3, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
+//    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 110, 4, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
+//    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 120, 2, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
+//    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 100, 110, 5, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
+//    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 120, 3, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
     
     //Place some random clouds
     for(int u = 0; u < 15; u++){
@@ -821,8 +822,9 @@ void init_environment(){
         int y = rand()%map_height;
         if(x>map_width-10 || x < 10){continue;}
         if(y>map_height-10 || y < 10){continue;}
-        cloud_place_shadow(&map_clouds, block_map, map_width, map_height, x, y, 1+rand()%13, shadow_col, {0,0,0,255} );
-        
+        //cloud_place_shadow(&map_clouds, block_map, map_width, map_height, x, y, 1+rand()%13, shadow_col, {0,0,0,255} );
+        Cloud temp_cloud = Cloud();
+        temp_cloud.cloud_place_shadow(&map_clouds, block_map, map_width, map_height, x, y, 1+rand()%13, shadow_col, {0,0,0,255});
     }
     
     map_towers = build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
@@ -2929,13 +2931,64 @@ void drop_mint_thread(Sprite* spr1){
             if(map_effects[ ((loc_y)*map_width)+loc_x].size() > 0){
                 //map_effects[((spr1->y)*map_width)+spr1->x-1].erase(map_effects[((spr1->y)*map_width)+spr1->x-1].begin());
                 map_effects[ ((loc_y)*map_width)+loc_x].pop_back();
-                printf("popped\n");
+                printf("popped\nw");
             }
             break;
         }
     }
     
     return;
+    
+}
+
+//air KNIGHT
+//Walks below a cloud
+//ascends up to it
+//Casts a line to fish
+//Catch Fish, flops to floor
+//Explosion occurs
+//Dagger appears on map
+void sword_fish_thread(Sprite* spr1){
+    printf("entering sword_fish_thread;\n");
+    
+    while(true){
+        
+    }
+    
+    //Firstly, indicate to the sprites that we need them...
+    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
+    //mainly used for OTHER creatures, outside thread...
+    spr1->isNeededByThread = true;
+    
+    //STAGE 1: WALK TO BELOW CLOUD
+    //Find a random cloud to walk to
+    int cloud_index = 0; //a random cloud index
+    while(true){
+        cloud_index = rand()%moving_clouds.size(); //pick a random cloud
+        if(moving_clouds[cloud_index].hasCreature == false){
+            break; //means we've found an empty cloud
+        }
+    }
+    //searching algorithm takes starting point, then destination
+    spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, spr1->owned_tower->x-1, spr1->owned_tower->y+1, spr1->owned_tower->num_floors-1);
+    
+    
+    //Find a path to target
+    free_path(*spr1); //clear path on sprite for starters
+    //searching algorithm takes starting point, then destination
+    spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, spr1->owned_tower->x-1, spr1->owned_tower->y+1, spr1->owned_tower->num_floors-1);
+    
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, no path to home");
+        
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    
     
 }
 
@@ -2963,7 +3016,7 @@ void task_creatures_thread(){
                 map_creatures[i].inThread = true;
                 choice = rand()%6;
                 //choice = rand()%2 * 2;
-                //choice = 5;
+                choice = 6;
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
@@ -3008,6 +3061,13 @@ void task_creatures_thread(){
                         map_creatures[i].task_status = "earth knight";
                         std::thread earthKnightObj(drop_mint_thread, &map_creatures[i]);
                         earthKnightObj.detach();
+                        break;
+                    }
+                    case 6: {
+                        //EARTH KNIGHTS: Sword Fish Thread
+                        map_creatures[i].task_status = "air knight";
+                        std::thread airKnightObj(sword_fish_thread, &map_creatures[i]);
+                        airKnightObj.detach();
                         break;
                     }
                         
