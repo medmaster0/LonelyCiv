@@ -416,6 +416,8 @@ void Cloud::cloud_place_shadow(vector<vector<Item>>* map_scenery_bottom, bool* b
                 
                 cur_z = cur_z - 1;
             }//End shadow
+            //Also, unblock out the area above cloud
+            block_map[(z*map_width*map_height) + (j*map_width) + i] = false;
         }
     }
     /////////////////////////DONE FIRST ROW
@@ -459,6 +461,8 @@ void Cloud::cloud_place_shadow(vector<vector<Item>>* map_scenery_bottom, bool* b
                     
                     cur_z = cur_z - 1;
                 }//End shadow
+                //Also, unblock out the area above cloud
+                block_map[(z*map_width*map_height) + (j*map_width) + i] = false;
                 
                 
             }
@@ -517,6 +521,8 @@ void Cloud::cloud_place_shadow(vector<vector<Item>>* map_scenery_bottom, bool* b
                     
                     cur_z = cur_z - 1;
                 }//End shadow
+                //Also, unblock out the area above cloud
+                block_map[(z*map_width*map_height) + (j*map_width) + i] = false;
             }
         }//Done drawing row
         
@@ -529,6 +535,34 @@ void Cloud::cloud_place_shadow(vector<vector<Item>>* map_scenery_bottom, bool* b
     }//End TAPER off
     
     printf("CLOUD:%d,%d,%d,%d,%d\n",xmin, xmax, ymin, ymax, z);
+    
+}
+
+//Returns the coordinates that actually has a cloud tile within the box
+//The Cloud object keeps track of the perimeter of the cloud
+// but does not guarantee every tile is filled.
+//We randomly pick a point within the perimeter
+//And check if it has a cloud tile on it
+vector<int> Cloud::walkableCoord(vector<vector<Item>>* map_clouds, int map_width, int map_height){
+ 
+    int walk_x,walk_y,walk_z;
+    walk_z = z;
+    while(true){
+        //pick random point
+        walk_x = xmin + rand()%(xmax - xmin);
+        walk_y = ymin + rand()%(ymax - ymin);
+        
+        //Check if it has a cloud item on it
+        if(map_clouds[ z*(map_width*map_height) + walk_y*(map_width) + walk_x].size()>0){
+            break;//It has a cloud there
+        }
+    }
+    
+    vector<int> coords;
+    coords.push_back(walk_x);
+    coords.push_back(walk_y);
+    coords.push_back(walk_z);
+    return coords;
     
 }
 

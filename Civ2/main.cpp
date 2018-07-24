@@ -817,7 +817,7 @@ void init_environment(){
 //    cloud_place_shadow(&map_clouds, block_map, map_width, map_height, 120, 120, 3, shadow_col, {0,0,0,255} ); //{0,0,0,255} /{255,255,255,255}/
     
     //Place some random clouds
-    for(int u = 0; u < 15; u++){
+    for(int u = 0; u < 30; u++){
         int x = rand()%map_width;
         int y = rand()%map_height;
         if(x>map_width-10 || x < 10){continue;}
@@ -825,6 +825,7 @@ void init_environment(){
         //cloud_place_shadow(&map_clouds, block_map, map_width, map_height, x, y, 1+rand()%13, shadow_col, {0,0,0,255} );
         Cloud temp_cloud = Cloud();
         temp_cloud.cloud_place_shadow(&map_clouds, block_map, map_width, map_height, x, y, 1+rand()%13, shadow_col, {0,0,0,255});
+        moving_clouds.push_back(temp_cloud);
     }
     
     map_towers = build_neighborhood(&map_scenery_top, &map_scenery_bottom, block_map, map_width, map_height, build_col_p, build_col_s, floor_col_p, floor_col_s, door_col_p, ladder_col_p);
@@ -2951,10 +2952,6 @@ void drop_mint_thread(Sprite* spr1){
 void sword_fish_thread(Sprite* spr1){
     printf("entering sword_fish_thread;\n");
     
-    while(true){
-        
-    }
-    
     //Firstly, indicate to the sprites that we need them...
     //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
     //mainly used for OTHER creatures, outside thread...
@@ -2969,19 +2966,41 @@ void sword_fish_thread(Sprite* spr1){
             break; //means we've found an empty cloud
         }
     }
+    //Get a random point on the cloud
+    vector<int> cloud_coords = moving_clouds[cloud_index].walkableCoord(&map_clouds, map_width, map_height);
     //searching algorithm takes starting point, then destination
-    spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, spr1->owned_tower->x-1, spr1->owned_tower->y+1, spr1->owned_tower->num_floors-1);
-    
-    
-    //Find a path to target
-    free_path(*spr1); //clear path on sprite for starters
-    //searching algorithm takes starting point, then destination
-    spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, spr1->owned_tower->x-1, spr1->owned_tower->y+1, spr1->owned_tower->num_floors-1);
+    free_path(*spr1); //clear old path
+    spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, cloud_coords[0], cloud_coords[1], 0);
     
     //Check if the search failed (error code (9999,9999)
     if(spr1->path[0][0] == 9999){
         spr1->path.pop_back();
-        printf("search failed, no path to home");
+        printf("search failed, no path to cloud");
+        
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    //Now we can start walking to the cloud
+    //Now start the thread that will actually walk the path to target
+    spr1->inThread = true;
+    std::thread walkPathObj(walk_path_thread, spr1);
+    walkPathObj.detach();
+    //walkPathObj.join(); //block (wait for it to complete)
+    while(spr1->inThread == true){
+    }
+    
+    //STAGE 2: FLOAT TO THE CLOUDS
+    //Find a path up to one step above the selected cloud
+    
+    free_path(*spr1); //clear old path
+    //searching algorithm takes starting point, then destination
+    spr1->path = A_Star_Free_Fall(block_map_free_space, map_width, map_height, spr1->x, spr1->y, spr1->z, cloud_coords[0], cloud_coords[1], cloud_coords[2]+1);
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, no path to cloud");
         
         //Just exit and try something else
         spr1->inThread = false;
@@ -2989,6 +3008,20 @@ void sword_fish_thread(Sprite* spr1){
         return; //search failed, try again....
     }
     
+    //Now we can start walking up the cloudshine
+    //Now start the thread that will actually walk the path to target
+    spr1->inThread = true;
+    std::thread flyPathObj(walk_path_thread, spr1);
+    flyPathObj.detach();
+    //walkPathObj.join(); //block (wait for it to complete)
+    while(spr1->inThread == true){
+    }
+    
+    printf("made it...\n");
+    
+    while(true){
+        
+    }
     
 }
 
@@ -3064,7 +3097,7 @@ void task_creatures_thread(){
                         break;
                     }
                     case 6: {
-                        //EARTH KNIGHTS: Sword Fish Thread
+                        //AIR KNIGHTS: Sword Fish Thread
                         map_creatures[i].task_status = "air knight";
                         std::thread airKnightObj(sword_fish_thread, &map_creatures[i]);
                         airKnightObj.detach();

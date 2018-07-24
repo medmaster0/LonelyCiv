@@ -22,7 +22,7 @@ void flower_spray(vector<vector<Item>>* map_scenery_bottom, bool* block_map, int
 
 //clouds
 void cloud_place(vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x, int y, int z, SDL_Color p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color s_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, int item_type = 333);
-void cloud_place_shadow(vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x, int y, int z, SDL_Color p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color s_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, int item_type = 333); //same as cloud_place, but it also creates an "shadow" under each item places (a series of blank/alpha transparent tiles )
+//void cloud_place_shadow(vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x, int y, int z, SDL_Color p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color s_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, int item_type = 333); //same as cloud_place, but it also creates an "shadow" under each item places (a series of blank/alpha transparent tiles )
 
 //CLOUD CLASS
 //Cloud Class will be used to keep track of where clouds are
@@ -31,11 +31,13 @@ class Cloud{
 public:
     Cloud(int xmin = 0, int xmax = 0, int ymin = 0, int ymax= 0, int z = 0); //construct new cloud
     int xmin, xmax, ymin, ymax, z; //Form a rectangle around CLoud
+    SDL_Color primColor; //The colors of the cloud
+    SDL_Color secoColor; //The colors of the cloud
     bool hasCreature; //A flag indicating a creature is on cloud
     //generate a cloud and record it's extreme points for cloud rectangle
     void cloud_place_shadow(vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x, int y, int z, SDL_Color p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color s_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, int item_type = 333);
     //void move_cloud(); //moves the cloud by shifting everything in the cloud's perimeter, one item at a time... (very long process)
-    
+    vector<int> walkableCoord(vector<vector<Item>>* map_clouds, int map_width, int map_height); //Returns the coordinates that actually has a cloud tile within the box
     
 };
 
