@@ -1192,7 +1192,6 @@ void draw_environment(Sprite* cre1){
                     for(int k = 0; k < map_effects[map_index].size(); k++){
                          map_effects[map_index][k].drawScroll( (map_effects[map_index][k].x - draw_map_x), ( draw_map_z - j - 2 ), gRenderer, misc_tiles  );//call the draw function with location translated for this view
                     }
-                   
                 }
             }//End drawing top items
          
@@ -1276,149 +1275,297 @@ void draw_environment(Sprite* cre1){
      //END BALCONY VIEW
      ////////////////////////////////////////
     
-    //Draw all bottom items
-    for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
-        if(i >= map_width || i < 0){continue;} //bounds checking
-        for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
-            if(j >= map_height || j < 0){continue;} //bounds checking
-            
-            int map_index = (draw_map_z*map_area) + (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
-            
-            //Cycle through all the items in the map_scenery_bottom list at that location
-            for(int k = 0; k < map_scenery_bottom[ map_index ].size(); k++ ){
-                map_scenery_bottom[map_index][k].draw( (map_scenery_bottom[map_index][k].x - draw_map_x) , (map_scenery_bottom[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
-            }
-            
-            //Cycle through all big animations on map
-            for(int k = 0; k < map_animations_big[ map_index ].size(); k++ ){
-                map_animations_big[map_index][k].draw( (map_animations_big[map_index][k].x - draw_map_x) , (map_animations_big[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
-            }
-            
-            //Cycle through all the items on the map
-            for(int k = 0; k < map_items[ map_index ].size(); k++ ){
-                map_items[map_index][k].draw( (map_items[map_index][k].x - draw_map_x) , (map_items[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
-            }
-            
-        }
-    } //End drawing bottom items, can draw creatures in a separate loop
     
-    //Cycle through all shrooms and draw...
-    for(int c = 0 ; c < map_shrooms.size(); c++){
-        
-        if(map_shrooms[c].z != draw_map_z){ //if not on currently drawn floor
-            continue; //skip to next one
-        }
-        
-        if (map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
-            map_shrooms[c].y > draw_map_y && map_shrooms[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
-            drawHorde(&map_shrooms[c], gRenderer, draw_map_x, draw_map_y, 4, item_tiles_p, item_tiles_s, item_tiles_t);
-            map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, map_shrooms[c].y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t);
-        }
-    }
     
-    //Cycle through all creatures and draw...
-    for(int c = 0 ; c < map_creatures.size(); c++){
-        
-        if(map_creatures[c].z != draw_map_z){ //if not on currently drawn floor
-            continue; //skip to next one
-        }
-        
-        if (map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
-            map_creatures[c].y > draw_map_y && map_creatures[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
-            map_creatures[c].draw_movement(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t);
-        }
-    }
-    if(cre1->z == draw_map_z){
-        cre1->draw_movement(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t); //DRAW MAIN CREATURE
-    }
     
-    //Cycle through all moving items and draw...
-    for(int c = 0; c < moving_items.size(); c++){
-        
-        if(moving_items[c].z != draw_map_z ){ //if not on currently drawn floor
-            continue;
-        }
-        if (moving_items[c].x > draw_map_x && moving_items[c].x < draw_map_x + draw_map_width &&
-            moving_items[c].y > draw_map_y && moving_items[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
-            moving_items[c].draw( (moving_items[c].x - draw_map_x) , (moving_items[c].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
-        }
-        
-    }
     
-    //Draw all top items
-    for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
-        if(i >= map_width || i < 0){continue;} //bounds checking
-        for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
-            if(j >= map_height || j < 0){continue;} //bounds checking
-            
-            int map_index = (draw_map_z*map_area) + (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
-            
-            //Cycle through all the items in the map_scenery_top list at that location
-            for(int k = 0; k < map_scenery_top[ map_index ].size(); k++ ){
-                map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x) , (map_scenery_top[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
-            }
-            
-            //Cycle through all animations on map
-            for(int k = 0; k < map_animations[ map_index ].size(); k++ ){
-                map_animations[map_index][k].draw( (map_animations[map_index][k].x - draw_map_x) , (map_animations[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
-            }
-            
-            //Cycle through all effects on map
-            for(int k = 0; k < map_effects[ map_index ].size(); k++ ){
-                map_effects[map_index][k].drawScroll( (map_effects[map_index][k].x - draw_map_x) , (map_effects[map_index][k].y - draw_map_y - 1), gRenderer, misc_tiles);
-            }
-            
-        }
-    } //End drawing top items
     
-    //Cycle through all creatures and draw their items...
-    for(int c = 0 ; c < map_creatures.size(); c++){
-        
-        if(map_creatures[c].z != draw_map_z){ //if not on currently drawn floor
-            continue; //skip to next one
-        }
-        
-        if (map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
-            map_creatures[c].y > draw_map_y && map_creatures[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
-            map_creatures[c].draw_movement_items(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t);
-        }
-    }
-    if(cre1->z == draw_map_z){
-        cre1->draw_movement_items(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t); //DRAW MAIN CREATURE's Items
-    }
     
-    //Cycle through all demons and draw...
-    for(int c = 0 ; c < map_demons.size(); c++){
-        
-        if(map_demons[c].z != draw_map_z){ //if not on currently drawn floor
-            continue; //skip to next one
-        }
-        
-        if (map_demons[c].x > draw_map_x && map_demons[c].x < draw_map_x + draw_map_width &&
-            map_demons[c].y > draw_map_y && map_demons[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
-            drawHorde(&map_demons[c], gRenderer, draw_map_x, draw_map_y, 4, item_tiles_p, item_tiles_s, item_tiles_t);
-            map_demons[c].draw(map_demons[c].x - draw_map_x, map_demons[c].y - draw_map_y);
-        }
-    }//done draw demons
     
-    //NOW FINALLY AT END DRAW THE CLOUDSS. THEY ARE ABOVE ALL
-    for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
-        if(i >= map_width || i < 0){continue;} //bounds checking
-        for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
-            if(j >= map_height || j < 0){continue;} //bounds checking
-            
-            int map_index = (draw_map_z*map_area) + (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    ///////////////////////////
+    //START OVERHEAD VIEW DRAW
+    
+    //Cycle through all of the drawn slices (starting with farthest behind first)
+    int draw_map_z_slice;
+    for(int s = 7; s >= 0; s--){
+        //BEGIN DRAWING A SINGLE SLICE
+        draw_map_z_slice = draw_map_z - s; //make sure to center on creature. But also draw behind slices first
+        if(draw_map_z_slice < 0) continue; //bounds check
 
-            //Cycle through all the items in the map_cloud list at that location
-            for(int k = 0; k < map_clouds[ map_index ].size(); k++ ){
+        int alpha_mod = 255 - ( (s/7.0)*255); //calculate the transparency level for this layer
+
+        //Draw all bottom items
+        for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
+            if(i >= map_width || i < 0){continue;} //bounds checking
+            for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
+                if(j >= map_height || j < 0){continue;} //bounds checking
+
+                int map_index = (draw_map_z_slice*map_area) + (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
                 
-                //Ensure texture is good
-                SDL_SetTextureAlphaMod(item_tiles_p[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a); //temorarily set the global alpha mod of the tile we need to use to draw
+                //Now cycle through the elements in the map_scenery_bottom list at that location
+                for(int k = 0; k < map_scenery_bottom[map_index].size(); k++){
+
+                    //Adjust alpha level based on depth
+                    SDL_SetTextureAlphaMod(item_tiles_p[map_scenery_bottom[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                    if(item_tiles_s[map_scenery_bottom[map_index][k].type] != (SDL_Texture*) 0x9999){
+                        SDL_SetTextureAlphaMod(item_tiles_s[map_scenery_bottom[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                    }
+                    if(item_tiles_t[map_scenery_bottom[map_index][k].type] != (SDL_Texture*) 0x9999){
+                        SDL_SetTextureAlphaMod(item_tiles_t[map_scenery_bottom[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                    }
+
+                    //call the draw function with location translated for this view
+                    map_scenery_bottom[map_index][k].draw( (map_scenery_bottom[map_index][k].x - draw_map_x), (map_scenery_bottom[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t  );
                 
-                map_clouds[map_index][k].draw( (map_clouds[map_index][k].x - draw_map_x) , (map_clouds[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
-            }//end clouds
+                }
+                
+                //Cycle through all big animations on map
+                for(int k = 0; k < map_animations_big[ map_index ].size(); k++ ){
+                    map_animations_big[map_index][k].draw( (map_animations_big[map_index][k].x - draw_map_x) , (map_animations_big[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
+                }
+                
+                //Now cycle through the elements in the map_items list at that location
+                for(int k = 0; k < map_items[map_index].size(); k++){
+                    
+                    //Adjust alpha level based on depth
+                    SDL_SetTextureAlphaMod(item_tiles_p[map_items[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                    if(item_tiles_s[map_items[map_index][k].type] != (SDL_Texture*) 0x9999){
+                        SDL_SetTextureAlphaMod(item_tiles_s[map_items[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                    }
+                    if(item_tiles_t[map_items[map_index][k].type] != (SDL_Texture*) 0x9999){
+                        SDL_SetTextureAlphaMod(item_tiles_t[map_items[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                    }
+                    
+                    //call the draw function with location translated for this view
+                    map_items[map_index][k].draw( (map_items[map_index][k].x - draw_map_x), (map_items[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t  );
+                }
+            }
+        } //End drawing bottom items, can draw creatures in a separate loop
+        
+        //Cycle through all shrooms and draw
+        for(int c = 0; c < map_shrooms.size(); c++){
+            
+            if(map_shrooms[c].z != draw_map_z_slice){ //if not on current z-dim slice
+                continue; //skiip to next one
+            }
+            
+            if (map_shrooms[c].x > draw_map_x && map_shrooms[c].x < draw_map_x + draw_map_width &&
+                map_shrooms[c].y > draw_map_y && map_shrooms[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+                
+                //Apply proper Alpha Modifier based on layer distance
+                SDL_SetTextureAlphaMod(map_shrooms[c].primTexture, alpha_mod);
+                SDL_SetTextureAlphaMod(map_shrooms[c].secoTexture, alpha_mod);
+                
+                //Now call actual draw function
+                map_shrooms[c].draw(map_shrooms[c].x - draw_map_x, map_shrooms[c].y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t);
+                //drawHorde(&map_shrooms[c], gRenderer, draw_map_x, draw_map_y, 4, item_tiles_p, item_tiles_s, item_tiles_t);
+                
+                //REturn the texture alpha level when done!!
+                SDL_SetTextureAlphaMod(map_shrooms[c].primTexture, 255);
+                SDL_SetTextureAlphaMod(map_shrooms[c].secoTexture, 255);
+            }
+        }//end drawing shrooms
+
+        //Cycle through all creatures and draw
+        for(int c = 0; c < map_creatures.size(); c++){
+            
+            if(map_creatures[c].z != draw_map_z_slice){ //if not on current z-dim slice
+                continue; //skiip to next one
+            }
+            
+            if (map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
+                map_creatures[c].y > draw_map_y && map_creatures[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+                
+                //Apply proper Alpha Modifier based on layer distance
+                SDL_SetTextureAlphaMod(map_creatures[c].primTexture, alpha_mod);
+                SDL_SetTextureAlphaMod(map_creatures[c].secoTexture, alpha_mod);
+                
+                //Now call actual draw function
+                //map_creatures[c].draw(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t);
+                map_creatures[c].draw_movement(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t);
+            
+                //REturn the texture alpha level when done!!
+                SDL_SetTextureAlphaMod(map_creatures[c].primTexture, 255);
+                SDL_SetTextureAlphaMod(map_creatures[c].secoTexture, 255);
+            }
+        }//end drawing creatures
+        //draw main creature
+        if(cre1->z == draw_map_z_slice){
+            //Apply proper Alpha Modifier based on layer distance
+            SDL_SetTextureAlphaMod(cre1->primTexture, alpha_mod);
+            SDL_SetTextureAlphaMod(cre1->secoTexture, alpha_mod);
+        
+            cre1->draw_movement(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t); //DRAW MAIN CREATURE
+        
+            //REturn the texture alpha level when done!!
+            SDL_SetTextureAlphaMod(cre1->primTexture, 255);
+            SDL_SetTextureAlphaMod(cre1->secoTexture, 255);
+        
+        }//end drawing main creature
+        
+        //Cycle through all moving items and draw...
+        for(int c = 0; c < moving_items.size(); c++){
+            
+            if(moving_items[c].z != draw_map_z_slice ){ //if not on currently drawn floor
+                continue;
+            }
+            
+            if (moving_items[c].x > draw_map_x && moving_items[c].x < draw_map_x + draw_map_width &&
+                moving_items[c].y > draw_map_y && moving_items[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+                
+                
+                //Adjust alpha level based on depth
+                SDL_SetTextureAlphaMod(item_tiles_p[moving_items[c].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                if(item_tiles_s[moving_items[c].type] != (SDL_Texture*) 0x9999){
+                    SDL_SetTextureAlphaMod(item_tiles_s[moving_items[c].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                }
+                if(item_tiles_t[moving_items[c].type] != (SDL_Texture*) 0x9999){
+                    SDL_SetTextureAlphaMod(item_tiles_t[moving_items[c].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                }
+    
+                moving_items[c].draw( (moving_items[c].x - draw_map_x) , (moving_items[c].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
+
+                
+            }
+            
+        }//end drawing moving items
+        
+        //Draw all top items
+        for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
+            if(i >= map_width || i < 0){continue;} //bounds checking
+            for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
+                if(j >= map_height || j < 0){continue;} //bounds checking
+                
+                int map_index = (draw_map_z_slice*map_area) + (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
+                
+                //Now cycle through the elements in the map_scenery_bottom list at that location
+                for(int k = 0; k < map_scenery_top[map_index].size(); k++){
+                    
+                    //Adjust alpha level based on depth
+                    SDL_SetTextureAlphaMod(item_tiles_p[map_scenery_top[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                    if(item_tiles_s[map_scenery_top[map_index][k].type] != (SDL_Texture*) 0x9999){
+                        SDL_SetTextureAlphaMod(item_tiles_s[map_scenery_top[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                    }
+                    if(item_tiles_t[map_scenery_top[map_index][k].type] != (SDL_Texture*) 0x9999){
+                        SDL_SetTextureAlphaMod(item_tiles_t[map_scenery_top[map_index][k].type], alpha_mod ); //temorarily set the global alpha mod of the tile we need to use to draw
+                    }
+                    
+                    //call the draw function with location translated for this view
+                    map_scenery_top[map_index][k].draw( (map_scenery_top[map_index][k].x - draw_map_x), (map_scenery_top[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t  );
+                    
+                }//end map_scenery_top
+                
+                //Draw map_animations
+                for(int k = 0; k < map_animations[ map_index ].size(); k++ ){
+                    map_animations[map_index][k].draw( (map_animations[map_index][k].x - draw_map_x) , (map_animations[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
+                }//end map_animations
+                
+                //Draw map_effects
+                for(int k = 0; k < map_effects[ map_index ].size(); k++ ){
+                    map_effects[map_index][k].drawScroll( (map_effects[map_index][k].x - draw_map_x) , (map_effects[map_index][k].y - draw_map_y - 1), gRenderer, misc_tiles);
+                }//end map_effects
+                
+                
+            }
+            
+        }//end drawing top items
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        //Cycle through all creatures and draw their items...
+        for(int c = 0 ; c < map_creatures.size(); c++){
+            
+            if(map_creatures[c].z != draw_map_z){ //if not on currently drawn floor
+                continue; //skip to next one
+            }
+            
+            if (map_creatures[c].x > draw_map_x && map_creatures[c].x < draw_map_x + draw_map_width &&
+                map_creatures[c].y > draw_map_y && map_creatures[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+                map_creatures[c].draw_movement_items(map_creatures[c].x - draw_map_x, map_creatures[c].y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t);
+            }
         }
-    } //End drawing CLOUDDSS
+        if(cre1->z == draw_map_z){
+            cre1->draw_movement_items(cre1->x - draw_map_x, cre1->y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t); //DRAW MAIN CREATURE's Items
+        }
+        
+        //Cycle through all demons and draw...
+        for(int c = 0 ; c < map_demons.size(); c++){
+            
+            if(map_demons[c].z != draw_map_z){ //if not on currently drawn floor
+                continue; //skip to next one
+            }
+            
+            if (map_demons[c].x > draw_map_x && map_demons[c].x < draw_map_x + draw_map_width &&
+                map_demons[c].y > draw_map_y && map_demons[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+                drawHorde(&map_demons[c], gRenderer, draw_map_x, draw_map_y, 4, item_tiles_p, item_tiles_s, item_tiles_t);
+                map_demons[c].draw(map_demons[c].x - draw_map_x, map_demons[c].y - draw_map_y);
+            }
+        }//done draw demons
+        
+        //NOW FINALLY AT END DRAW THE CLOUDSS. THEY ARE ABOVE ALL
+        for(int i = draw_map_x ; i < (draw_map_x + draw_map_width) ; i++){ //cycle through x dimension
+            if(i >= map_width || i < 0){continue;} //bounds checking
+            for(int j = draw_map_y ; j < (draw_map_y + draw_map_height); j++){ //cycle through y dimensiion
+                if(j >= map_height || j < 0){continue;} //bounds checking
+                
+                int map_index = (draw_map_z*map_area) + (j*map_width) + i; //calculate the index required to acces the location (i,j) on the map (since we use it so much)
+
+                //Cycle through all the items in the map_cloud list at that location
+                for(int k = 0; k < map_clouds[ map_index ].size(); k++ ){
+                    
+                    //Ensure texture is good
+                    SDL_SetTextureAlphaMod(item_tiles_p[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a); //temorarily set the global alpha mod of the tile we need to use to draw
+                    
+                    map_clouds[map_index][k].draw( (map_clouds[map_index][k].x - draw_map_x) , (map_clouds[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t); //call the draw function. We draw the item at a location translated from the current draw_map
+                }//end clouds
+            }
+        } //End drawing CLOUDDSS
+        
+    }//End depth slice
     
 
 }
@@ -3049,7 +3196,7 @@ void task_creatures_thread(){
                 map_creatures[i].inThread = true;
                 choice = rand()%6;
                 //choice = rand()%2 * 2;
-                choice = 6;
+                choice = 5;
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
