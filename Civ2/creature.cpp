@@ -116,7 +116,7 @@ void Sprite::draw(int in_x, int in_y, SDL_Texture** item_tiles_p, SDL_Texture** 
 }
 
 //draws the sprite to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
-void Sprite::draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t){
+void Sprite::draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t, int alpha_mod){
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { at_x*16, at_y*16, mWidth, mHeight };
     SDL_Rect* clip = NULL;
@@ -129,54 +129,55 @@ void Sprite::draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_T
     //prev_y becomes at_y + (prev_y - y)
     //prev_x becomes at_x + (prev_x - x)
     
-    //DRAW STAFF
-    //the staff should flow behind cre so we need to calculate where that's at on the translated image
-    if(staff != nullptr){
-        staff->y = at_y + (prev_y-y); //Apply the different between y and previous y to the new location
-        staff->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
-        staff->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
-    }
-    
-    //DRAW LIGHT
-    if(light != nullptr){
-        
-        //If has staff, then need to put candle on other side
-        if(staff!=nullptr){
-            if(prev_y < y && prev_x == x){
-                light->y = at_y+1;
-                light->x = at_x;
-            }
-            if(prev_y > y && prev_x == x){
-                light->y = at_y-1;
-                light->x = at_x;
-            }
-            if(prev_x < x && prev_y == y){
-                light->y = at_y;
-                light->x = at_x+1;
-            }
-            if(prev_x > x && prev_y == y){
-                light->y = at_y;
-                light->x = at_x-1;
-            }
-        }else{
-            light->y = at_y + (prev_y-y); //Apply the different between y and previous y to the new location
-            light->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
-        }
-        
-        light->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
-    }
-    
-    //DRAW HAT
-    if(hat != nullptr){
-        hat->y = at_y; //move the hat to the right place
-        hat->x = at_x;
-        hat->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
-    }
+    //CURRENTLY NOT DRAWING ITEMS IN THIS ROUTINE (ONLY THE SPIRTE ITSELF)
+//    //DRAW STAFF
+//    //the staff should flow behind cre so we need to calculate where that's at on the translated image
+//    if(staff != nullptr){
+//        staff->y = at_y + (prev_y-y); //Apply the different between y and previous y to the new location
+//        staff->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
+//        staff->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t, alpha_mod);
+//    }
+//
+//    //DRAW LIGHT
+//    if(light != nullptr){
+//
+//        //If has staff, then need to put candle on other side
+//        if(staff!=nullptr){
+//            if(prev_y < y && prev_x == x){
+//                light->y = at_y+1;
+//                light->x = at_x;
+//            }
+//            if(prev_y > y && prev_x == x){
+//                light->y = at_y-1;
+//                light->x = at_x;
+//            }
+//            if(prev_x < x && prev_y == y){
+//                light->y = at_y;
+//                light->x = at_x+1;
+//            }
+//            if(prev_x > x && prev_y == y){
+//                light->y = at_y;
+//                light->x = at_x-1;
+//            }
+//        }else{
+//            light->y = at_y + (prev_y-y); //Apply the different between y and previous y to the new location
+//            light->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
+//        }
+//
+//        light->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t, alpha_mod);
+//    }
+//
+//    //DRAW HAT
+//    if(hat != nullptr){
+//        hat->y = at_y; //move the hat to the right place
+//        hat->x = at_x;
+//        hat->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t, alpha_mod);
+//    }
     
 }
 
 //draws the sprite's items to the screen at specific map coords, but items "flow" with creature movement (considers prev location)
-void Sprite::draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t){
+void Sprite::draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t, int alpha_mod){
 //    //Set rendering space and render to screen
 //    SDL_Rect renderQuad = { at_x*16, at_y*16, mWidth, mHeight };
 //    SDL_Rect* clip = NULL;
@@ -193,7 +194,7 @@ void Sprite::draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p,
     if(hat != nullptr){
         hat->y = at_y; //move the hat to the right place
         hat->x = at_x;
-        hat->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
+        hat->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t, alpha_mod);
     }
     
     //DRAW STAFF
@@ -201,7 +202,7 @@ void Sprite::draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p,
     if(staff != nullptr){
         staff->y = at_y + (prev_y-y); //Apply the different between y and previous y to the new location
         staff->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
-        staff->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
+        staff->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t, alpha_mod);
     }
     
     //DRAW LIGHT
@@ -230,7 +231,7 @@ void Sprite::draw_movement_items(int at_x, int at_y, SDL_Texture** item_tiles_p,
             light->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
         }
         
-        light->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
+        light->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t, alpha_mod);
     }
     
 }
@@ -568,6 +569,8 @@ bool Sprite2x2::loadFromFile( std::string path1, std::string path2,std::string p
 }
 //Draws the Big Creature at the coordinates, taking into consideration spatial issues
 void Sprite2x2::draw(int in_x, int in_y){
+    
+    
     
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { in_x*16, (in_y-1)*16, mWidth, mHeight };
