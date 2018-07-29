@@ -67,6 +67,9 @@ using namespace std;
 // 340 - CHALICE
 // 341 - BANDANA
 // 342 - HOOD
+// 343 - ROD
+// 344 - FISH (UP)
+// 345 - FISH (DOWN)
 
 
 //static variable constructor
@@ -89,7 +92,8 @@ Item::Item(int xpos, int ypos, int tile_type, string in_desc){
     type = tile_type;
     primColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
     secoColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
-    tertColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
+    //tertColor = {static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)};
+    tertColor = {255,255,255,255};
     description = in_desc;
     move_speed = 3.0;
     

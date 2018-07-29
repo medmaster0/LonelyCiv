@@ -53,6 +53,10 @@ public:
     void draw_forward_pose_items(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t, int alpha_mod = 255); //draws the sprite's items to the screen at specific map coords, but items are side by side (considers prev location) FOR BALCONY VIEW
     //END BALCONY DRAW FUNCTIONS
     //////////////////////////////////
+    /////////////////////////////////
+    //SPECIAL POSE FUNCTIONS
+    void center_items(); //places the wielded items in a certain way: staff left, light right
+    /////////////////////////////////
     void drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //Draw's the sprite's inventory
     //These functions position the Creature's Items after movement
     void drawHat(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t); //draaws the creature's hat (just moved up 8 px)

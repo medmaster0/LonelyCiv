@@ -460,6 +460,21 @@ void Sprite::randomDance(){
     
 }
 
+//places the wielded items in a certain way: staff left, light right
+void Sprite::center_items(){
+    if(staff != nullptr){
+        staff->y = y;
+        staff->x = x-1;
+    }
+    if(light != nullptr){
+        light->y = y;
+        light->x = x + 1;
+    }
+    //Also set the proper prev to retain effects afterwards
+    prev_x = x-1;
+    prev_y = y;
+}
+
 //Draw the sprite's inventory
 void Sprite::drawInventory(SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t){
     for(int i = 0; i < inventory.size(); i++){

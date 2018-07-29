@@ -50,6 +50,10 @@ Effect::Effect(int xp, int yp, int type){
             color1 = {static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255), 126};
             tile_index = 21;
             break;
+        case 3: //EXCLAMATION
+            color1 = generate_pink();
+            tile_index = 27;
+            break;
         default:
             break;
     }

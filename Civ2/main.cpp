@@ -83,6 +83,7 @@ vector<Cloud> moving_clouds; //a 1d list of clouds that move around the map
 vector<Sprite> map_creatures; //a list of all creatures on map
 vector<Shroom> map_shrooms; //a list of all shroom sprites on map
 vector<Sprite2x2> map_demons; //a list of all demon sprites on map
+vector<Sprite> map_animals; //a list of all animals on map
 
 //Towers and Neighboorhood Stuff.
 vector<Tower> map_towers; //holds the list of all towers on the map
@@ -598,6 +599,27 @@ void loadTiles(){
     item_tiles_s_balcony[342] = loadTexture("Civ2/Civ2/tiles/hoodSeco.png");
     item_tiles_t_balcony[342] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[343] = loadTexture("Civ2/Civ2/tiles/rodPrim.png");
+    item_tiles_s[343] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[343] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[343] = loadTexture("Civ2/Civ2/tiles/rodPrim.png");
+    item_tiles_s_balcony[343] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[343] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[344] = loadTexture("Civ2/Civ2/tiles/fishPrim.png");
+    item_tiles_s[344] = loadTexture("Civ2/Civ2/tiles/fishSeco.png");
+    item_tiles_t[344] = loadTexture("Civ2/Civ2/tiles/fishTert.png");
+    item_tiles_p_balcony[344] = loadTexture("Civ2/Civ2/tiles/fishPrim.png");
+    item_tiles_s_balcony[344] = loadTexture("Civ2/Civ2/tiles/fishSeco.png");
+    item_tiles_t_balcony[344] = loadTexture("Civ2/Civ2/tiles/fishTert.png");
+    
+    item_tiles_p[345] = loadTexture("Civ2/Civ2/tiles/fishPrim.png");
+    item_tiles_s[345] = loadTexture("Civ2/Civ2/tiles/fishSeco.png");
+    item_tiles_t[345] = loadTexture("Civ2/Civ2/tiles/fishTert.png");
+    item_tiles_p_balcony[345] = loadTexture("Civ2/Civ2/tiles/fishPrim.png");
+    item_tiles_s_balcony[345] = loadTexture("Civ2/Civ2/tiles/fishSeco.png");
+    item_tiles_t_balcony[345] = loadTexture("Civ2/Civ2/tiles/fishTert.png");
+    
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
     misc_tiles[1] = loadTexture("Civ2/Civ2/tiles/zodiac/taurus.png");
@@ -629,6 +651,8 @@ void loadTiles(){
     misc_tiles[25] = loadTexture("Civ2/Civ2/tiles/fire_animate/T4Prim.png");
     //Tiles for Explosion Animation
     misc_tiles[26] = loadTexture("Civ2/Civ2/tiles/explosion_animate/bam_T1.png");
+    //UNORGANIZED>>>>>
+    misc_tiles[27] = loadTexture("Civ2/Civ2/tiles/exclaimPrim.png");
     
 }
 
@@ -858,7 +882,7 @@ void init_environment(){
             //Staff* temp_staff = new Staff(0,0,staff_tiles[rand()%8]); //a temp Item to be added to the cre's equip inventory
             int staff_tiles[6] = {315,330,331,332,339,340}; //315 - coin, 331 - dagger, 339 - wand, 340 - cup
             Staff* temp_staff = new Staff(0,0,staff_tiles[rand()%6]); //a temp Item to be added to the cre's equip inventory
-            //Staff* temp_staff = new Staff(0,0,340); //DEBUG
+            //Staff* temp_staff = new Staff(0,0,343); //DEBUG
             map_creatures.back().staff = temp_staff;
         }
 //        //randomly give lights
@@ -1082,6 +1106,29 @@ void draw_environment(Sprite* cre1){
                     SDL_SetTextureAlphaMod(map_shrooms[c].secoTexture, 255);
                 }
             }//end drawing shrooms
+            
+            //Cycle through all animals and draw
+            for(int c = 0; c < map_animals.size(); c++){
+                
+                if(map_animals[c].y != draw_map_y){ //if not on current y-dim slice
+                    continue; //skiip to next one
+                }
+                
+                if(map_animals[c].x > draw_map_x && map_animals[c].x < draw_map_x + draw_map_width &&
+                   map_animals[c].z < draw_map_z && map_animals[c].z > draw_map_z - draw_map_height){ //do bounds checking so we don't draw out of screen
+                    
+                    //Apply proper Alpha Modifier based on layer distance
+                    SDL_SetTextureAlphaMod(map_animals[c].primTexture, alpha_mod);
+                    SDL_SetTextureAlphaMod(map_animals[c].secoTexture, alpha_mod);
+                    
+                    //Now call actual draw function
+                    map_animals[c].draw(map_animals[c].x - draw_map_x, draw_map_z - map_animals[c].z - 1, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony);
+                    
+                    //REturn the texture alpha level when done!!
+                    SDL_SetTextureAlphaMod(map_animals[c].primTexture, 255);
+                    SDL_SetTextureAlphaMod(map_animals[c].secoTexture, 255);
+                }
+            }//end drawing animals
             
             //Cycle through all demons and draw
             for(int c = 0; c < map_demons.size(); c++){
@@ -1376,6 +1423,30 @@ void draw_environment(Sprite* cre1){
                 SDL_SetTextureAlphaMod(map_shrooms[c].secoTexture, 255);
             }
         }//end drawing shrooms
+        
+        //Cycle through all animals and draw
+        for(int c = 0; c < map_animals.size(); c++){
+            
+            if(map_animals[c].z != draw_map_z_slice){ //if not on current z-dim slice
+                continue; //skiip to next one
+            }
+            
+            if (map_animals[c].x > draw_map_x && map_animals[c].x < draw_map_x + draw_map_width &&
+                map_animals[c].y > draw_map_y && map_animals[c].y < draw_map_y + draw_map_height ) { //do bounds checking so don't draw out of screen
+                
+                //Apply proper Alpha Modifier based on layer distance
+                SDL_SetTextureAlphaMod(map_animals[c].primTexture, alpha_mod);
+                SDL_SetTextureAlphaMod(map_animals[c].secoTexture, alpha_mod);
+                
+                //Now call actual draw function
+                map_animals[c].draw(map_animals[c].x - draw_map_x, map_animals[c].y - draw_map_y, item_tiles_p, item_tiles_s, item_tiles_t);
+                //drawHorde(&map_shrooms[c], gRenderer, draw_map_x, draw_map_y, 4, item_tiles_p, item_tiles_s, item_tiles_t);
+                
+                //REturn the texture alpha level when done!!
+                SDL_SetTextureAlphaMod(map_animals[c].primTexture, 255);
+                SDL_SetTextureAlphaMod(map_animals[c].secoTexture, 255);
+            }
+        }//end drawing animals
 
         //Cycle through all creatures and draw
         for(int c = 0; c < map_creatures.size(); c++){
@@ -3038,7 +3109,7 @@ void drop_mint_thread(Sprite* spr1){
             //STAGE FOUR: EXPLOSION (BAM CAN)
             //Create the new COIN!
             Item temp_item = Item(spr1->x - 1, spr1->y, 315, spr1->inventory.back().primColor, spr1->inventory.back().secoColor );
-            map_items[spr1->y*map_width + spr1->x].push_back(temp_item);
+            map_items[spr1->y*map_width + spr1->x-1].push_back(temp_item);
             //And begin sparkles effect
             Effect temp_effect = Effect(spr1->x-1 , spr1->y, 1); //create the effect above the newly created item. Effect code for sparkles is 1 (last argument)
             map_effects[((spr1->y)*map_width)+spr1->x-1 ].push_back(temp_effect); //add the effect to global queue so it can be drawn
@@ -3075,7 +3146,6 @@ void drop_mint_thread(Sprite* spr1){
     loc_x = spr1->x-1;
     loc_y = spr1->y;
     
-    //We didn't find a can so just exit
     //We can NOW break out of this THREAD
     //Turn off flags
     spr1->inThread = false;
@@ -3090,7 +3160,6 @@ void drop_mint_thread(Sprite* spr1){
             if(map_effects[ ((loc_y)*map_width)+loc_x].size() > 0){
                 //map_effects[((spr1->y)*map_width)+spr1->x-1].erase(map_effects[((spr1->y)*map_width)+spr1->x-1].begin());
                 map_effects[ ((loc_y)*map_width)+loc_x].pop_back();
-                printf("popped\nw");
             }
             break;
         }
@@ -3175,11 +3244,167 @@ void sword_fish_thread(Sprite* spr1){
     while(spr1->inThread == true){
     }
     
-    printf("made it...\n");
+    printf("gon fishin...\n");
+    //STAGE 3: WIELD FISHING ROD
+    //We are going to swap the creatures main wielded item (staff)
+    //(if applicable)
     
-    while(true){
-        
+    //possibly need to temporarily store the wileded items
+    Staff* hold_staff = nullptr;
+    if(spr1->staff != nullptr){
+        hold_staff = spr1->staff; //hold on to the creature's current staff
     }
+    
+    //Now create a new temporary rod and swap with the staff
+    Staff* temp_rod = new Staff(0,0,343);
+    spr1->staff = temp_rod;
+    spr1->center_items();
+    
+    //STAGE 4: WAIT FOR FISH TO BITE
+    int countdown = 3+rand()%7; //determine a random amount of time it will take for fish to bite
+    int fish_timer = SDL_GetTicks(); //start the timer
+    while(true){
+        if(SDL_GetTicks() > fish_timer+(countdown*1000)){
+            break;
+        }
+    }
+    
+    //STAGE 5: SPAWN FISH
+    printf("fish bot\n");
+    
+    //And begin exclaim effect
+    Effect temp_effect = Effect(spr1->x , spr1->y, 3); //create the effect above the newly created item. Effect code for exclaim is 3 (last argument)
+    map_effects[spr1->z*(map_area) + ((spr1->y)*map_width)+spr1->x ].push_back(temp_effect); //add the effect to global queue so it can be drawn
+    
+    //Create new fish moving item
+    Item temp_fish = Item(spr1->x - 1, spr1->y, 344 );
+    temp_fish.z = spr1->z;
+    //moving_items.push_back(temp_temp_fish);
+    
+    //STAGE 6: FISH FLOP
+    //fish jumps up and then down
+    free_path(temp_fish); //clear the old path of the object
+    //Find path from current position directly up a couple spaces
+    temp_fish.path = A_Star_Free_Fall(block_map_free_space, map_width, map_height, temp_fish.x, temp_fish.y, spr1->z, temp_fish.x, temp_fish.y, temp_fish.z + 2);
+    //Check if the search failed (error code (9999,9999)
+    if(temp_fish.path[0][0] == 9999){
+        temp_fish.path.pop_back();
+        printf("search failed, CANT JUMP FISH!!!!\n");
+        
+        //Just exit and try something else
+        temp_fish.inThread = false;
+        return; //search failed, try again....
+    }
+    
+    //other wise... we can start walking the path...
+    //Now start the thread that will actually walk the path to target
+    temp_fish.inThread = true;
+    std::thread jumpFishObj(item_path_thread, &temp_fish);
+    jumpFishObj.detach();
+    //walkPathObj.join(); //block (wait for it to complete)
+    while(temp_fish.inThread == true){
+    }
+    
+    //switch the item tile of the fish
+    temp_fish.type = 345;
+    
+    //then fish jumps back down to the ground
+    free_path(temp_fish); //clear the old path of the object
+    //Find path from current position directly up a couple spaces
+    temp_fish.path = A_Star_Free_Fall(block_map_free_space, map_width, map_height, temp_fish.x, temp_fish.y, spr1->z, temp_fish.x, temp_fish.y, 0);
+    //Check if the search failed (error code (9999,9999)
+    if(temp_fish.path[0][0] == 9999){
+        temp_fish.path.pop_back();
+        printf("search failed, CANT JUMP DOWNFISH!!!!\n");
+        
+        //Just exit and try something else
+        temp_fish.inThread = false;
+        return; //search failed, try again....
+    }
+    
+    //other wise... we can start walking the path...
+    //Now start the thread that will actually walk the path to target
+    temp_fish.inThread = true;
+    std::thread jumpDownObj(item_path_thread, &temp_fish);
+    jumpDownObj.detach();
+    //walkPathObj.join(); //block (wait for it to complete)
+    while(temp_fish.inThread == true){
+    }
+    printf("jumped down bitch\n");
+    
+    //STAGE 7: TRANSMUTATION (SWORD SPAWN)
+    //Create the new dagger
+    Item temp_dagger = Item(temp_fish.x, temp_fish.y, 331, temp_fish.primColor, temp_fish.secoColor);
+    map_items[temp_fish.y*map_width + temp_fish.x].push_back(temp_dagger);
+    //And begin sparkles effect
+    Effect temp_sparkles = Effect(temp_fish.x, temp_fish.y, 1); //create the effect above the newly created item. Effect code for sparkles is 1 (last argument)
+    map_effects[temp_fish.y*map_width + temp_fish.x].push_back(temp_sparkles);
+    
+    //Also create a short EXPLOSION
+    int explosion_list[4] = {26,26,26,26};
+    Animation_Big temp_animation_big = Animation_Big(temp_dagger.x, temp_dagger.y, explosion_list);
+    temp_animation_big.z = 0;
+    map_animations_big[ ( temp_animation_big.y * map_width ) + (temp_animation_big.x) ].push_back(temp_animation_big);
+    //And wait 1 second for it to finish
+    spr1->thread_timer = SDL_GetTicks(); //start the timer since it's going to stand here for 1 second
+    //Now wait for the timee to finish
+    while(true){
+        if(SDL_GetTicks() > spr1->thread_timer + 1000){ //waiting 1 seconds
+            break;
+        }
+    }
+    
+    printf("exploded bitch! \n");
+    
+    //STAGE 8: DELETE ANIMATIONS
+    //delete the big animation
+    if(map_animations_big[ ( temp_animation_big.y * map_width ) + (temp_animation_big.x)  ].size() > 0){
+        map_animations_big[ ( temp_animation_big.y * map_width ) + (temp_animation_big.x)  ].erase(map_animations_big[ ( temp_animation_big.y * map_width ) + (temp_animation_big.x)  ].begin());
+    }
+    //delete exclamation animation
+    if(map_effects[spr1->z*(map_area) + ((spr1->y)*map_width)+spr1->x ].size() > 0){
+        map_effects[spr1->z*(map_area) + ((spr1->y)*map_width)+spr1->x ].erase( map_effects[spr1->z*(map_area) + ((spr1->y)*map_width)+spr1->x ].begin() )  ;
+    }
+    
+    //STAGE 9: RETURN TO GROUND
+    //Return staff and delete rod
+    spr1->staff = hold_staff;
+    delete temp_rod;
+    
+    //"Walking" back to earth
+    free_path(*spr1); //clear old path
+    //searching algorithm takes starting point, then destination
+    spr1->path = A_Star_Free_Fall(block_map_free_space, map_width, map_height, spr1->x, spr1->y, spr1->z, spr1->x, spr1->y, 0);
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, no path to ground");
+        
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    //Now we can start walking down the cloudshine
+    //Now start the thread that will actually walk the path to target
+    spr1->inThread = true;
+    std::thread flyDownObj(walk_path_thread, spr1);
+    flyDownObj.detach();
+    //walkPathObj.join(); //block (wait for it to complete)
+    while(spr1->inThread == true){
+    }
+    //Reached ground
+    //Delete sparkles effect
+    //delete exclamation animation
+    if(map_effects[ ((temp_dagger.y)*map_width)+temp_dagger.x ].size() > 0){
+        map_effects[ ((temp_dagger.y)*map_width)+temp_dagger.x  ].erase( map_effects[ ((temp_dagger.y)*map_width)+temp_dagger.x  ].begin() );
+    }
+    
+    //We can NOW break out of this THREAD
+    //Turn off flags
+    spr1->inThread = false;
+    spr1->isNeededByThread = false;
+    return;
     
 }
 
@@ -3207,8 +3432,8 @@ void task_creatures_thread(){
                 map_creatures[i].inThread = true;
                 choice = rand()%6;
                 //choice = rand()%2 * 2;
-                //choice = 5+rand()%2;
-                choice = 6;
+                choice = 5+rand()%2;
+                //choice = 6;
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
