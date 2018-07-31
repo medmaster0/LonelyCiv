@@ -2385,7 +2385,7 @@ void item_path_thread(Item* item1){
         
         //Check if done with path
         if(item1->path.size()<1){ //then it's empty
-            item1->inThread = false;
+            //item1->inThread = false;
             break;
         }
         
@@ -2402,6 +2402,8 @@ void item_path_thread(Item* item1){
     for(int t = 0; t < moving_items.size(); t++){ //cycle through moving_items
         if(moving_items[t].type == item1->type && moving_items[t].x == item1->x && moving_items[t].y == item1->y && moving_items[t].z == item1->z){
             moving_items.erase(moving_items.begin()+t);
+            item1->inThread = false; //only allow for other thread control, after erasing moving item...
+                                        //or else the item will move and we won't be able to end that if statement
         }
     }
     
@@ -3040,6 +3042,7 @@ void drop_mint_thread(Sprite* spr1){
     //Now we have to wait for it to finish walking
     
     //Wait for spr1 to get to destination (walk_to_thread signals end by setting inThread to false)
+    int loc_x, loc_y; //will later store the site of the dropped item
     while(spr1->inThread == true){
     } //just keep looping while it's in thread...
         
@@ -3059,8 +3062,36 @@ void drop_mint_thread(Sprite* spr1){
             free_path(*spr1); //clear old path
             
             //Find path to top story of house...
+            //Pick a random point on the top floor...
+            int direction = rand()%4; //0 - top row, 1 - bottom row, 2 - left row, 3 - right row
+            int walk_x, walk_y;
+            switch (direction) {
+                case 0: //top - works
+                    walk_x = spr1->owned_tower->x + rand()%(spr1->owned_tower->n-1);
+                    walk_y = spr1->owned_tower->y - 1;
+                    break;
+                    
+                case 1: //bottom - works
+                    walk_x = spr1->owned_tower->x + rand()%(spr1->owned_tower->n-1);
+                    walk_y = spr1->owned_tower->y + spr1->owned_tower->n-1 + 1;
+                    break;
+                    
+                case 2: //left - works
+                    walk_x = spr1->owned_tower->x - 1;
+                    walk_y = spr1->owned_tower->y + rand()%(spr1->owned_tower->n-1);
+                    break;
+                    
+                default: //right - works
+                    walk_x = spr1->owned_tower->x + spr1->owned_tower->n-1 + 1;
+                    walk_y = spr1->owned_tower->y + rand()%(spr1->owned_tower->n-1);
+                    break;
+            }
             //searching algorithm takes starting point, then destination
-            spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, spr1->owned_tower->x-1, spr1->owned_tower->y+1, spr1->owned_tower->num_floors-1);
+            spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, walk_x, walk_y, spr1->owned_tower->num_floors-1);
+            
+            
+//            //searching algorithm takes starting point, then destination
+//            spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, spr1->owned_tower->x-1, spr1->owned_tower->y+1, spr1->owned_tower->num_floors-1);
             
             //Check if the search failed (error code (9999,9999)
             if(spr1->path[0][0] == 9999){
@@ -3085,13 +3116,30 @@ void drop_mint_thread(Sprite* spr1){
             
             //STAGE THREE: DROP CAN
             Item item1 = spr1->inventory.back(); //store the item that's currently in sprite's inventory (a can)
-            item1.x = spr1->x - 1;
-            item1.y = spr1->y;
+            //Decide x & y depending on where (what part of balcony) we walked to
+            switch (direction) {
+                case 0: //top
+                    item1.x = walk_x;
+                    item1.y = walk_y - 1;
+                    break;
+                case 1: //bottom
+                    item1.x = walk_x;
+                    item1.y = walk_y + 1;
+                    break;
+                case 2: //left
+                    item1.x = walk_x - 1;
+                    item1.y = walk_y;
+                    break;
+                default: //right
+                    item1.x = walk_x + 1;
+                    item1.y = walk_y;
+                    break;
+            }
             item1.z = spr1->z;
             free_path(item1); //clear the old path of the object
             
             //Find path from top of house down below...
-            item1.path = A_Star_Free_Fall(block_map_free_space, map_width, map_height, spr1->x-1, spr1->y, spr1->z, spr1->x-1, spr1->y, 0);
+            item1.path = A_Star_Free_Fall(block_map_free_space, map_width, map_height, item1.x, item1.y, item1.z, item1.x, item1.y, 0);
             //Check if the search failed (error code (9999,9999)
             if(item1.path[0][0] == 9999){
                 item1.path.pop_back();
@@ -3114,15 +3162,15 @@ void drop_mint_thread(Sprite* spr1){
             
             //STAGE FOUR: EXPLOSION (BAM CAN)
             //Create the new COIN!
-            Item temp_item = Item(spr1->x - 1, spr1->y, 315, spr1->inventory.back().primColor, spr1->inventory.back().secoColor );
-            map_items[spr1->y*map_width + spr1->x-1].push_back(temp_item);
+            Item temp_item = Item(item1.x, item1.y, 315, spr1->inventory.back().primColor, spr1->inventory.back().secoColor );
+            map_items[item1.y*map_width + item1.x].push_back(temp_item);
             //And begin sparkles effect
-            Effect temp_effect = Effect(spr1->x-1 , spr1->y, 1); //create the effect above the newly created item. Effect code for sparkles is 1 (last argument)
-            map_effects[((spr1->y)*map_width)+spr1->x-1 ].push_back(temp_effect); //add the effect to global queue so it can be drawn
+            Effect temp_effect = Effect(item1.x , item1.y, 1); //create the effect above the newly created item. Effect code for sparkles is 1 (last argument)
+            map_effects[ item1.y*map_width + item1.x ].push_back(temp_effect); //add the effect to global queue so it can be drawn
             
             //Also create an EXPLOSION
             int explosion_list[4] = {26, 26, 26, 26};
-            Animation_Big temp_animation_big = Animation_Big(spr1->x-1, spr1->y, explosion_list);
+            Animation_Big temp_animation_big = Animation_Big(item1.x, item1.y, explosion_list);
             temp_animation_big.z = 0;
             map_animations_big[ ( temp_animation_big.y * map_width ) + (temp_animation_big.x) ].push_back(temp_animation_big);
             //And wait 1 second for it to finish
@@ -3136,21 +3184,21 @@ void drop_mint_thread(Sprite* spr1){
             
             //STAGE FIVE: TRANSMUTE ITEM -> SPAWN ITEM AND DELETE MOVING ITEM
             //delete the big animationb
-            if(map_animations_big[ ( (spr1->y)*map_width) + spr1->x-1 ].size() > 0){
-                map_animations_big[ ( (spr1->y)*map_width) + spr1->x-1 ].erase(map_animations_big[ ( (spr1->y)*map_width) + spr1->x-1 ].begin());
+            if(map_animations_big[ ( temp_animation_big.y * map_width ) + (temp_animation_big.x)].size() > 0){
+                map_animations_big[ ( temp_animation_big.y * map_width ) + (temp_animation_big.x) ].erase(map_animations_big[ ( temp_animation_big.y * map_width ) + (temp_animation_big.x) ].begin());
             }
             //Also erase item from creature inventory
             spr1->inventory.pop_back();
+            
+            //TEMPORARILY store values of drop site...
+            loc_x = item1.x;
+            loc_y = item1.y;
+            //item1 will then be automatically deleted out of scope
             
             break;
         }
         
     }
-    
-    //TEMPORARILY store values of drop site...
-    int loc_x, loc_y;
-    loc_x = spr1->x-1;
-    loc_y = spr1->y;
     
     //We can NOW break out of this THREAD
     //Turn off flags
