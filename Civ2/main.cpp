@@ -55,6 +55,7 @@ int draw_map_x = 50; //The (x,y,z) coords of the top left corner
 int draw_map_y = 50;
 int draw_map_z = 0; //which floor, we're drawing
 int draw_map_width, draw_map_height;
+Sprite* draw_sprite = nullptr; //the sprite that we center drawing on...
 //Balcony View Stuff
 bool isBalconyView = false; //flag for whether 2D-side view is activated
 
@@ -1019,6 +1020,11 @@ void init_environment(){
 
 //This method is not the most efficient (I imagine?) but will do for now.
 void draw_environment(Sprite* cre1){
+    
+    //Firstly, center draw mpa on input creature
+    draw_map_y = cre1->y - draw_map_height/2;
+    draw_map_x = cre1->x - draw_map_width/2;
+    //draw_map_z is being fiddled with under SDLK_b (balcony toggle)
     
     ////////////////////////////////////////
     //BEGIN BALCONY VIEW
@@ -3900,6 +3906,9 @@ int main( int argc, char* args[] ){
     Light temp_light = Light(0,0,339);//a temp Item to be added to the cre's equip inventory
     cre1->light = &temp_light;
     
+    //Also, center on cre1 by default...
+    draw_sprite = cre1;
+    
     //STORY TEST
     for(int p = 0; p < 200; p++){
         cout << genHerokuName() << "\n";
@@ -4045,6 +4054,18 @@ int main( int argc, char* args[] ){
                 {
                     case SDLK_q:
                         break;
+                        
+                    case SDLK_k:
+                        //center draw map on a creature (that's selected by status)
+                        if(statusDisplayOn == true){
+                            draw_sprite = &map_creatures[creature_inventory_index];
+                        }
+                        break;
+                    
+                    case SDLK_i:
+                        draw_sprite = cre1;//return the draw view back to center on creature
+                        break;
+                        
                     
                     case SDLK_w:
                         
@@ -4180,16 +4201,23 @@ int main( int argc, char* args[] ){
                         break;
                         
                     case SDLK_b:
-                        if(isBalconyView == false){ //if balcony view is ABOUT TO BE TURNED ON
-                            //move up draw_map_z by halft the width of screen. (in order to center current level)
-                            draw_map_z = cre1->z + (draw_map_height/2);
-                            draw_map_y = cre1->y;
-                        }else{ //then, otherwise, BALCONY VIEW about to be TURNED OFF
-                            //move back to the original position
-                            draw_map_z = cre1->z;
-                            draw_map_y = cre1->y - draw_map_height/2;
-                        }
+//                        if(isBalconyView == false){ //if balcony view is ABOUT TO BE TURNED ON
+//                            //move up draw_map_z by halft the width of screen. (in order to center current level)
+//                            draw_map_z = cre1->z + (draw_map_height/2);
+//                            draw_map_y = cre1->y;
+//                        }else{ //then, otherwise, BALCONY VIEW about to be TURNED OFF
+//                            //move back to the original position
+//                            draw_map_z = cre1->z;
+//                            draw_map_y = cre1->y - draw_map_height/2;
+//                        }
                         isBalconyView = !isBalconyView; //toggle balconyView
+                        //Adjust draw_map_z, depending on what view we are in
+                        if(isBalconyView == true){
+                            draw_map_z = draw_sprite->z + draw_map_height/2;
+                        }else{
+                            draw_map_z = draw_sprite->z;
+                        }
+                        
                         break;
                         
                     case SDLK_p:{
@@ -4440,10 +4468,10 @@ int main( int argc, char* args[] ){
                 //carry_over now has how many ticks we haven't updated for
                 sKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
                 
-                //Finally, update draw_map indices
-                if(isBalconyView==false){ //only update if not in Balcony View
-                    draw_map_y = cre1->y - draw_map_height/2;
-                }
+//                //Finally, update draw_map indices
+//                if(isBalconyView==false){ //only update if not in Balcony View
+//                    draw_map_y = cre1->y - draw_map_height/2;
+//                }
                 
             }//end s key processing
             //D-KEY TIMER
@@ -4480,7 +4508,7 @@ int main( int argc, char* args[] ){
                 dKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
                 
                 //Finally, update draw_map indices
-                draw_map_x = cre1->x - draw_map_width/2;
+                //draw_map_x = cre1->x - draw_map_width/2;
                 
             }//end d key processing
             
@@ -4515,7 +4543,7 @@ int main( int argc, char* args[] ){
                 aKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
                 
                 //Finally, update draw_map indices
-                draw_map_x = cre1->x - draw_map_width/2;
+                //draw_map_x = cre1->x - draw_map_width/2;
                 
             }//end a key processing
             
@@ -4549,10 +4577,10 @@ int main( int argc, char* args[] ){
                 //carry_over now has how many ticks we haven't updated for
                 wKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
                 
-                //Finally, update draw_map indices
-                if(isBalconyView==false){ //only update if not in Balcony View
-                    draw_map_y = cre1->y - draw_map_height/2;
-                }
+//                //Finally, update draw_map indices
+//                if(isBalconyView==false){ //only update if not in Balcony View
+//                    draw_map_y = cre1->y - draw_map_height/2;
+//                }
                 
             }//end a key processing
             
@@ -4562,7 +4590,8 @@ int main( int argc, char* args[] ){
         //BEGIN DRAW ROUTINES
         
         drawVectorMap();
-        draw_environment(cre1);
+        //draw_environment(cre1);
+        draw_environment(draw_sprite);
         //Draw all the sprites
         //#
         
