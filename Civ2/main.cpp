@@ -1304,14 +1304,28 @@ void draw_environment(Sprite* cre1){
                      //Cycle through all the items in the map_cloud list at that location
                      for(int k = 0; k < map_clouds[ map_index ].size(); k++ ){
                          
-                         //Ensure texture transparency is good
-                         SDL_SetTextureAlphaMod(item_tiles_p_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0) );
-                         if(item_tiles_s_balcony[map_clouds[map_index][k].type] != (SDL_Texture*) 0x9999){
-                             SDL_SetTextureAlphaMod(item_tiles_s_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0)  ); //temorarily set the global alpha mod of the tile we need to use to draw
-                         }
-                         if(item_tiles_t_balcony[map_clouds[map_index][k].type] != (SDL_Texture*) 0x9999){
-                             SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0)  ); //temorarily set the global alpha mod of the tile we need to use to draw
-                         }
+//                         //Ensure texture transparency is good
+//                         SDL_SetTextureAlphaMod(item_tiles_p_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0) );
+//                         if(item_tiles_s_balcony[map_clouds[map_index][k].type] != (SDL_Texture*) 0x9999){
+//                             SDL_SetTextureAlphaMod(item_tiles_s_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0)  ); //temorarily set the global alpha mod of the tile we need to use to draw
+//                         }
+//                         if(item_tiles_t_balcony[map_clouds[map_index][k].type] != (SDL_Texture*) 0x9999){
+//                             SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod/255.0)  ); //temorarily set the global alpha mod of the tile we need to use to draw
+//                         }
+                         
+                          //Ensure texture transparency is good
+                         //NOTE the slightly less alphaMod...
+                         //We make these more transparent then others
+                         //so we can create that "aura" effect
+                         int alpha_mod_cloud = (alpha_mod / 5) * 4; //   4/5 alpha modifier
+                        SDL_SetTextureAlphaMod(item_tiles_p_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod_cloud/255.0) );
+                        if(item_tiles_s_balcony[map_clouds[map_index][k].type] != (SDL_Texture*) 0x9999){
+                          SDL_SetTextureAlphaMod(item_tiles_s_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod_cloud/255.0)  ); //temorarily set the global alpha mod of the tile we need to use to draw
+                        }
+                        if(item_tiles_t_balcony[map_clouds[map_index][k].type] != (SDL_Texture*) 0x9999){
+                          SDL_SetTextureAlphaMod(item_tiles_t_balcony[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * (alpha_mod_cloud/255.0)  ); //temorarily set the global alpha mod of the tile we need to use to draw
+                        }
+
                          
                          map_clouds[map_index][k].draw( (map_clouds[map_index][k].x - draw_map_x) , (draw_map_z - j -1 ), gRenderer, item_tiles_p_balcony, item_tiles_s_balcony, item_tiles_t_balcony); //call the draw function. We draw the item at a location translated from the current draw_map
                      }//end clouds
@@ -1634,7 +1648,8 @@ void draw_environment(Sprite* cre1){
                 for(int k = 0; k < map_clouds[ map_index ].size(); k++ ){
                     
                     //Ensure texture is good
-                    SDL_SetTextureAlphaMod(item_tiles_p[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a); //temorarily set the global alpha mod of the tile we need to use to draw
+                    //Need to make the cloud layers more transparent then other drawn images...
+                    SDL_SetTextureAlphaMod(item_tiles_p[map_clouds[map_index][k].type], map_clouds[map_index][k].primColor.a * 0.5); //temorarily set the global alpha mod of the tile we need to use to draw
                     
                     //If it is an actual cloud (and not the shadow)
                     //We need to apply transparency to it differently
