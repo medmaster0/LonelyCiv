@@ -516,11 +516,11 @@ void loadTiles(){
     item_tiles_s_balcony[330] = loadTexture("Civ2/Civ2/tiles/quillSeco.png");
     item_tiles_t_balcony[330] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
-    item_tiles_p[331] = loadTexture("Civ2/Civ2/tiles/daggerPrim.png");
-    item_tiles_s[331] = loadTexture("Civ2/Civ2/tiles/daggerSeco.png");
+    item_tiles_p[331] = loadTexture("Civ2/Civ2/tiles/knifePrim.png");
+    item_tiles_s[331] = loadTexture("Civ2/Civ2/tiles/knifeSeco.png");
     item_tiles_t[331] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
-    item_tiles_p_balcony[331] = loadTexture("Civ2/Civ2/tiles/daggerPrim.png");
-    item_tiles_s_balcony[331] = loadTexture("Civ2/Civ2/tiles/daggerSeco.png");
+    item_tiles_p_balcony[331] = loadTexture("Civ2/Civ2/tiles/knifePrim.png");
+    item_tiles_s_balcony[331] = loadTexture("Civ2/Civ2/tiles/knifeSeco.png");
     item_tiles_t_balcony[331] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     item_tiles_p[332] = loadTexture("Civ2/Civ2/tiles/bombPrim.png");
@@ -620,6 +620,20 @@ void loadTiles(){
     item_tiles_p_balcony[345] = loadTexture("Civ2/Civ2/tiles/fishPrim.png");
     item_tiles_s_balcony[345] = loadTexture("Civ2/Civ2/tiles/fishSeco.png");
     item_tiles_t_balcony[345] = loadTexture("Civ2/Civ2/tiles/fishTert.png");
+    
+    item_tiles_p[346] = loadTexture("Civ2/Civ2/tiles/mailPrim.png");
+    item_tiles_s[346] = loadTexture("Civ2/Civ2/tiles/mailSeco.png");
+    item_tiles_t[346] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[346] = loadTexture("Civ2/Civ2/tiles/mailPrim.png");
+    item_tiles_s_balcony[346] = loadTexture("Civ2/Civ2/tiles/mailSeco.png");
+    item_tiles_t_balcony[346] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[347] = loadTexture("Civ2/Civ2/tiles/giftPrim.png");
+    item_tiles_s[347] = loadTexture("Civ2/Civ2/tiles/giftSeco.png");
+    item_tiles_t[347] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[347] = loadTexture("Civ2/Civ2/tiles/giftPrim.png");
+    item_tiles_s_balcony[347] = loadTexture("Civ2/Civ2/tiles/giftSeco.png");
+    item_tiles_t_balcony[347] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
@@ -929,6 +943,22 @@ void init_environment(){
 //        
 //    }
     
+    //Animals
+    int num_animals = 15; //how many animals are on the map
+    for(int i=0; i<num_animals; i++){
+        int tx, ty;
+        while(true){
+            tx = rand()%map_width;
+            ty = rand()%map_height;
+            if(block_map[(ty*map_width) + tx]==false){ //if the place is not blocked
+                Sprite temp_sprite = Sprite(tx, ty); //create new sprite
+                temp_sprite.loadFromFile("Civ2/Civ2/tiles/lovPrim.png", "Civ2/Civ2/tiles/lovSeco.png", 16, 16);
+                map_animals.push_back(temp_sprite);
+                break;
+            }
+        }
+    }
+    
     //Shrooms
     int num_shrooms = 5; //How many shrooms are on the map
     //Sprite temp_shroom;
@@ -1004,6 +1034,42 @@ void init_environment(){
         //temp_item.tertColor = generate_golden(); //since item is perfume, apply gold to it's third color
         map_items[ (tempz*map_area) + (tempy*map_width)+tempx].push_back(temp_item);
     }
+    
+//    //CREATE BY ITEM NUMBER!!!!!
+//    //create random items (from the randomly generated assets)
+//    for(int g = 0 ; g<420; g++){
+//        tempx = rand()%(map_width);
+//        tempy = rand()%(map_height);
+//        temp_tile = 346; //328 for flowers
+//        //    Both Random Colors
+//        //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
+//        //    Pink / Green
+//        //Item temp_item = Item(tempx, tempy , temp_tile, generate_pink(), generate_green()); //temporary item (scenery)
+//        //    Random Color / Greens
+//        //Item temp_item = Item(tempx, tempy , temp_tile, {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, generate_green()); //temporary item (scenery)
+//        //    Both Random WOLRDZ COLORZ
+//        Item temp_item = Item(tempx, tempy , temp_tile, world_colors[rand()%world_colors.size()], world_colors[rand()%world_colors.size()]); //temporary item (scenery)
+//        //temp_item.tertColor = generate_golden(); //since item is perfume, apply gold to it's third color
+//        map_items[ (tempz*map_area) + (tempy*map_width)+tempx].push_back(temp_item);
+//    }
+    
+//    //CREATE BY ITEM NUMBER!!!!!
+//    //create random items (from the randomly generated assets)
+//    for(int g = 0 ; g<420; g++){
+//        tempx = rand()%(map_width);
+//        tempy = rand()%(map_height);
+//        temp_tile = 347; //328 for flowers
+//        //    Both Random Colors
+//        //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
+//        //    Pink / Green
+//        //Item temp_item = Item(tempx, tempy , temp_tile, generate_pink(), generate_green()); //temporary item (scenery)
+//        //    Random Color / Greens
+//        //Item temp_item = Item(tempx, tempy , temp_tile, {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, generate_green()); //temporary item (scenery)
+//        //    Both Random WOLRDZ COLORZ
+//        Item temp_item = Item(tempx, tempy , temp_tile, world_colors[rand()%world_colors.size()], world_colors[rand()%world_colors.size()]); //temporary item (scenery)
+//        //temp_item.tertColor = generate_golden(); //since item is perfume, apply gold to it's third color
+//        map_items[ (tempz*map_area) + (tempy*map_width)+tempx].push_back(temp_item);
+//    }
 
     
 }
@@ -2966,6 +3032,11 @@ void perform_ritual_thread(Sprite* spr1){
     
 }
 
+/////
+///////
+/////
+///////
+/////
 //A thread that makes the creature walk home
 void walk_home_thread(Sprite* spr1){
     
@@ -3016,6 +3087,150 @@ void walk_home_thread(Sprite* spr1){
     
 }
 
+////////
+//////////
+///////
+//////////
+///////
+//STRUCTURED THREADS
+//Threads that call the other threads... the crrently highest level???
+//roam Thread
+//Keep picking a random location and walk to there
+void roam_thread(Sprite* spr1){
+    //printf("entering roam_thread\n");
+    
+    //Firstly, indicate to the sprites that we need them...
+    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
+    //mainly used for OTHER creatures, outside thread...
+    spr1->isNeededByThread = true;
+    
+    //STAGE 1: PICK RANDOM POINT
+    int tx, ty;
+    while(true){
+        tx = rand()%map_width;
+        ty = rand()%map_height;
+        if(block_map[(ty*map_width)+tx]==false){
+            break;
+        }
+    }
+    
+    //STAGE 2: ATTEMPT A PATH THERE...
+    free_path(*spr1); //clear path on sprite for starters
+    if(spr1->path.empty()){ //if path is empty
+        spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, tx, ty, 0);
+    }
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, no path ROAM\n");
+        
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    
+    //STAGE 3: WALK PATH (SPAWN NEW THREAD)
+    //Now we can start walking to the point
+    //Now start the thread that will actually walk the path to target
+    spr1->inThread = true;
+    std::thread walkPathObj(walk_path_thread, spr1);
+    walkPathObj.detach();
+    //walkPathObj.join(); //block (wait for it to complete)
+    while(spr1->inThread == true){
+    }
+    
+    //STAGE 4: STANDARD EXIT PROCEDURE
+    //We can NOW break out of this THREAD
+    //Turn off flags
+    spr1->inThread = false;
+    spr1->isNeededByThread = false;
+    return;
+    
+}
+
+//HOME HOARD Thread
+//Search for items of favorite color
+//And store in home
+void home_hoard_thread(Sprite* spr1){
+    
+    //Firstly, indicate to the sprites that we need them...
+    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
+    //mainly used for OTHER creatures, outside thread...
+    spr1->isNeededByThread = true;
+    
+    //STAGE 1: FIND AN ITEM OF FAVE COLOR
+    //find a new target path
+    int color_thresh = 100;
+    free_path(*spr1);
+    if(spr1->path.empty()){ //if path is empty
+        faveColorSearch_Z(spr1, color_thresh);
+        //itemTypeSearch(spr1, search_item);
+    }
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        //continue; //search failed, try again....
+        //search failed
+        //EXPIRE THREAD:
+        //printf("can't find fave color item...\n");
+        //cout << spr1->name << "\n";
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return;
+    }
+
+    //STAGE 2: WALK THE PATH
+    //Now we can start walking to the point
+    //Now start the thread that will actually walk the path to target
+    spr1->inThread = true;
+    std::thread walkPathObj(walk_path_thread, spr1);
+    walkPathObj.detach();
+    //walkPathObj.join(); //block (wait for it to complete)
+    while(spr1->inThread == true){
+    }
+    
+    //STAGE 3: PICK UP ITEM - INTO INV FROM MAP
+    //look on tile and check if item is still there and pick up
+    for(int i = 0; i < map_items[(spr1->y*map_width)+spr1->x].size(); i++){ //cycle through all items on tile
+        if(color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor)<color_thresh ||
+           color_diff(map_items[(spr1->y*map_width)+spr1->x][i].primColor, spr1->faveColor2)<color_thresh){ //make sure the colors match
+            //if(map_items[(spr1->y*map_width)+spr1->x][i].type == search_item){
+            pickUpItem(spr1, spr1->x, spr1->y, i); //then pick up the item
+        }
+    }
+    //Make sure we actually picked up
+    if(spr1->inventory.size() == 0){
+        printf("item wasn't there....\n");
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return;
+    }
+    
+    //STAGE 4: WALK HOME
+    //We can use the walk home utility thread
+    spr1->inThread = true;
+    std::thread walkHomeObj(walk_home_thread, spr1);
+    walkHomeObj.detach();
+    while(spr1->inThread == true){
+    }
+    
+    //STAGE 5: PUT ITEM IN TOWER INVENTORY
+    Item temp_item = spr1->inventory.back();
+    spr1->owned_tower->placeItem(temp_item, &map_scenery_bottom, map_width, map_height); //add to tower
+    spr1->inventory.pop_back();//remove item from inventory
+    
+    //STAGE 6: STANDARD EXIT PROCEDURE
+    //We can NOW break out of this THREAD
+    //Turn off flags
+    spr1->inThread = false;
+    spr1->isNeededByThread = false;
+    return;
+    
+}
+
+
+
 //ZODIAC_TASK THREADS
 //earth KNIGHT
 //Picks up a can,
@@ -3042,7 +3257,7 @@ void drop_mint_thread(Sprite* spr1){
     //Check if the search failed (error code (9999,9999)
     if(spr1->path[0][0] == 9999){
         spr1->path.pop_back();
-        printf("search failed, no path CAN");
+        //printf("search failed, no path CAN");
         
         //Just exit and try something else
         spr1->inThread = false;
@@ -3246,7 +3461,7 @@ void drop_mint_thread(Sprite* spr1){
 //Explosion occurs
 //Dagger appears on map
 void sword_fish_thread(Sprite* spr1){
-    printf("entering sword_fish_thread;\n");
+    //printf("entering sword_fish_thread;\n");
     
     //Firstly, indicate to the sprites that we need them...
     //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
@@ -3313,7 +3528,6 @@ void sword_fish_thread(Sprite* spr1){
     while(spr1->inThread == true){
     }
     
-    printf("gon fishin...\n");
     //STAGE 3: WIELD FISHING ROD
     //We are going to swap the creatures main wielded item (staff)
     //(if applicable)
@@ -3339,7 +3553,6 @@ void sword_fish_thread(Sprite* spr1){
     }
     
     //STAGE 5: SPAWN FISH
-    printf("fish bot\n");
     
     //And begin exclaim effect
     Effect temp_effect = Effect(spr1->x , spr1->y, 3); //create the effect above the newly created item. Effect code for exclaim is 3 (last argument)
@@ -3399,7 +3612,6 @@ void sword_fish_thread(Sprite* spr1){
     //walkPathObj.join(); //block (wait for it to complete)
     while(temp_fish.inThread == true){
     }
-    printf("jumped down bitch\n");
     
     //STAGE 7: TRANSMUTATION (SWORD SPAWN)
     //Create the new dagger
@@ -3422,8 +3634,6 @@ void sword_fish_thread(Sprite* spr1){
             break;
         }
     }
-    
-    printf("exploded bitch! \n");
     
     //STAGE 8: DELETE ANIMATIONS
     //delete the big animation
@@ -3477,6 +3687,91 @@ void sword_fish_thread(Sprite* spr1){
     
 }
 
+//water KNIGHT
+//Walk home
+//Produce mail envelope (change staff into envelope)
+//Walk to Random mailbox
+//Return home and check mailbox
+//Find present
+//Present explodes
+//Chalice appears
+void deliver_mail_thread(Sprite* spr1){
+    printf("entering deliver_mail_thread;\n");
+    
+    //Firstly, indicate to the sprites that we need them...
+    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
+    //mainly used for OTHER creatures, outside thread...
+    spr1->isNeededByThread = true;
+    
+    //STAGE 1: WALK HOME (SO WE CAN WRITE MAIL)
+    //Get a random point in ground floor of tower
+    
+    vector<int> home_coords = spr1->owned_tower->randomGroundCoord();
+    //vector<int> home_coords = {0,0};
+    //searching algorithm takes starting point, then destination
+    free_path(*spr1); //clear old path
+    spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, home_coords[0], home_coords[1], 0);
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, no path to homed\n");
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    //Now we can start walking home
+    //Now start the thread that will actually walk the path to target
+    spr1->inThread = true;
+    std::thread walkPathObj(walk_path_thread, spr1);
+    walkPathObj.detach();
+    //walkPathObj.join(); //block (wait for it to complete)
+    while(spr1->inThread == true){
+    }
+    
+    printf("reched home\n");
+    
+    return;
+    
+}
+
+
+//Periodically give animals a new task
+//This function starts threads and sets inThread flag = true
+//**Individual spawned threas are responsible for inThread flag = false again
+void task_animals_thread(){
+    short choice = 0; //decide which thread to run
+    
+    while(true){
+        
+        //cycle through all animals
+        for(int i = 0; i < map_animals.size(); i++){
+            
+            //check if isNeededByThread flag is set (indicating another thread will take responsibility for setting flags)
+            if(map_animals[i].isNeededByThread == true){
+                continue; //don't do anything to animal
+            }
+            
+            if(map_animals[i].inThread == false){ //we need to assign it a new thread
+                free_path(map_animals[i]);//clear old path, fuction to individually delete path
+                map_animals[i].thread_timer = time(NULL);
+                map_animals[i].inThread = true;
+                
+                //Now actually spawn the thread we want to spawn
+                map_animals[i].task_status = "roam";
+                std::thread roamObj(roam_thread, &map_animals[i]);
+                roamObj.detach();
+                
+            }
+            
+        }
+        
+        SDL_Delay(2000); //doesn't have to run all the time
+        
+    }//end while
+    
+}
+
 //periodically gives a new task to creatures
 //This function starts threads and sets inThread flag = true
 //**Individual spawned threads are responsible for inThread flag = false again
@@ -3501,8 +3796,10 @@ void task_creatures_thread(){
                 map_creatures[i].inThread = true;
                 choice = rand()%6;
                 //choice = rand()%2 * 2;
-                choice = 5+rand()%2;
-                //choice = 6;
+                //choice = 5+rand()%2;
+                //choice = 7;
+                vector<int> choices = {5,6,13};
+                choice = choices[ rand()%choices.size()  ];
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
@@ -3554,6 +3851,20 @@ void task_creatures_thread(){
                         map_creatures[i].task_status = "air knight";
                         std::thread airKnightObj(sword_fish_thread, &map_creatures[i]);
                         airKnightObj.detach();
+                        break;
+                    }
+                    case 7: {
+                        //WATER KNIGHTS: Deliver Mail Thread
+                        map_creatures[i].task_status = "water knight";
+                        std::thread waterKnightObj(deliver_mail_thread, &map_creatures[i]);
+                        waterKnightObj.detach();
+                        break;
+                    }
+                    case 13: {
+                        //Hoard items in tower
+                        map_creatures[i].task_status = "hoard items";
+                        std::thread homeHoardObj(home_hoard_thread, &map_creatures[i]);
+                        homeHoardObj.detach();
                         break;
                     }
                         
@@ -4083,6 +4394,9 @@ int main( int argc, char* args[] ){
     //This thread schedules new threads for halted creatures!
     std::thread taskObj(task_creatures_thread);
     taskObj.detach();
+    //This thread schedules new threads for halted animals!
+    std::thread taskAnimalObj(task_animals_thread);
+    taskAnimalObj.detach();
     //This thread wanders the player character around the map
     std::thread playerWanderObj(wander_player_thread, cre1);
     playerWanderObj.detach();
@@ -4129,6 +4443,13 @@ int main( int argc, char* args[] ){
                         draw_sprite = cre1;//return the draw view back to center on creature
                         break;
                         
+                    //DEBUG... BUGGY
+                    case SDLK_z:
+                    {
+                        Item temp_item = Item(0,0, 315);
+                        draw_sprite->owned_tower->placeItem(temp_item, &map_scenery_bottom, map_width, map_height);
+                        break;
+                    }
                     
                     case SDLK_w:
                         

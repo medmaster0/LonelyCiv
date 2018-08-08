@@ -304,6 +304,15 @@ void popNodeFromSet(list_node* in_node, list* in_set){
     
 }
 
+//print path
+//print the values of the given path
+void printPath(vector<vector<int>> path){
+    //iterate through path
+    for(int i = 0; i < path.size(); i++){
+        printf("Coord: %d,%d,%d\n", path[i][0], path[i][1], path[i][2]);
+    }
+    return;
+}
 
 ////////////////////////////////////////////////END END NED LIST STUFFF
 
@@ -909,6 +918,9 @@ vector<vector<int>> A_Star_Z(bool block_map[], vector<vector<Item>>* map_scenery
     vector<vector<int>> search_q; //the main "list", could really be turned into what ever datat type you wantx
     vector<int> coord; //a temp coord to add to the search_q.
     list_node* travel = closed_set.last; //temp pointer for traversing the lists
+    //First, need to add final step manually?
+    coord = {x2,y2,z2}; //destination coordinate
+    search_q.push_back(coord);
     while(true){
         coord = {travel->x,travel->y,travel->z};
         search_q.push_back(coord);

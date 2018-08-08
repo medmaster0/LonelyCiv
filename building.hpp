@@ -47,6 +47,8 @@ class Tower{
 public:
     Tower(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x, int y, int n, int num_floors, SDL_Color brick_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color brick_col2 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color floor_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color floor_col2 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255},SDL_Color ladder_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, string street_name = genStreetName(), int address_number = rand()%900); //initialize and build a tower with the initial input parameters
     int x, y, n; //the location and dimensions of the tower
+                //n, outer wall thickness, (doesn't include balcony walkway path
+                //x,y upper left coords
     int ladder_x, ladder_y; //the location of the main ladder within the tower
     int door_x, door_y; //the location of the front door on the tower
     int mailbox_x, mailbox_y; //the location of the tower's mailbox
@@ -59,14 +61,50 @@ public:
     SDL_Color door_col1;
     SDL_Color ladder_col1;
     string address; //the name of the address
+    vector<bool> hasItem; //list of items inside the tower
+    int last_empty_item_position; //the index of the position of last empty item space (see item position explanation below class definition...)
+    int max_empty_item_position; //the maximum position item can be at (top floor, bottom right)
     bool isOwned = false; 
     void build_floor(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height); //build another floor on tower, and increment num_floors counter
     void build_floor_inner(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height); //build another floor on tower and increment num_floors counter
     void build_door(vector<vector<Item>>* map_scenery_top, bool* block_map, int map_width, int map_height, int floor, int position = 0); //clears the specified coordinate and puts a door there.
     void build_mailbox(vector<vector<Item>>* map_scenery_top, bool* block_map, int map_width, int map_height, int position = 0, string description = "test"); //Puts a mailbox near the front door
     void assign_backyard(int position); //calculate where the backyard is on Tower
-    
+    /////TOWER INVENTORY
+    //DRAW TO map_scenery_bottom, but keep track of positions internally
+    //consult ITEM POSITIONS below
+    void placeItem(Item item, vector<vector<Item>>* map_scenery_bottom, int map_width, int map_height); //puts an item in the last available item position
+    //Item takeItem(vector<vector<Item>>* map_scenery_bottom, int map_width, int map_height); //removes the last placed item
+    vector<int> randomGroundCoord(); //returns a coord to a random point on the ground floor that is at least one step away from wall
 };
+
+//ITEM POSITIONS
+//7x7
+//xxxxxxx
+//x0 1 2x
+//x     x
+//x3 4 5x
+//x     x
+//x6 7 8x
+//xxxxxxx
+//
+//6x6
+//xxxxxx
+//x0 1 x
+//x    x
+//x2 3 x
+//x    x
+//xxxxxx
+//
+//xxxxxx
+//x4 5 x
+//x    x
+//x6 7 x
+//x    x
+//xxxxxx
+//second floor
+//
+//EXAMPLES OF POSITION LOCATIONS
 
 
 //misc

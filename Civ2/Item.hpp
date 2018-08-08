@@ -68,6 +68,8 @@ using namespace std;
 // 343 - ROD
 // 344 - FISH (UP)
 // 345 - FISH (DOWN)
+// 346 - MAIL
+// 347 - GIFT
 
 //SDL_Texture* loadTexture( string path, SDL_Renderer* gRenderer );
 extern SDL_Renderer* gRenderer;//The window renderer

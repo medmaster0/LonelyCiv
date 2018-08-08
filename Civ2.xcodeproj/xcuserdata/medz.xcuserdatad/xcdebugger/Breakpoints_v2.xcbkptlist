@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Civ2/med_algo.cpp"
-            timestampString = "554096039.480371"
+            timestampString = "555461194.1222349"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "860"
-            endingLineNumber = "860"
+            startingLineNumber = "869"
+            endingLineNumber = "869"
             landmarkName = "A_Star_Z(bool block_map[], vector&lt;vector&lt;Item&gt;&gt;* map_scenery_top, int map_width, int map_height, int x1, int y1, int z1, int x2, int y2, int z2)"
             landmarkType = "9">
          </BreakpointContent>

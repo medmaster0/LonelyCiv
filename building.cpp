@@ -360,6 +360,9 @@ Tower::Tower(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_sce
     
     address = to_string(in_address_number) + " " + in_street_name;
     
+    last_empty_item_position = 0; //initialize item position
+    max_empty_item_position = 0; //initialize max item position.... soon be changing it
+    
     //Build ground floor
     build_floor_inner(map_scenery_top, map_scenery_bottom, block_map, map_width, map_height);
     num_floors = num_floors + 1;
@@ -448,6 +451,15 @@ void Tower::build_floor(vector<vector<Item>>* map_scenery_top,vector<vector<Item
         Item temp_railing = Item(r_x, r_y, 319, {0,0,0,255}, {0,0,0,255});
         map_scenery_top->at( ((num_floors)*map_height*map_width) + (r_y*map_width) + r_x ).push_back(temp_railing);
     }
+    
+    //also push the required amount of entries in hasItem matrix/vector
+    int item_positions_to_add = (int)pow(  (int)(((n-2)/2.0) + 0.5) , 2.0  ); //int conversion always down converts
+    for(int i = 0; i<item_positions_to_add; i++){
+        hasItem.push_back(false);
+    }
+    
+    //also recalculate max_empty_item_position
+    max_empty_item_position = hasItem.size() - 1;
     
     return;
     
@@ -576,6 +588,54 @@ void Tower::assign_backyard(int position ){
     }
     
 }
+
+//puts an item in the last available item position
+void Tower::placeItem(Item item, vector<vector<Item>>* map_scenery_bottom, int map_width, int map_height){
+    
+    //Calculate coordinates of where to put item (based on last position)
+    //First, calculate items_per_row
+    int items_per_row = (int)(  ((n-2)/2.0) + 0.5  );
+    //Second, calculate floor
+    int floor = last_empty_item_position/( pow(items_per_row,2) );
+    int single_floor_position = last_empty_item_position%( (int)pow(items_per_row,2) ); //now that we know floor, we can treat row,col as if on first floor to make calculations easier
+    
+    
+    //Third, calculate row and columns of item
+    int row = single_floor_position/items_per_row;
+    int col = single_floor_position%items_per_row;
+    //Third, calculate x,y from row,column
+    int place_x = x + 1 + (col*2);
+    int place_y = y + 1 + (row*2);
+    
+    //Place item on map_scenery.
+    //Also correct the values
+    item.x = place_x;
+    item.y = place_y;
+    item.z = floor;
+    map_scenery_bottom->at( floor*(map_width*map_height) + place_y*map_width + place_x  ).push_back(item);
+    
+    //update tower data points
+    hasItem[last_empty_item_position] = true;
+    last_empty_item_position = last_empty_item_position+1;//increment
+    
+}
+
+////removes the last placed item
+//Item Tower::takeItem(vector<vector<Item>>* map_scenery_bottom, int map_width, int map_height){
+//    
+//}
+
+//returns a coord to a random point on the ground floor that is at least one step away from wall
+vector<int> Tower::randomGroundCoord(){
+    int rx = x+2 + rand()%(n-4);
+    int ry = y+2 + rand()%(n-4);
+    vector<int> coords = {rx,ry};
+    return coords;
+}
+
+
+//////////////////////END TOWER CLASS
+//END TOWER CLASS
 
 //Builds a circular structure of bricks
 //Uses Midpoint Circle Drawing Algorithm

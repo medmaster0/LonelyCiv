@@ -70,6 +70,8 @@ using namespace std;
 // 343 - ROD
 // 344 - FISH (UP)
 // 345 - FISH (DOWN)
+// 346 - MAIL
+// 347 - GIFT
 
 
 //static variable constructor
