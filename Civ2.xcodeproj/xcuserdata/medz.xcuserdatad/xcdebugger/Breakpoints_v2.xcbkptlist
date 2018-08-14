@@ -10,12 +10,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Civ2/med_algo.cpp"
-            timestampString = "555461194.1222349"
+            timestampString = "555916577.646082"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "869"
-            endingLineNumber = "869"
+            startingLineNumber = "867"
+            endingLineNumber = "867"
             landmarkName = "A_Star_Z(bool block_map[], vector&lt;vector&lt;Item&gt;&gt;* map_scenery_top, int map_width, int map_height, int x1, int y1, int z1, int x2, int y2, int z2)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "building.cpp"
+            timestampString = "555916577.646153"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "964"
+            endingLineNumber = "964"
+            landmarkName = "build_neighborhood(vector&lt;vector&lt;Item&gt;&gt;* map_scenery_top,vector&lt;vector&lt;Item&gt;&gt;* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color brick_p_col_in, SDL_Color brick_s_col_in, SDL_Color floor_p_col_in, SDL_Color floor_s_col_in, SDL_Color door_col1, SDL_Color ladder_col_p )"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

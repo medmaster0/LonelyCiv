@@ -76,6 +76,11 @@ public:
     void placeItem(Item item, vector<vector<Item>>* map_scenery_bottom, int map_width, int map_height); //puts an item in the last available item position
     //Item takeItem(vector<vector<Item>>* map_scenery_bottom, int map_width, int map_height); //removes the last placed item
     vector<int> randomGroundCoord(); //returns a coord to a random point on the ground floor that is at least one step away from wall
+    
+    //TOWER DIRECTIONALITY:
+    //NEED TO KNOW IF TOWER DOOR FACES north, east, south, west (1,2,3,4) never eat shredded wheat
+    int cardinality; 
+    
 };
 
 //ITEM POSITIONS

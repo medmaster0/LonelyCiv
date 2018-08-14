@@ -82,7 +82,7 @@ public:
     int zodiac_element; //code for the creature's zodiac element
     Hat* hat; //a single item containing the sprite's hat
     Staff* staff; //a single item containing the sprite's staff
-    Light* light; //a single item containign the sprites light
+    Light* light; //a single item containing the sprites light
     void moveTo(int x1, int y1); //moves to a specific (x,y) coord
     //Targeting stuff, below - hopefully GENERAL PURPOSE
     vector<vector<int>> path; //a path to whatever target it has

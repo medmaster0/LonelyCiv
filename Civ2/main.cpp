@@ -3728,8 +3728,139 @@ void deliver_mail_thread(Sprite* spr1){
     //walkPathObj.join(); //block (wait for it to complete)
     while(spr1->inThread == true){
     }
+    //rechaed home
     
-    printf("reched home\n");
+    //STAGE 2: SWITCH ITEM TO MAIL ENVELOPE (if applicable)
+    //temporary variables to hold staff info
+    SDL_Color staff_prim_col, staff_seco_col, staff_tert_col;
+    int staff_type;
+    bool made_staff; //indicate whether we make a brand new staff or not
+    if(spr1->staff!=nullptr){ //if creature has staff
+        staff_prim_col = spr1->staff->primColor;
+        staff_seco_col = spr1->staff->secoColor;
+        staff_tert_col = spr1->staff->tertColor;
+        staff_type = spr1->staff->type;
+        //*change* the old staff to a new envelope - new type, new color
+        spr1->staff->primColor = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+        spr1->staff->secoColor = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+        spr1->staff->tertColor = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+        spr1->staff->type = 346;
+        made_staff = false;
+    }else{ //otherwise, create a new item, and give creature it
+        Staff* temp_staff = new Staff( 0, 0, 346);
+        spr1->staff = temp_staff;
+        made_staff = true;
+    }
+    
+    //STAGE 3: WALK TO RANDOM MAILBOX
+    //pick a random mailbox
+    Tower temp_tower = map_towers[rand()%map_towers.size()]; //pick a random tower from map
+    //find path to tower mailbox
+    free_path(*spr1); //clear old path
+    
+    //Need to calculate the FRONT OF THE MAILBOX - PEEKING IN
+    if(temp_tower.mailbox_y > temp_tower.door_y && temp_tower.mailbox_x > temp_tower.door_x){
+        spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, temp_tower.mailbox_x+1, temp_tower.mailbox_y, 0);
+    }else if(temp_tower.mailbox_y < temp_tower.door_y && temp_tower.mailbox_x > temp_tower.door_x){
+        spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, temp_tower.mailbox_x, temp_tower.mailbox_y-1, 0);
+    }else if(temp_tower.mailbox_y > temp_tower.door_y && temp_tower.mailbox_x < temp_tower.door_x){
+        spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, temp_tower.mailbox_x, temp_tower.mailbox_y+1, 0);
+    //}else if(temp_tower.mailbox_y < temp_tower.door_y && temp_tower.mailbox_x < temp_tower.door_x){
+    }else{
+        spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, temp_tower.mailbox_x-1, temp_tower.mailbox_y, 0);
+    }
+    
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, no path to mailb\n");
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    //Now we can start walking to mailbox
+    //Now start the thread that will actually walk the path to target
+    spr1->inThread = true;
+    std::thread walkMailboxObj(walk_path_thread, spr1);
+    walkMailboxObj.detach();
+    while(spr1->inThread == true){
+    }
+    //rechaed mailbox
+    
+    //STAGE 4: PUDDING BACK STAFF
+    if(made_staff == true){ //if we had to make a new staff..
+        //free up memory
+        delete spr1->staff;
+        spr1->staff = nullptr;
+    }else{ //if we didn't have to create a new staff
+        //just change the existing item back to old
+        spr1->staff->primColor = staff_prim_col;
+        spr1->staff->secoColor = staff_seco_col;
+        spr1->staff->tertColor = staff_tert_col;
+        spr1->staff->type = staff_type;
+    }
+    
+    //STAGE 5: SPAWN RANDOM GIFT ON MAP
+    //pick a random point
+    int gx, gy; //the point where the gift will be
+    while(true){
+        gx = rand()%map_width;
+        gy = rand()%map_height;
+        if(block_map[(gy*map_width)+gx]==false && block_map[(gy*map_width)+gx+1]==false ){ //make sure both the space and the space next to it are open
+            break;
+        }
+    }
+    //Create a new gift at that point
+    Item temp_gift = Item(gx, gy, 347);
+    temp_gift.z = 0;
+    map_scenery_bottom[gy*map_width + gx].push_back(temp_gift);
+    
+    //Also cretae a short BAM
+    int explosion_list[4] = {26,26,26,26};
+    Animation_Big temp_animation_big = Animation_Big(gx, gy, explosion_list);
+    temp_animation_big.z = 0;
+    map_animations_big[ ( temp_animation_big.y * map_width ) + (temp_animation_big.x) ].push_back(temp_animation_big);
+    //And wait 1 second for it to finish
+    spr1->thread_timer = SDL_GetTicks(); //start the timer since it's going to stand here for 1 second
+    //Now wait for the timee to finish
+    while(true){
+        if(SDL_GetTicks() > spr1->thread_timer + 1000){ //waiting 1 seconds
+            break;
+        }
+    }
+    //delete the big animation
+    if(map_animations_big[ ( temp_animation_big.y * map_width ) + (temp_animation_big.x)  ].size() > 0){
+        map_animations_big[ ( temp_animation_big.y * map_width ) + (temp_animation_big.x)  ].erase(map_animations_big[ ( temp_animation_big.y * map_width ) + (temp_animation_big.x)  ].begin());
+    }
+    
+    //and walk towards that point...
+    //walk towards that point
+    free_path(*spr1); //clear old path
+    spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, gx+1, gy, 0);
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, no path to gifted\n");
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    //Now we can start walking to gift
+    //Now start the thread that will actually walk the path to target
+    spr1->inThread = true;
+    std::thread walkGiftObj(walk_path_thread, spr1);
+    walkGiftObj.detach();
+    while(spr1->inThread == true){
+    }
+    //reached gift
+    
+    //STAGE 6: OPEN GIFT INTO A CHALICE
+    
+    while(true){
+        
+    }
     
     return;
     
@@ -3797,9 +3928,9 @@ void task_creatures_thread(){
                 choice = rand()%6;
                 //choice = rand()%2 * 2;
                 //choice = 5+rand()%2;
-                //choice = 7;
-                vector<int> choices = {5,6,13};
-                choice = choices[ rand()%choices.size()  ];
+                choice = 7;
+//                vector<int> choices = {5,6,13};
+//                choice = choices[ rand()%choices.size()  ];
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
@@ -4395,8 +4526,8 @@ int main( int argc, char* args[] ){
     std::thread taskObj(task_creatures_thread);
     taskObj.detach();
     //This thread schedules new threads for halted animals!
-    std::thread taskAnimalObj(task_animals_thread);
-    taskAnimalObj.detach();
+//    std::thread taskAnimalObj(task_animals_thread);
+//    taskAnimalObj.detach();
     //This thread wanders the player character around the map
     std::thread playerWanderObj(wander_player_thread, cre1);
     playerWanderObj.detach();

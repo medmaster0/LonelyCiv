@@ -551,8 +551,6 @@ vector<vector<int>> A_Star(bool block_map[],int map_width, int map_height, int x
         
     }//end open_list empty
     
-    printf("got out of open loop");
-    
     //CCONSTRUCT VECTOR TO RETURN BY TRAVERSING THE CLOSED LIST
     vector<vector<int>> search_q; //the main "list", could really be turned into what ever datat type you wantx
     vector<int> coord; //a temp coord to add to the search_q.
