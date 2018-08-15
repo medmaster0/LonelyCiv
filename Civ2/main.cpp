@@ -2451,7 +2451,6 @@ void item_path_thread(Item* item1){
         //we need to update the copy in moving_items, as well...
         for(int t = 0; t < moving_items.size(); t++){ //cycle through moving_items
             if(moving_items[t].type == item1->type && moving_items[t].x == item1->x && moving_items[t].y == item1->y && moving_items[t].z == item1->z){
-                printf("update moving items list\n");
                 moving_items[t].x = next_step[0];
                 moving_items[t].y = next_step[1];
                 moving_items[t].z = next_step[2]; //also set correct floor
@@ -3857,14 +3856,62 @@ void deliver_mail_thread(Sprite* spr1){
     //reached gift
     
     //STAGE 6: OPEN GIFT INTO A CHALICE
+    //remove gift from map_scenery
+    //now look on tile and check if item is still there and pick up
+    for(int i = 0; i < map_scenery_bottom[(gy*map_width)+gx].size(); i++){
+        if(map_scenery_bottom[(gy*map_width)+gx][i].type ==  347){
+            map_scenery_bottom[(gy*map_width)+gx].erase(map_scenery_bottom[(gy*map_width)+gx].begin() + i); //remove the first gift on tile
+            break; //break so we don't delete more than one
+        }
+    }
     
+    //Start another quick BAM
+    Animation_Big temp_animation_big2 = Animation_Big(gx, gy, explosion_list);
+    temp_animation_big2.z = 0;
+    map_animations_big[ ( temp_animation_big2.y * map_width ) + (temp_animation_big2.x) ].push_back(temp_animation_big2);
+    //And wait 1 second for it to finish
+    spr1->thread_timer = SDL_GetTicks(); //start the timer since it's going to stand here for 1 second
+    //Now wait for the timee to finish
     while(true){
-        
+        if(SDL_GetTicks() > spr1->thread_timer + 1000){ //waiting 1 seconds
+            break;
+        }
+    }
+    //delete the big animation
+    if(map_animations_big[ ( temp_animation_big2.y * map_width ) + (temp_animation_big2.x)  ].size() > 0){
+        map_animations_big[ ( temp_animation_big2.y * map_width ) + (temp_animation_big2.x)  ].erase(map_animations_big[ ( temp_animation_big2.y * map_width ) + (temp_animation_big2.x)  ].begin());
+    }
+    //spwn a new chalice
+    Item temp_chalice = Item(gx,gy,340);
+    map_items[gy*map_width + gx].push_back(temp_chalice);
+    //and begin sparkles effect
+    Effect temp_sparkles = Effect(gx, gy, 1); //create the effect above newly created item. effect code 1 for sparkles
+    map_effects[gy*map_width + gx].push_back(temp_sparkles);
+
+
+    //STAGE 7: CLOSING OUT
+    //We can NOW break out of this THREAD
+    //Turn off flags
+    spr1->inThread = false;
+    spr1->isNeededByThread = false;
+
+    //Now wait 10 seconds to delete the effect
+    int cup_timer = SDL_GetTicks(); //start the timer
+    while(true){
+        if(SDL_GetTicks() > cup_timer+10000){ //waiting 10 seconds
+            if(map_effects[ (gy*map_width)+gx].size() > 0){
+                map_effects[ (gy*map_width)+gx].pop_back();
+            }
+            break;
+        }
     }
     
     return;
     
 }
+
+
+//
 
 
 //Periodically give animals a new task
@@ -3928,9 +3975,9 @@ void task_creatures_thread(){
                 choice = rand()%6;
                 //choice = rand()%2 * 2;
                 //choice = 5+rand()%2;
-                choice = 7;
-//                vector<int> choices = {5,6,13};
-//                choice = choices[ rand()%choices.size()  ];
+                //choice = 7;
+                vector<int> choices = {5,6,7,13};
+                choice = choices[ rand()%choices.size()  ];
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
