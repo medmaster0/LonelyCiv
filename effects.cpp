@@ -280,6 +280,8 @@ void Animation::draw(int at_x, int at_y, SDL_Renderer* gRenderer, SDL_Texture** 
     
 }
 
+
+
 //CONSTRUCTOR FOR ANIMATION_BIG
 //Right now, tile_list_in must be a 4-element array of ints, speicfying seuqnece on animation
 Animation_Big::Animation_Big(int xp, int yp, int tile_list_in[]){
@@ -298,6 +300,8 @@ Animation_Big::Animation_Big(int xp, int yp, int tile_list_in[]){
     animate_timer = SDL_GetTicks(); //start timer bitch
     
 }
+
+
 
 //Identical to the above, but draws it at a specified x,y coord)
 void Animation_Big::draw(int at_x, int at_y, SDL_Renderer* gRenderer, SDL_Texture** misc_tiles){
@@ -341,8 +345,82 @@ void Animation_Big::draw(int at_x, int at_y, SDL_Renderer* gRenderer, SDL_Textur
     
 }
 
+//CONSTRUCTOR FOR COLOR_ANIMATION
+////Right now, tile_list_in must be a 4-element array of ints, speicfying seuqnece on animation
+//construcor: input xy-pos and list of tiles to follow, and also color
+Color_Animation::Color_Animation(int xp, int yp, int zp, int tile_list_in[], SDL_Color primCol, SDL_Color secoCol, SDL_Color tertCol){
+    
+    mWidth = 16;
+    mHeight = 16;
+    x = xp;
+    y = yp;
+    z = zp;
+    animate_index = 0;
+    tile_list[0] = tile_list_in[0];
+    tile_list[1] = tile_list_in[1];
+    tile_list[2] = tile_list_in[2];
+    tile_list[3] = tile_list_in[3];
+    prim_col = primCol;
+    seco_col = secoCol;
+    tert_col = tertCol;
+    
+    animate_timer = SDL_GetTicks(); //start timer bitch
+    
+}
 
+//Keeps track of drawing and updating frames
+void Color_Animation::draw(int at_x, int at_y , SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t, int alpha_mod){
+    
+    int temp_index = 0; //user to store and check the animation index before actually writing it
+    
+    //STNDARD-ISSUE MOVEMENT TIMING VARIABLES
+    //spr1->move_timer = SDL_GetTicks(); //start move timer
+    int steps_to_pop = 0; //how many steps need to be popped off path
+    int carry_over = 0; //how many ticks were rounded off
+    int ANIMATE_SPEED = 100; //constant used to throttle animation speed
+    
+    //determine if need to change tile index, animate_index
+    if(SDL_GetTicks() > animate_timer + 100){ //if more than 1 second has passed since last tick
+        
+        //Determine how many steps have to be moved while time has passed
+        steps_to_pop = ( SDL_GetTicks() - animate_timer ) / ANIMATE_SPEED; //ONe tick every 100 ms
+        
+        //Update Animation tile index (calculate how many ticks have gone by
+        temp_index = (animate_index + steps_to_pop)%4; //if above 4, wrap around... built in bounds check, should never be above 4
+        animate_index = temp_index;//temp_index should be safe to write to animate_index, now
+        
+        //Update animate timer
+        //Figure out how much time not accounted for
+        carry_over = SDL_GetTicks() - animate_timer; //How much time has elapsed since last timing
+        carry_over = carry_over - (steps_to_pop * ANIMATE_SPEED); //don't count the time we *have* accounted for
+        //Now check new timer but also remember the time we haven't accounted for
+        animate_timer = SDL_GetTicks() - carry_over; //Now update the timer, but set it back for unaccounted time
+        
+    }//otherwise, we won't have to do any updating
+    
+    //Now animate_index should be all figured out and ready to draw
+    //determine the required tile
+    int tile = tile_list[animate_index];
+    
+    //Set rendering space and render to screen
+    SDL_Rect renderQuad = { at_x*16, at_y*16, mWidth, mHeight };
+    SDL_Rect* clip = NULL;
+    
+    //drawing tile_p
+    SDL_SetTextureColorMod( item_tiles_p[tile], prim_col.r, prim_col.g, prim_col.b); //modulate color, update to match the new one
+    SDL_RenderCopy( gRenderer, item_tiles_p[tile], clip, &renderQuad );//Render to screen
+    //drawing tile_ss
+    if(item_tiles_s[tile] != (SDL_Texture*) 0x9999 ){
+        SDL_SetTextureColorMod( item_tiles_s[tile], seco_col.r, seco_col.g, seco_col.b); //modulate color, update to match the new one
+        SDL_RenderCopy( gRenderer, item_tiles_s[tile], clip, &renderQuad );//Render to screen
+    }
+    //Draw the tert part (if applicable)
+    if(item_tiles_t[tile] != (SDL_Texture*) 0x9999 ){
+        SDL_SetTextureColorMod( item_tiles_t[tile], tert_col.r, tert_col.g, tert_col.b); //no need to modulate this one
+        SDL_RenderCopy( gRenderer, item_tiles_t[tile], clip, &renderQuad );//Render to screen
+    }
 
-
+    
+}
 
 

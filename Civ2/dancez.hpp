@@ -19,3 +19,8 @@
 using namespace std;
 
 std::vector<std::vector<int>> generateChaCha() ; //ChaCha
+
+//DANCE TYPES:
+// 0 - CIRCLE DANCE (CCW x 3)
+// 1 - CHA-CHA
+vector<vector <int>> dancePathGen(int refx, int refy, int refz, int type); //generates a list of steps to take for a dance

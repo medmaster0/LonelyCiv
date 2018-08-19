@@ -130,49 +130,6 @@ void Sprite::draw_movement(int at_x, int at_y, SDL_Texture** item_tiles_p, SDL_T
     //prev_x becomes at_x + (prev_x - x)
     
     //CURRENTLY NOT DRAWING ITEMS IN THIS ROUTINE (ONLY THE SPIRTE ITSELF)
-//    //DRAW STAFF
-//    //the staff should flow behind cre so we need to calculate where that's at on the translated image
-//    if(staff != nullptr){
-//        staff->y = at_y + (prev_y-y); //Apply the different between y and previous y to the new location
-//        staff->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
-//        staff->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t, alpha_mod);
-//    }
-//
-//    //DRAW LIGHT
-//    if(light != nullptr){
-//
-//        //If has staff, then need to put candle on other side
-//        if(staff!=nullptr){
-//            if(prev_y < y && prev_x == x){
-//                light->y = at_y+1;
-//                light->x = at_x;
-//            }
-//            if(prev_y > y && prev_x == x){
-//                light->y = at_y-1;
-//                light->x = at_x;
-//            }
-//            if(prev_x < x && prev_y == y){
-//                light->y = at_y;
-//                light->x = at_x+1;
-//            }
-//            if(prev_x > x && prev_y == y){
-//                light->y = at_y;
-//                light->x = at_x-1;
-//            }
-//        }else{
-//            light->y = at_y + (prev_y-y); //Apply the different between y and previous y to the new location
-//            light->x = at_x + (prev_x-x); //Apply the different between x and previous x to the new location
-//        }
-//
-//        light->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t, alpha_mod);
-//    }
-//
-//    //DRAW HAT
-//    if(hat != nullptr){
-//        hat->y = at_y; //move the hat to the right place
-//        hat->x = at_x;
-//        hat->draw(gRenderer, item_tiles_p, item_tiles_s, item_tiles_t, alpha_mod);
-//    }
     
 }
 

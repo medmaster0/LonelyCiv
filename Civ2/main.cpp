@@ -98,6 +98,7 @@ vector<vector<Effect>> map_effects; //a list of list of effects on a tile. Index
 //Animation Stuff
 vector<vector<Animation>> map_animations; //a list of list of animations on a tile. Index corresponds to [y*map_width + x]
 vector<vector<Animation_Big>> map_animations_big; //a list of the "big" animations on a tile. Index corresponds to [y*map_width + x]
+vector<vector<Color_Animation>> map_animations_color; //a list of the "color" animations on a tile. Index corresponds to [y*map_width + x]
 SDL_Texture** misc_tiles; //Symbols and Effects Tile Stuff misc. (tiles (symbols, effects, etc.)
 
 //SDL Stuff
@@ -635,6 +636,35 @@ void loadTiles(){
     item_tiles_s_balcony[347] = loadTexture("Civ2/Civ2/tiles/giftSeco.png");
     item_tiles_t_balcony[347] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[348] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t1_prim.png");
+    item_tiles_s[348] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t1_seco.png");
+    item_tiles_t[348] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t1_tert.png");
+    item_tiles_p_balcony[348] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t1_prim.png");
+    item_tiles_s_balcony[348] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t1_seco.png");
+    item_tiles_t_balcony[348] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t1_tert.png");
+    
+    item_tiles_p[349] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t2_prim.png");
+    item_tiles_s[349] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t2_seco.png");
+    item_tiles_t[349] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t2_tert.png");
+    item_tiles_p_balcony[349] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t2_prim.png");
+    item_tiles_s_balcony[349] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t2_seco.png");
+    item_tiles_t_balcony[349] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t2_tert.png");
+    
+    item_tiles_p[350] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t3_prim.png");
+    item_tiles_s[350] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t3_seco.png");
+    item_tiles_t[350] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t3_tert.png");
+    item_tiles_p_balcony[350] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t3_prim.png");
+    item_tiles_s_balcony[350] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t3_seco.png");
+    item_tiles_t_balcony[350] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t3_tert.png");
+    
+    item_tiles_p[351] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t4_prim.png");
+    item_tiles_s[351] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t4_seco.png");
+    item_tiles_t[351] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t4_tert.png");
+    item_tiles_p_balcony[351] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t4_prim.png");
+    item_tiles_s_balcony[351] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t4_seco.png");
+    item_tiles_t_balcony[351] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t4_tert.png");
+    
+    
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
     misc_tiles[1] = loadTexture("Civ2/Civ2/tiles/zodiac/taurus.png");
@@ -763,6 +793,7 @@ void init_environment(){
     map_effects.resize(map_width*map_height*map_floors);
     map_animations.resize(map_width*map_height*map_floors);
     map_animations_big.resize(map_width*map_height*map_floors);
+    map_animations_color.resize(map_width*map_height*map_floors);
     
     //we're going to create 300 random items (basic first kind)
     //we have to generate items, and also add them to the correct element in the array
@@ -874,8 +905,8 @@ void init_environment(){
     printf("Done with build aye\\\n");
     
     //Creatures
-    int num_creatures = 25; //How many creatures are on the map
-    //int num_creatures = 1; //How many creatures are on the map DEBUG DEBUG DEBUG
+    //int num_creatures = 25; //How many creatures are on the map
+    int num_creatures = 1; //How many creatures are on the map DEBUG DEBUG DEBUG
     //int num_creatures = 1; //DEBUG How many creatures are on the map
     for(int i = 0 ; i < num_creatures; i++){
         //Sprite temp_cre = Sprite(1+rand()%(map_width-2), 1+rand()%(map_height-2));
@@ -1000,6 +1031,19 @@ void init_environment(){
 //     temp_animation.z = 1;
 //     map_animations[ ( temp_animation.z*map_area) + temp_animation.y*map_width + temp_animation.x ].push_back(temp_animation);
     
+//    //create random items (from the randomly generated assets)
+//    for(int g = 0 ; g<1420; g++){
+//        //Start a colorful Animation (standard protocol)
+//        int list[4] = {348,349,350,351};
+//        tempx = rand()%map_width;
+//        tempy = rand()%map_height;
+//        Color_Animation temp_animation = Color_Animation(tempx,tempy , 0, list, world_colors[rand()%world_colors.size()], world_colors[rand()%world_colors.size()]);
+//        map_animations_color[ ( temp_animation.z*map_area) + temp_animation.y*map_width + temp_animation.x ].push_back(temp_animation);
+//
+//
+//    }
+    
+    
     //create random items (from the randomly generated assets)
     for(int g = 0 ; g<225; g++){
         tempx = rand()%(map_width);
@@ -1022,7 +1066,7 @@ void init_environment(){
     for(int g = 0 ; g<1420; g++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
-        temp_tile = 300; //328 for flowers
+        temp_tile = 328; //328 for flowers, 300 for cans
         //    Both Random Colors
         //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
         //    Pink / Green
@@ -1034,6 +1078,8 @@ void init_environment(){
         //temp_item.tertColor = generate_golden(); //since item is perfume, apply gold to it's third color
         map_items[ (tempz*map_area) + (tempy*map_width)+tempx].push_back(temp_item);
     }
+    
+
     
 //    //CREATE BY ITEM NUMBER!!!!!
 //    //create random items (from the randomly generated assets)
@@ -1135,6 +1181,10 @@ void draw_environment(Sprite* cre1){
                     //Now cycle through the elements in the map_animations_big list at that location
                     for(int k = 0; k < map_animations_big[map_index].size(); k++){
                         map_animations_big[map_index][k].draw( (map_animations_big[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, misc_tiles ); //call the draw function with location translated for this view
+                    }
+                    //Now cycle through the elements in the map_animations_color list at that location
+                    for(int k = 0; k < map_animations_color[map_index].size(); k++){
+                        map_animations_color[map_index][k].draw( (map_animations_color[map_index][k].x - draw_map_x), ( draw_map_z - j - 1 ), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t ); //call the draw function with location translated for this view
                     }
                     
                     //Now cycle through the elements in the map_items list at that location
@@ -1466,6 +1516,11 @@ void draw_environment(Sprite* cre1){
                 //Cycle through all big animations on map
                 for(int k = 0; k < map_animations_big[ map_index ].size(); k++ ){
                     map_animations_big[map_index][k].draw( (map_animations_big[map_index][k].x - draw_map_x) , (map_animations_big[map_index][k].y - draw_map_y), gRenderer, misc_tiles);
+                }
+                
+                //Cycle through all color animations on map
+                for(int k = 0; k < map_animations_color[ map_index ].size(); k++ ){
+                    map_animations_color[map_index][k].draw( (map_animations_color[map_index][k].x - draw_map_x) , (map_animations_color[map_index][k].y - draw_map_y), gRenderer, item_tiles_p, item_tiles_s, item_tiles_t);
                 }
                 
                 //Now cycle through the elements in the map_items list at that location
@@ -3695,7 +3750,7 @@ void sword_fish_thread(Sprite* spr1){
 //Present explodes
 //Chalice appears
 void deliver_mail_thread(Sprite* spr1){
-    printf("entering deliver_mail_thread;\n");
+    //printf("entering deliver_mail_thread;\n");
     
     //Firstly, indicate to the sprites that we need them...
     //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
@@ -3911,7 +3966,133 @@ void deliver_mail_thread(Sprite* spr1){
 }
 
 
-//
+//fire KNIGHT
+//Walk just left of a map_items flower
+//Dance around (utilize Class)
+//Flower turns to color fire animation
+//Dance finishes
+//Find present
+//Wand appears
+void dance_flower_thread(Sprite* spr1){
+    
+    printf("entering dance_flower_thread;\n");
+    
+    //Firstly, indicate to the sprites that we need them...
+    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
+    //mainly used for OTHER creatures, outside thread...
+    spr1->isNeededByThread = true;
+    
+    //STAGE 1: wALK TO RANDOM FLOWER
+    
+    //Need to find a flower to walk to but also need to make sure area around it is empty...
+    //Find a path to target
+    free_path(*spr1); //clear path on sprite for starters
+    if(spr1->path.empty()){ //if path is empty
+        spr1->path = itemTypeSearch_Z(spr1, 328);
+    }
+    
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, can't find a flower\n");
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    
+    //okay, all set, walk...
+    //Now start the thread that will actually walk the path to target
+    spr1->inThread = true;
+    std::thread walkFlowerObj(walk_path_thread, spr1);
+    walkFlowerObj.detach();
+    while(spr1->inThread == true){
+    }
+    //reached flower...
+    
+    //but we're on top of flower so move one step right
+    spr1->x = spr1->x + 1;
+//    //possibly move another step for items...
+//    if( spr1->staff!=nullptr || spr1->light!=nullptr ){
+//        spr1->x = spr1->x + 1;
+//    }
+    
+    //Stage 2: SPAWN fIRE!
+    
+    //Remove Flower from map_items
+    //also keep track of what the colors were
+    //If we can't remove ("pick") flower, then we just exit
+    bool pickedFlower = false;
+    SDL_Color flower_prim_col, flower_seco_col;
+    if(map_items[(spr1->y*map_width)+spr1->x-1].size() != 0){
+        for(int i = 0; i< map_items[(spr1->y*map_width)+spr1->x-1].size(); i++){
+            if(map_items[(spr1->y*map_width)+spr1->x-1][i].type == 328 ){
+                flower_prim_col = map_items[(spr1->y*map_width)+spr1->x-1][i].primColor;
+                flower_seco_col = map_items[(spr1->y*map_width)+spr1->x-1][i].secoColor;
+                map_items[(spr1->y*map_width)+spr1->x-1].erase(map_items[(spr1->y*map_width)+spr1->x-1].begin() + i);
+                pickedFlower = true;
+                break;
+            }
+        }
+    }
+    //check if we actually got the flower...
+    if(pickedFlower == false){
+        printf("got to flower lcoation but can't pick anymore\n");
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    //Start a colorful Animation (standard protocol)
+    int list[4] = {348,349,350,351};
+    //Color_Animation temp_animation = Color_Animation(spr1->x-1 , spr1->y,0, list, {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)}, {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255)});
+    Color_Animation temp_animation = Color_Animation(spr1->x-1 , spr1->y,0, list, flower_prim_col, flower_seco_col);
+    map_animations_color[ ( temp_animation.z*map_area) + temp_animation.y*map_width + temp_animation.x ].push_back(temp_animation);
+    
+    //STAGE 3: DANCE TIME!
+    
+    //generate a list of dance steps based on creature's current location
+    free_path(*spr1); //clear path on sprite for starters
+    spr1->path = dancePathGen(spr1->x, spr1->y, spr1->z, 0);
+    //okay, all set, walk/dance...
+    //Now start the thread that will actually walk the creature along path
+    spr1->inThread = true;
+    std::thread walkDanceObj(walk_path_thread, spr1);
+    walkDanceObj.detach();
+    while(spr1->inThread == true){
+    }
+    
+    //STAGE 4: SPAWN BRAND NEW WAND AND DELETE FIRE
+    //delete fire
+    map_animations_color[ ( temp_animation.z*map_area) + temp_animation.y*map_width + temp_animation.x ].pop_back();
+    
+    //make new wand
+    Item temp_wand = Item(temp_animation.x, temp_animation.y, 339, temp_animation.prim_col, temp_animation.seco_col, {0,0,0,static_cast<char>(255)});
+    temp_wand.z = 0;
+    map_items[( temp_wand.z*map_area) + temp_wand.y*map_width + temp_wand.x].push_back(temp_wand);
+
+    //Also add sparkles effect
+    Effect temp_sparkles = Effect(temp_wand.x, temp_wand.y, 1); //create the effect above newly created item. effect code 1 for sparkles
+    map_effects[temp_wand.y*map_width + temp_wand.x].push_back(temp_sparkles);
+    
+    //STAGE 5: CLOSING
+    //We can NOW break out of this THREAD
+    //Turn off flags
+    spr1->inThread = false;
+    spr1->isNeededByThread = false;
+    
+    //Now wait 10 seconds to delete the effect
+    int wand_timer = SDL_GetTicks(); //start the timer
+    while(true){
+        if(SDL_GetTicks() > wand_timer+10000){ //waiting 10 seconds
+            if(map_effects[ (temp_wand.y*map_width)+temp_wand.x].size() > 0){
+                map_effects[ (temp_wand.y*map_width)+temp_wand.x].pop_back();
+            }
+            break;
+        }
+    }
+    
+}
 
 
 //Periodically give animals a new task
@@ -3975,9 +4156,9 @@ void task_creatures_thread(){
                 choice = rand()%6;
                 //choice = rand()%2 * 2;
                 //choice = 5+rand()%2;
-                //choice = 7;
-                vector<int> choices = {5,6,7,13};
-                choice = choices[ rand()%choices.size()  ];
+                choice = 8;
+//                vector<int> choices = {5,6,7,13};
+//                choice = choices[ rand()%choices.size()  ];
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
@@ -4036,6 +4217,13 @@ void task_creatures_thread(){
                         map_creatures[i].task_status = "water knight";
                         std::thread waterKnightObj(deliver_mail_thread, &map_creatures[i]);
                         waterKnightObj.detach();
+                        break;
+                    }
+                    case 8: {
+                        //FIRE KNIGHTS: Dance Flower Thread
+                        map_creatures[i].task_status = "fire knight";
+                        std::thread fireKnightObj(dance_flower_thread, &map_creatures[i]);
+                        fireKnightObj.detach();
                         break;
                     }
                     case 13: {
@@ -4498,46 +4686,6 @@ int main( int argc, char* args[] ){
         
     }
     
-//    //DEBUG: Figure out wine colors. Will make a nice wine and herb display
-//    //wine made of herb and berry
-//    for(int r = 0 ; r < 5; r ++){
-//        //Generate them
-//        Resource berry = Resource(4); //generate a berry
-//        Resource cloth = Resource(3); //generate a cloth (for label)
-//        Recipe wine = Recipe(2, berry, cloth); //create a recipe from the generated resources.
-//
-//        Item temp_berry = Item(16, 5+r, berry.item_type, berry.colorPrim, berry.colorSeco);
-//        map_items[(temp_berry.y * map_width) + temp_berry.x].push_back(temp_berry);
-//        Item temp_cloth = Item(17, 5+r, cloth.item_type, cloth.colorPrim, cloth.colorSeco);
-//        map_items[(temp_cloth.y * map_width) + temp_cloth.x].push_back(temp_cloth);
-//        Item temp_wine = Item(18, 5+r, wine.item_type, wine.ingredient1.colorPrim, wine.ingredient2.colorPrim);
-//        map_items[(temp_wine.y * map_width) + temp_wine.x].push_back(temp_wine);
-//
-//        cout << wine.name << "\n";
-//        cout << wine.description << "\n";
-//
-//    }
-
-//    //DEBUG: Figure out potion colors. Will make a nice potion and herb display
-//    //potion made out of oil and glass
-//    for(int r = 0 ; r < 5; r ++){
-//        //Generate them
-//        Resource oil = Resource(2); //generate a berry
-//        Resource glass = Resource(0); //generate a cloth (for label)
-//        Recipe potion = Recipe(0, oil, glass); //create a recipe from the generated resources.
-//
-//        Item temp_oil = Item(16, 5+r, oil.item_type, oil.colorPrim, oil.colorSeco);
-//        map_items[(temp_oil.y * map_width) + temp_oil.x].push_back(temp_oil);
-//        Item temp_glass = Item(17, 5+r, glass.item_type, glass.colorPrim, glass.colorSeco);
-//        map_items[(temp_glass.y * map_width) + temp_glass.x].push_back(temp_glass);
-//        Item temp_potion = Item(18, 5+r, potion.item_type, potion.ingredient1.colorPrim, potion.ingredient2.colorPrim);
-//        map_items[(temp_potion.y * map_width) + temp_potion.x].push_back(temp_potion);
-//
-//        cout << potion.name << "\n";
-//        cout << potion.description << "\n";
-//
-//    }
-    
     //DEBUG: Figure out powder colors. Will make a nice powder and stone display
     //powder made out of stone and cloth
     for(int r = 0 ; r < 5; r ++){
@@ -4559,9 +4707,17 @@ int main( int argc, char* args[] ){
         
     }
 
+    //ANIMAITON DEBUG
+    //     //Start a fire Animation (standard protocol)
+    //     int list[4] = {22, 23, 24, 25};
+    //     Animation temp_animation = Animation(100, 100, list);
+    //     temp_animation.z = 1;
+    //     map_animations[ ( temp_animation.z*map_area) + temp_animation.y*map_width + temp_animation.x ].push_back(temp_animation);
     
-    //
-    //DEBUG TEST : SPAWN SOME THREAD DAWGd
+
+    
+    
+
     //This thread updates the background color
     std::thread backObj(background_color_thread);
     backObj.detach();

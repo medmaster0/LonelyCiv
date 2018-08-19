@@ -77,5 +77,32 @@ private:
     unsigned int animate_timer; //a timer used in animation
 };
 
+//AN COLORFUL ANIMATION CLASS
+//that has the potential for different colors....
+class Color_Animation{
+public:
+    Color_Animation(int xp, int yp, int zp, int tile_list_in[], SDL_Color primCol = {0,0,0}, SDL_Color secoCol = {0,0,0}, SDL_Color tertCol = {0,0,0}); //construcor: input xy-pos and list of tiles to follow, and also color
+    void draw(int at_x, int at_y, SDL_Renderer* gRenderer, SDL_Texture** item_tiles_p, SDL_Texture** item_tiles_s, SDL_Texture** item_tiles_t, int alpha_mod = 255.0); //draws the sprite tot hte screen at a specified map
+    int x,y,z;
+    SDL_Color prim_col, seco_col, tert_col; // colors of the sprite
+private:
+    int mWidth; //Image dimenstions - pixels
+    int mHeight;//Image dimensions - pixels
+    int tile_list[4]; //a list of tiles to sequence through in animation (indices for "misc_tiles")
+    int animate_index; //the current index in the tile_list that we are displaying
+    unsigned int animate_timer; //a timer used in animation
+};
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif /* effects_hpp */

@@ -101,19 +101,75 @@ std::vector<std::vector<int>> generateChaCha() {
     return steps;
 }
 
-//int main()
-//{
-//    printf("test");
-//    
-//    std::vector<std::vector<int>> routine;
-//    
-//    routine = generateChaCha();
-//    
-//    printf("%d %d %d",routine[0][0],routine[2][1],routine[4][1]);
-//    
-//    while (1) {
-//        1 + 1; //gotta manually exit
-//    }
-//    return 0;
-//}
+//generates a list of steps to take for a dance
+//returns a list of coords of steps to take
+vector<vector <int>> dancePathGen(int refx, int refy, int refz, int type){
+    
+    vector<vector <int>> steps; //list of steps to return
+    vector<int> step; //a single step (list of coords)
+    
+    //NOTE TO DANCE WRITERS:
+    //when developing these dances, you need to push items in from the top up.
+    //so the order of actually moved steps will be from the bottom up
+    //(i.e. last step listed is the first one to be moves)
+    switch (type) {
+        case 0:
+            printf("you chose, circle dance times 3\n");
+            
+            //do it three times
+            for(int i = 0; i<3; i++){
+                
+                //add the required steps, one by one
+                steps.push_back({ refx, refy, refz });
+                steps.push_back({ refx, refy + 1, refz });
+                steps.push_back({ refx - 1, refy + 1, refz });
+                steps.push_back({ refx - 2, refy + 1, refz });
+                steps.push_back({ refx - 2, refy, refz });
+                steps.push_back({ refx - 2, refy - 1, refz });
+                steps.push_back({ refx - 1, refy - 1, refz });
+                steps.push_back({ refx, refy - 1, refz });
+                
+            }
+            break;
+        case 1:
+            printf("you chose cha cha\n");
+            
+            //do it three times
+            for(int i = 0; i<3; i++){
+                //add the required steps, one by one
+                steps.push_back({ refx, refy, refz });
+                steps.push_back({ refx + 1, refy, refz });
+                steps.push_back({ refx + 1, refy - 1, refz });
+                steps.push_back({ refx + 1, refy, refz });
+                steps.push_back({ refx, refy, refz });
+                steps.push_back({ refx - 1 , refy, refz });
+                steps.push_back({ refx - 1 , refy + 1, refz });
+                steps.push_back({ refx - 1 , refy, refz });
+                
+            }
+            break;
+            
+        default:
+            break;
+    }
+    
+    return steps;
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

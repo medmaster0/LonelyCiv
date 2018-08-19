@@ -70,6 +70,10 @@ using namespace std;
 // 345 - FISH (DOWN)
 // 346 - MAIL
 // 347 - GIFT
+// 348 - FIRE_1
+// 349 - FIRE_2
+// 350 - FIRE_3
+// 351 - FIRE_4
 
 //SDL_Texture* loadTexture( string path, SDL_Renderer* gRenderer );
 extern SDL_Renderer* gRenderer;//The window renderer
