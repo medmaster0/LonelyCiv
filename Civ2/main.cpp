@@ -122,8 +122,10 @@ bool statusDisplayOn = false;
 bool shroomDepoDisplayOn = false;
 int shroom_inventory_index = 0; //which shroom in map_shrooms to display invontory for
 //-----------------
-bool consoleDisplayOn = false;
-queue<string> consoleLog; //a queue of strings to keep track of console messages
+bool consoleDisplayOn = true;
+vector<string> consoleHistory; //the entire list of messages written to console (can scroll through them)
+int consoleScrollPosition = 0; //where in the history we are displaying
+void addToConsoleLog(string msg); //declare a function for writing to Console
 
 //UI SETTINGS
 double PLAYER_CREATURE_SPEED = 7.0;
@@ -906,7 +908,7 @@ void init_environment(){
     
     //Creatures
     //int num_creatures = 25; //How many creatures are on the map
-    int num_creatures = 1; //How many creatures are on the map DEBUG DEBUG DEBUG
+    int num_creatures = 25; //How many creatures are on the map DEBUG DEBUG DEBUG
     //int num_creatures = 1; //DEBUG How many creatures are on the map
     for(int i = 0 ; i < num_creatures; i++){
         //Sprite temp_cre = Sprite(1+rand()%(map_width-2), 1+rand()%(map_height-2));
@@ -1066,7 +1068,7 @@ void init_environment(){
     for(int g = 0 ; g<1420; g++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
-        temp_tile = 328; //328 for flowers, 300 for cans
+        temp_tile = 300; //328 for flowers, 300 for cans
         //    Both Random Colors
         //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
         //    Pink / Green
@@ -3447,6 +3449,8 @@ void drop_mint_thread(Sprite* spr1){
             //STAGE FOUR: EXPLOSION (BAM CAN)
             //Create the new COIN!
             Item temp_item = Item(item1.x, item1.y, 315, spr1->inventory.back().primColor, spr1->inventory.back().secoColor );
+            temp_item.description = "A coin.";
+            addToConsoleLog(spr1->name + " has minted a coin." );
             map_items[item1.y*map_width + item1.x].push_back(temp_item);
             //And begin sparkles effect
             Effect temp_effect = Effect(item1.x , item1.y, 1); //create the effect above the newly created item. Effect code for sparkles is 1 (last argument)
@@ -3670,8 +3674,13 @@ void sword_fish_thread(Sprite* spr1){
     //STAGE 7: TRANSMUTATION (SWORD SPAWN)
     //Create the new dagger
     Item temp_dagger = Item(temp_fish.x, temp_fish.y, 331, temp_fish.primColor, temp_fish.secoColor);
+    temp_dagger.z = 0;
+    string dagger_name = rand()%2==0?genSaintName():genDemonName(); //keep track of the name of the dagger
+    temp_dagger.description = "The spirit dagger of " + dagger_name;
+    addToConsoleLog(spr1->name + " has captured the spirit dagger of " + dagger_name + ".");
+    //add to map_items
     map_items[temp_fish.y*map_width + temp_fish.x].push_back(temp_dagger);
-    //And begin sparkles effect
+    //Please begin sparkles effect
     Effect temp_sparkles = Effect(temp_fish.x, temp_fish.y, 1); //create the effect above the newly created item. Effect code for sparkles is 1 (last argument)
     map_effects[temp_fish.y*map_width + temp_fish.x].push_back(temp_sparkles);
     
@@ -3936,8 +3945,13 @@ void deliver_mail_thread(Sprite* spr1){
     if(map_animations_big[ ( temp_animation_big2.y * map_width ) + (temp_animation_big2.x)  ].size() > 0){
         map_animations_big[ ( temp_animation_big2.y * map_width ) + (temp_animation_big2.x)  ].erase(map_animations_big[ ( temp_animation_big2.y * map_width ) + (temp_animation_big2.x)  ].begin());
     }
-    //spwn a new chalice
+    //spawn a new chalice
     Item temp_chalice = Item(gx,gy,340);
+    temp_chalice.z = 0;
+    string chalice_name = genOldName(); //keep track of name of chalice
+    temp_chalice.description = "An heirloom of " + chalice_name;
+    addToConsoleLog(spr1->name + " has uncovered an heirloom of " + chalice_name + ".");
+    //add to the map
     map_items[gy*map_width + gx].push_back(temp_chalice);
     //and begin sparkles effect
     Effect temp_sparkles = Effect(gx, gy, 1); //create the effect above newly created item. effect code 1 for sparkles
@@ -4067,8 +4081,12 @@ void dance_flower_thread(Sprite* spr1){
     map_animations_color[ ( temp_animation.z*map_area) + temp_animation.y*map_width + temp_animation.x ].pop_back();
     
     //make new wand
-    Item temp_wand = Item(temp_animation.x, temp_animation.y, 339, temp_animation.prim_col, temp_animation.seco_col, {0,0,0,static_cast<char>(255)});
+    Item temp_wand = Item(temp_animation.x, temp_animation.y, 339, temp_animation.prim_col, temp_animation.seco_col);
+    temp_wand.tertColor = spr1->faveColor;
     temp_wand.z = 0;
+    string wand_name = genHerokuName(); //keep track of name
+    temp_wand.description = "The magic wand, " + wand_name;
+    addToConsoleLog(spr1->name + " has bound the wand, " + wand_name + ".");
     map_items[( temp_wand.z*map_area) + temp_wand.y*map_width + temp_wand.x].push_back(temp_wand);
 
     //Also add sparkles effect
@@ -4156,9 +4174,9 @@ void task_creatures_thread(){
                 choice = rand()%6;
                 //choice = rand()%2 * 2;
                 //choice = 5+rand()%2;
-                choice = 8;
-//                vector<int> choices = {5,6,7,13};
-//                choice = choices[ rand()%choices.size()  ];
+                //choice = 6;
+                vector<int> choices = {5,6,7,8,13};
+                choice = choices[ rand()%choices.size()  ];
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
@@ -4558,10 +4576,15 @@ void wander_player_thread(Sprite* cre1){
 //Display/Interface Functions
 
 void addToConsoleLog(string msg){
-    consoleLog.push(msg);
-    if(consoleLog.size() > 9){ //if queue is too big, pop last element
-        consoleLog.pop();
+    
+    consoleHistory.push_back(msg);
+    //consoleHistory can just grow and grow
+    
+    //check if need to adjust conscoleScrollPosition
+    if(consoleHistory.size() > 10){
+        consoleScrollPosition = consoleScrollPosition+1;
     }
+    
 }
 
 //Create a display window for game story console messages
@@ -4570,33 +4593,51 @@ SDL_Texture* console_display_texture;
 SDL_Color console_font_clr = {255,255,255}; //color of font
 int console_texW = 650;//constants used in displaying fonts
 int console_texH = 0;//constants used in displaying fonts
-void displayConsole(SDL_Renderer* gRenderer, queue<string> consoleLog){
+void displayConsole(SDL_Renderer* gRenderer, vector<string> consoleHistory){
+    
     string console_text = ""; //Char buffer that is displayed
     
     //We're gonna have to pick out the proper strings to print out to console
     //WITH THIS CONFIGURATION, we only have about 9 lines
-    queue<string> temp_log = consoleLog;
-    for(int i=0; i<consoleLog.size(); i++){
-        console_text += temp_log.front() + "\n";
-        temp_log.pop();
-    }
+    //vector<string> messages_to_print;
     
     //Blackout Box {x,y,w,h}
-    SDL_Rect r = {SCREEN_WIDTH-650,SCREEN_HEIGHT-150,SCREEN_WIDTH,150};
+    SDL_Rect r = {SCREEN_WIDTH-670,SCREEN_HEIGHT-170,SCREEN_WIDTH,170};
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
     SDL_RenderFillRect(gRenderer, &r);
-    console_display_surface = TTF_RenderText_Blended_Wrapped(font1, console_text.c_str(), console_font_clr, 1550);
-    console_display_texture = SDL_CreateTextureFromSurface(gRenderer, console_display_surface);
-    //create text rect (text box)
-    SDL_QueryTexture(console_display_texture, NULL, NULL, &console_texW, &console_texH); //gets the dimenstions of the font/text
-    SDL_Rect dstrect = {SCREEN_WIDTH-650,SCREEN_HEIGHT-150, console_texW, console_texH }; //so we can make the proper rect to dispay it
-    SDL_RenderCopy(gRenderer, console_display_texture, NULL, &dstrect); //write
-    //FREE MEMORY
-    SDL_DestroyTexture(console_display_texture);
-    SDL_FreeSurface(console_display_surface);
-    //FINISH PUtting the Title: Status
+    
+    int console_step = 1;
+    for(int i = 9; i >= 0; i--){
+    
+        //check if there is an entry in consoleHistory
+        if( (i+consoleScrollPosition) >= consoleHistory.size()){
+            continue;
+        }
 
-    SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE); //turn alpha back off
+        console_text = consoleHistory[i+consoleScrollPosition];
+        
+        console_display_surface = TTF_RenderText_Blended_Wrapped(font1, console_text.c_str(), console_font_clr, 1550);
+        console_display_texture = SDL_CreateTextureFromSurface(gRenderer, console_display_surface);
+        //create text rect (text box)
+        SDL_QueryTexture(console_display_texture, NULL, NULL, &console_texW, &console_texH); //gets the dimenstions of the font/text
+        //SDL_Rect dstrect = {SCREEN_WIDTH-650,SCREEN_HEIGHT-150, console_texW, console_texH }; //so we can make the proper rect to display it
+        SDL_Rect dstrect = {SCREEN_WIDTH-650, SCREEN_HEIGHT-(console_step*console_texH), console_texW, console_texH}; //so we can make the proper rect to display it
+        SDL_RenderCopy(gRenderer, console_display_texture, NULL, &dstrect); //write
+        //FREE MEMORY
+        SDL_DestroyTexture(console_display_texture);
+        SDL_FreeSurface(console_display_surface);
+        //FINISH PUtting the Title: Status
+
+        SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE); //turn alpha back off
+        
+        console_step = console_step+1;
+        
+    }
+    
+//    //if the entire console was filled with text, increment consoleScrollPosition to prepare for next message
+//    if(console_step == 10){
+//        consoleScrollPosition =
+//    }
     
 }
 
@@ -4648,6 +4689,10 @@ int main( int argc, char* args[] ){
     
     //Also, center on cre1 by default...
     draw_sprite = cre1;
+    
+    //Write Console Welcome Message
+    addToConsoleLog("Welcome to the neighborhood...");
+    
     
     //STORY TEST
     for(int p = 0; p < 200; p++){
@@ -5125,6 +5170,26 @@ int main( int argc, char* args[] ){
             if(statusDisplayOn){
                 //process input for status display
             }
+            if(consoleDisplayOn){
+                //process input for console display
+                if( e.type == SDL_KEYDOWN){
+                    switch( e.key.keysym.sym ){
+                        case SDLK_LEFTBRACKET:
+                            //increment console scroll position
+                            consoleScrollPosition = consoleScrollPosition + 1;
+                            //bounds check
+                            if(consoleScrollPosition >= consoleHistory.size()-9){ consoleScrollPosition = consoleHistory.size()-10;}
+                            break;
+                        case SDLK_RIGHTBRACKET:
+                            //decrement console scroll position
+                            consoleScrollPosition = consoleScrollPosition - 1;
+                            //bounds check
+                            if(consoleScrollPosition < 0){ consoleScrollPosition = 0;}
+                            break;
+                            
+                    }
+                }
+            }
             if(shroomDepoDisplayOn){
                 //Process input for shroomDepoDisplay
                 if(e.type == SDL_KEYDOWN){
@@ -5185,11 +5250,6 @@ int main( int argc, char* args[] ){
                 carry_over = carry_over - (steps_to_pop*1000.0/PLAYER_CREATURE_SPEED); //now subtract how much time we've accounted for
                 //carry_over now has how many ticks we haven't updated for
                 sKeyTimer = SDL_GetTicks() - carry_over; //Now update the timer and considering unaccounted for time
-                
-//                //Finally, update draw_map indices
-//                if(isBalconyView==false){ //only update if not in Balcony View
-//                    draw_map_y = cre1->y - draw_map_height/2;
-//                }
                 
             }//end s key processing
             //D-KEY TIMER
@@ -5329,7 +5389,7 @@ int main( int argc, char* args[] ){
             displayItemList(map_shrooms[shroom_inventory_index].inventory, gRenderer, SCREEN_HEIGHT);
         }
         if(consoleDisplayOn){
-            displayConsole(gRenderer,consoleLog);
+            displayConsole(gRenderer,consoleHistory);
         }
 
         SDL_RenderPresent( gRenderer ); //Update screen
