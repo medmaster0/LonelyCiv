@@ -92,8 +92,8 @@ Constellation:: Constellation(int SCREEN_WIDTH, int SCREEN_HEIGHT){
     vector<int> planet_tiles = {28,29,30,31,32,33,34,35,36,37,38}; //list of valid tiles for planets
     
     //Put A SINGLE point constellation
-    x1 = rand()%SCREEN_WIDTH;
-    y1 = rand()%SCREEN_HEIGHT;
+    x1 = 8 + (rand()%(SCREEN_WIDTH - 16) );
+    y1 = 8 + (rand()%(SCREEN_HEIGHT - 16) );
     vertices_coords.push_back( {x1,y1} ); //add the coords to list
     vertices_types.push_back( star_tiles[rand()%star_tiles.size()] ); //pick a random star type for it
     //set color
@@ -107,8 +107,8 @@ Constellation:: Constellation(int SCREEN_WIDTH, int SCREEN_HEIGHT){
     for(int j = 0 ; j < 6; j++){
         //Keep trying until you can find a valid point
         while(true){
-            x2 = rand()%SCREEN_WIDTH;
-            y2 = rand()%SCREEN_HEIGHT;
+            x2 = 8 + (rand()%(SCREEN_WIDTH - 16) );
+            y2 = 8 + (rand()%(SCREEN_HEIGHT - 16) );
             //Cycle through all edges and make sure this new points won't cause an intersection
             bool foundIntersection = false;
             if(edges_coords.size()>=2){ //make sure there are actully edges in list
@@ -120,6 +120,9 @@ Constellation:: Constellation(int SCREEN_WIDTH, int SCREEN_HEIGHT){
                     //break; //if we made it here, means, no intersections
                 }
             }
+            
+            //Also make sure point isn't in the "Console area" - bottom right corner
+            if(x2>SCREEN_WIDTH-670-8 || y2>SCREEN_HEIGHT-170-8){ continue; }
             
             if(foundIntersection == true){continue;} //redo the loop if we found an intersection...
             break;//if we made it here, means, no intersections
@@ -161,7 +164,47 @@ Constellation:: Constellation(int SCREEN_WIDTH, int SCREEN_HEIGHT){
         planet_types.push_back( planet_tiles[rand()%planet_tiles.size()] );
     }
     
-    //Possibly add branches??
+    //BRANCHES: Possibly add branches?? -> only one branch per constellation?
+    int num_branches = 1 + rand()%2;
+    for(int i = 0; i < num_branches; i++ ){
+        
+        //Single Branch
+        int branch_off_index = rand()%vertices_coords.size();
+        //Pick a random point
+        x2 = 8 + (rand()%(SCREEN_WIDTH - 16) );
+        y2 = 8 + (rand()%(SCREEN_HEIGHT - 16) );
+        branch_vertices_coords.push_back( {x2,y2} ); //add the coords to list
+        branch_vertices_types.push_back( star_tiles[rand()%star_tiles.size()] ); //pick a random star type for it
+        //set color
+        if(branch_vertices_types.back() == 41){
+            branch_vertices_colors.push_back({static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)});
+        }else{
+            branch_vertices_colors.push_back({255,255,255});
+        }
+        //Also add the edge to list
+        branch_edges_coords.push_back( {vertices_coords[branch_off_index][0],vertices_coords[branch_off_index][1],x2,y2} );
+        //end single branch
+        
+        //possibly add a branch to THAT branch
+        //Single Branch
+        //Pick a random point
+        int tempx = x2;//retain the just created branch point
+        int tempy = y2;//retain the just created branch point
+        x2 = 8 + (rand()%(SCREEN_WIDTH - 16) );
+        y2 = 8 + (rand()%(SCREEN_HEIGHT - 16) );
+        branch_vertices_coords.push_back( {x2,y2} ); //add the coords to list
+        branch_vertices_types.push_back( star_tiles[rand()%star_tiles.size()] ); //pick a random star type for it
+        //set color
+        if(branch_vertices_types.back() == 41){
+            branch_vertices_colors.push_back({static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)});
+        }else{
+            branch_vertices_colors.push_back({255,255,255});
+        }
+        //Also add the edge to list
+        branch_edges_coords.push_back( {tempx,tempy,x2,y2} );
+        //end single branch
+    
+    }//end multiple branches
     
     printf("Done creating constellation...\n");
     
@@ -177,8 +220,6 @@ void DrawCircle(SDL_Renderer *Renderer, int _x, int _y, int radius){
     // doubles the value. == tx - diameter
     while (x >= y)
     {
-
-        
         //  Each of the following renders an octant of the circle
         SDL_RenderDrawPoint(Renderer, _x + x, _y - y);
         SDL_RenderDrawPoint(Renderer, _x + x, _y + y);
@@ -204,6 +245,254 @@ void DrawCircle(SDL_Renderer *Renderer, int _x, int _y, int radius){
     }
 }
 
+////CURRENTLY BROKE FUCK
+////Draws a dotted line
+////Divides the line into steps of sixteen (pixels)
+////Then draws each dash one at a time?
+//void DrawDashedLine(SDL_Renderer *gRenderer, int x1, int y1, int x2, int y2){
+//
+//    //calculate essential paramerets
+//    //float slope = (x2-x1)/(y2-y1);
+//    //float distance = sqrt( pow(x2-x1, 2.0) + pow(y2-y1, 2.0)  );
+//    //int num_dashes = (int)(distance / 16.0);
+//
+//
+//    printf("DRAWING DASHED LINE\n]\n\n\n");
+//
+//
+//
+//    float xinc, yinc;
+//    int x, y, e, k;
+//    int d=1;
+//    int a=1;
+//    int n=1;
+//
+//    int dx=x2-x1;
+//    int dy=y2-y1;
+//
+//
+//    if(x1<x2)
+//        xinc=1;
+//    else
+//        xinc=-1;
+//    if(y1<y2)
+//        yinc=1;
+//    else
+//        yinc=-1;
+//
+//    x=x1;
+//    y=y1;
+//    if(dx>=dy){
+//        e=(2*dy)-dx;
+//        k=0;
+//        //first make sure, x2 is greater than x1 (for while loop to work)
+//        if(x2 < x1){
+//            int tempx, tempy;
+//            tempx = x1;
+//            tempy = y1;
+//            x1 = x2;
+//            y1 = y2;
+//            x2 = tempx;
+//            y2 = tempy;
+//        }
+//        while(x<x2){
+//            if(d==1)
+//                a=1;
+//            if(k%10==0 && d==1)
+//                a=5;
+//            if(e<0)
+//                e=e+2*dy;
+//            else{
+//                e=e+2*(dy-dx);
+//                y=y+yinc*a;
+//            }
+//            x=x+xinc*a;
+//            k++;
+//            for(int j=0;j<n;j++){
+//                SDL_RenderDrawPoint(gRenderer, x+j, y-j);
+//            }
+//            printf("hap%d,%d ", x,y);
+//        }
+//    }
+//    else{
+//        k=0;
+//        e=(2*dx)-dy;
+//        //first make sure, y2 is greater than y1 (for while loop to work)
+//        if(y2 < y1){
+//            int tempx, tempy;
+//            tempx = x1;
+//            tempy = y1;
+//            x1 = x2;
+//            y1 = y2;
+//            x2 = tempx;
+//            y2 = tempy;
+//        }
+//        while(y<y2){
+//            if(d==1)
+//                a=1;
+//            if(k%10==0 && d==1)
+//                a=4;
+//            if(e<0)
+//                e=e+2*dx;
+//            else{
+//                e=e+2*(dx-dy);
+//                x=x+xinc*a;
+//            }
+//            y=y+yinc*a;
+//            k++;
+//            for(int j=0;j<n;j++){
+//                SDL_RenderDrawPoint(gRenderer, x-j, y+j);
+//            }
+//
+//        }
+//    }
+//
+//
+//
+//    printf("END DRAWING EDNED DASHED LINE\n]\n\nEND\n");
+//
+//
+//    //printf("%f,%f,%d\n", slope, distance, num_dashes ) ;
+//
+//}
+
+////Draws a dotted line
+////Then draws each dash one at a time?
+//void DrawDottedLine(SDL_Renderer *gRenderer, int x1, int y1, int x2, int y2){
+//
+//    printf("DRAWING DOTTED LINE\n]\n\n\n");
+//
+//
+//    float xinc, yinc;
+//    int x, y, e, k;
+//    int d=1;
+//    int a=2;
+//    int n=1;
+//
+//    int dx=x2-x1;
+//    int dy=y2-y1;
+//
+//
+//    if(x1<x2)
+//        xinc=1;
+//    else
+//        xinc=-1;
+//    if(y1<y2)
+//        yinc=1;
+//    else
+//        yinc=-1;
+//
+//    x=x1;
+//    y=y1;
+//    if(dx>=dy){
+//        e=(2*dy)-dx;
+//        //first make sure, x2 is greater than x1 (for while loop to work)
+//        if(x2 < x1){
+//            int tempx, tempy;
+//            tempx = x1;
+//            tempy = y1;
+//            x1 = x2;
+//            y1 = y2;
+//            x2 = tempx;
+//            y2 = tempy;
+//        }
+//        while(x!=x2){
+//
+//            //STOP!!
+//
+//            if(e<0)
+//                e=e+(2*dy);
+//            else
+//            {
+//                e=e+(2*(dy-dx));
+//                x=x+xinc;
+//                y=y+yinc;
+//            }
+//            x=x+xinc;
+//            y=y+yinc;
+//            SDL_RenderDrawPoint(gRenderer, x, y);
+//            printf("hap%d,%d ", x,y);
+//        }
+//    }
+//    else{
+//        e=(2*dx)-dy;
+//        //first make sure, y2 is greater than y1 (for while loop to work)
+//        if(y2 < y1){
+//            int tempx, tempy;
+//            tempx = x1;
+//            tempy = y1;
+//            x1 = x2;
+//            y1 = y2;
+//            x2 = tempx;
+//            y2 = tempy;
+//        }
+//        while(y!=y2){
+//
+//            if(e<0)
+//                e=e+(2*dx);
+//            else
+//            {
+//                e=e+(2*(dx-dy));
+//                x=x+xinc;
+//                y=y+yinc;
+//            }
+//            x=x+xinc;
+//            y=y+yinc;
+//            SDL_RenderDrawPoint(gRenderer,x,y);
+//
+//            printf("lux hap;\n");
+//        }
+//    }
+//
+//
+//
+//    printf("END DRAWING EDNED DOTTED LINE\n]\n\nEND\n");
+//
+//
+//    //printf("%f,%f,%d\n", slope, distance, num_dashes ) ;
+//
+//}
+
+//Draw Dashed Line
+//1. Figure out perecentage of line is long enough for one dash
+//2. Go through and draw dashes (tiny lines) until you reach end
+void DrawDashedLine(SDL_Renderer *gRenderer, int x1, int y1, int x2, int y2){
+    
+    //First make important calculations
+    int dash_length = 16;
+    float distance = sqrt(pow(x2-x1, 2.0) + pow(y2-y1, 2.0));
+    //Determine percentage of line is 16
+    float dash_percent = dash_length / distance;
+    //Find out how many steps we'll need...
+    //(each step has a dash and then a space for same length...)
+    int num_steps = (int)( distance/(2.0*(float)dash_length) );
+    
+    printf("debug%f,%d\n", distance, num_steps);
+    
+    //Now, for drwing all the dashes
+    int tempx1, tempy1, tempx2, tempy2;
+    for(int i = 0 ; i<num_steps; i++){
+        
+        //every other step draw a dash (why we multiply by 2
+        tempx1 = (int)( ( (float)x2 * dash_percent * (2*i) ) + ( (float)x1*(1.0 - (dash_percent * (2*i) ) ) ) );
+        tempy1 = (int)( ( (float)y2 * dash_percent * (2*i) ) + ( (float)y1*(1.0 - (dash_percent * (2*i) ) ) ) );
+        tempx2 = (int)( ( (float)x2 * dash_percent * (2*i+1) ) + ( (float)x1*(1.0 - (dash_percent * (2*i+1) ) ) ) );
+        tempy2 = (int)( ( (float)y2 * dash_percent * (2*i+1) ) + ( (float)y1*(1.0 - (dash_percent * (2*i+1) ) ) ) );
+        
+        //Draw the dash
+        SDL_RenderDrawLine(gRenderer, tempx1, tempy1, tempx2, tempy2);
+        
+        
+    }
+
+    //Finish up by drawing the last little bit
+    //move temps to the right position
+    tempx2 = (int)( ( (float)x2 * dash_percent * (2*num_steps) ) + ( (float)x1*(1.0 - (dash_percent * (2*num_steps) ) ) ) );
+    tempy2 = (int)( ( (float)y2 * dash_percent * (2*num_steps) ) + ( (float)y1*(1.0 - (dash_percent * (2*num_steps) ) ) ) );
+    SDL_RenderDrawLine(gRenderer, tempx2, tempy2, x2, y2);
+    
+}
+
 //Draw Constellations
 //draws a blank screen and the constellation
 void Constellation::draw_constellation(SDL_Renderer* gRenderer, SDL_Texture** misc_tiles, SDL_Color back_ground_col){
@@ -217,6 +506,15 @@ void Constellation::draw_constellation(SDL_Renderer* gRenderer, SDL_Texture** mi
     //Get ready to draw black
     SDL_SetRenderDrawColor(gRenderer, 0.0,0.0,0.0,0.0);
     
+    //"Start backwards" -> drw branches first
+    for(int i = 0; i < branch_vertices_coords.size(); i++){
+        //Draw Star Symbol
+        SDL_SetTextureColorMod( misc_tiles[branch_vertices_types[i]], branch_vertices_colors[i].r,branch_vertices_colors[i].g,branch_vertices_colors[i].b); //modulate color, update to match the new one
+        SDL_Rect renderQuad = {branch_vertices_coords[i][0] - 8, branch_vertices_coords[i][1] - 8, 16, 16 };
+        SDL_Rect* clip = NULL;
+        SDL_RenderCopy(gRenderer, misc_tiles[branch_vertices_types[i]], clip, &renderQuad); //Render to screen
+    }
+    
     //Go THrough and draw each circle
     for(int i = 0 ; i < circles.size(); i++){
         DrawCircle(gRenderer, circles[i][0], circles[i][1], circles[i][2]);
@@ -225,7 +523,7 @@ void Constellation::draw_constellation(SDL_Renderer* gRenderer, SDL_Texture** mi
     //Go through and draw each Edge
     for(int i = 0 ; i < edges_coords.size(); i++){
         
-        //Draw a dotted line
+        //Draw a line
         SDL_RenderDrawLine(gRenderer, edges_coords[i][0], edges_coords[i][1], edges_coords[i][2], edges_coords[i][3]);
         
     }
@@ -234,7 +532,6 @@ void Constellation::draw_constellation(SDL_Renderer* gRenderer, SDL_Texture** mi
     for(int i = 0 ; i < vertices_coords.size(); i++ ){
         
         //Draw Star Symbol
-        printf("%d,%d,%d\n",vertices_colors[i].r,vertices_colors[i].g,vertices_colors[i].b);
         SDL_SetTextureColorMod( misc_tiles[vertices_types[i]], vertices_colors[i].r,vertices_colors[i].g,vertices_colors[i].b); //modulate color, update to match the new one
         SDL_Rect renderQuad = {vertices_coords[i][0] - 8, vertices_coords[i][1] - 8, 16, 16 };
         SDL_Rect* clip = NULL;
@@ -242,7 +539,7 @@ void Constellation::draw_constellation(SDL_Renderer* gRenderer, SDL_Texture** mi
         
     }
     
-    //Go through and draw each planet (rmember to center it)
+    //Go through and draw each planet (remember to center it)
     for(int i = 0 ; i < planet_coords.size(); i++ ){
         
         //Draw Planet Symbol
@@ -252,10 +549,12 @@ void Constellation::draw_constellation(SDL_Renderer* gRenderer, SDL_Texture** mi
         
     }
     
-
-        
+    for(int i = 0; i <branch_edges_coords.size(); i ++){
+        DrawDashedLine(gRenderer, branch_edges_coords[i][0], branch_edges_coords[i][1], branch_edges_coords[i][2], branch_edges_coords[i][3]);
+        //SDL_RenderDrawLine(gRenderer, branch_edges_coords[i][0], branch_edges_coords[i][1], branch_edges_coords[i][2], branch_edges_coords[i][3]);
+    }
     
-    //DrawCircle(gRenderer, vertices_coords[3][0], vertices_coords[3][1], 50);
+    //DrawDottedLine(gRenderer, 70,70,500,150);
     
 }
 
