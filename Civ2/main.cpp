@@ -28,8 +28,8 @@
 #include "building.hpp"
 #include "recipes.hpp"
 #include "dispersal.hpp"
+#include "constellation.hpp"
 //#include <unistd.h>
-
 
 using std::vector;
 using std::queue;
@@ -700,6 +700,23 @@ void loadTiles(){
     misc_tiles[26] = loadTexture("Civ2/Civ2/tiles/explosion_animate/bam_T1.png");
     //UNORGANIZED>>>>>
     misc_tiles[27] = loadTexture("Civ2/Civ2/tiles/exclaimPrim.png");
+    //Tiles for Astrological Stuffs
+    misc_tiles[28] = loadTexture("Civ2/Civ2/tiles/astrological/sun.png");
+    misc_tiles[29] = loadTexture("Civ2/Civ2/tiles/astrological/moon.png");
+    misc_tiles[30] = loadTexture("Civ2/Civ2/tiles/astrological/mars.png");
+    misc_tiles[31] = loadTexture("Civ2/Civ2/tiles/astrological/mercury.png");
+    misc_tiles[32] = loadTexture("Civ2/Civ2/tiles/astrological/jupiter.png");
+    misc_tiles[33] = loadTexture("Civ2/Civ2/tiles/astrological/venus.png");
+    misc_tiles[34] = loadTexture("Civ2/Civ2/tiles/astrological/saturn.png");
+    misc_tiles[35] = loadTexture("Civ2/Civ2/tiles/astrological/uranus.png");
+    misc_tiles[36] = loadTexture("Civ2/Civ2/tiles/astrological/neptune.png");
+    misc_tiles[37] = loadTexture("Civ2/Civ2/tiles/astrological/pluto.png");
+    misc_tiles[38] = loadTexture("Civ2/Civ2/tiles/astrological/earth.png");
+    misc_tiles[39] = loadTexture("Civ2/Civ2/tiles/astrological/star_v1.png");
+    misc_tiles[40] = loadTexture("Civ2/Civ2/tiles/astrological/star_v2.png");
+    misc_tiles[41] = loadTexture("Civ2/Civ2/tiles/astrological/star_v3.png");
+    misc_tiles[42] = loadTexture("Civ2/Civ2/tiles/astrological/star_v4.png");
+    
     
 }
 
@@ -1138,6 +1155,7 @@ void draw_environment(Sprite* cre1){
     //Firstly, center draw mpa on input creature
     draw_map_y = cre1->y - draw_map_height/2;
     draw_map_x = cre1->x - draw_map_width/2;
+    if(isBalconyView == false){draw_map_z = cre1->z;}
     //draw_map_z is being fiddled with under SDLK_b (balcony toggle)
     
     ////////////////////////////////////////
@@ -1146,6 +1164,7 @@ void draw_environment(Sprite* cre1){
     //Remember: draw_map_z is elevated up by draw_height/2 when Balcony View is first entered.
     if(isBalconyView == true){
 
+        //draw_map_z = draw_sprite->z + draw_map_height/2;
         //SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
         
         //Cycle through all of the drawn slices (starting with farthest behind first)
@@ -4474,7 +4493,7 @@ void wander_player_thread(Sprite* cre1){
                         for(int j = 0 ; j<map_scenery_top[ (cre1->z+1)*map_area + cre1->y*map_width + cre1->x ].size(); j++){
                             if(map_scenery_top[ (cre1->z+1)*map_area + cre1->y*map_width + cre1->x ][j].type == 318){//if this tils is a ladder too
                                 cre1->z = cre1->z + 1; //update position
-                                draw_map_z = cre1->z; //tie the draw map back
+                                //draw_map_z = cre1->z; //tie the draw map back
                             }
                         }
                         
@@ -4487,7 +4506,7 @@ void wander_player_thread(Sprite* cre1){
                         for(int j = 0 ; j<map_scenery_top[ (cre1->z-1)*map_area + cre1->y*map_width + cre1->x ].size(); j++){
                             if(map_scenery_top[ (cre1->z-1)*map_area + cre1->y*map_width + cre1->x ][j].type == 318){ //if that tile is a ladder too
                                 cre1->z = cre1->z - 1; //update position
-                                draw_map_z = cre1->z; //tie the draw map back
+                                //draw_map_z = cre1->z; //tie the draw map back
                             }
                         }
                         
@@ -4563,8 +4582,8 @@ void wander_player_thread(Sprite* cre1){
         choice = rand()%4;
         
         //Finally, update draw_map indices
-        draw_map_y = cre1->y - draw_map_height/2;
-        draw_map_x = cre1->x - draw_map_width/2;
+        //draw_map_y = cre1->y - draw_map_height/2;
+        //draw_map_x = cre1->x - draw_map_width/2;
         
         SDL_Delay(500);
         
@@ -4759,9 +4778,8 @@ int main( int argc, char* args[] ){
     //     temp_animation.z = 1;
     //     map_animations[ ( temp_animation.z*map_area) + temp_animation.y*map_width + temp_animation.x ].push_back(temp_animation);
     
-
-    
-    
+    //CONSTELLATION DEBUG
+    Constellation constellation_test = Constellation(SCREEN_WIDTH, SCREEN_HEIGHT);
 
     //This thread updates the background color
     std::thread backObj(background_color_thread);
@@ -5372,7 +5390,7 @@ int main( int argc, char* args[] ){
         draw_environment(draw_sprite);
         //Draw all the sprites
         //#
-        
+        constellation_test.draw_constellation(gRenderer, misc_tiles, back_col);
         
         //Draw Display windows
         if(inventoryDisplayOn){

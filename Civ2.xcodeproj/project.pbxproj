@@ -24,6 +24,8 @@
 		0C5BEAE11FC21D38003D61B1 /* story.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C5BEADF1FC21D38003D61B1 /* story.hpp */; };
 		0C5DEA5D2074A6EC0095EA59 /* effects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0C5DEA5B2074A6EC0095EA59 /* effects.cpp */; };
 		0C5DEA5E2074A6EC0095EA59 /* effects.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C5DEA5C2074A6EC0095EA59 /* effects.hpp */; };
+		0C88B3CE213B59A600D4DAFD /* constellation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0C88B3CC213B59A600D4DAFD /* constellation.cpp */; };
+		0C88B3CF213B59A600D4DAFD /* constellation.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C88B3CD213B59A600D4DAFD /* constellation.hpp */; };
 		0CA100A61F3A8476004836E0 /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CA100A51F3A8476004836E0 /* SDL2_ttf.framework */; };
 		0CCDE8741FAD6187005CDAD6 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CCDE8731FAD6187005CDAD6 /* SDL2_mixer.framework */; };
 		0CCDE8781FB29921005CDAD6 /* music.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CCDE8761FB29921005CDAD6 /* music.cpp */; };
@@ -69,6 +71,8 @@
 		0C5BEADF1FC21D38003D61B1 /* story.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = story.hpp; sourceTree = "<group>"; };
 		0C5DEA5B2074A6EC0095EA59 /* effects.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = effects.cpp; sourceTree = "<group>"; };
 		0C5DEA5C2074A6EC0095EA59 /* effects.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = effects.hpp; sourceTree = "<group>"; };
+		0C88B3CC213B59A600D4DAFD /* constellation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = constellation.cpp; sourceTree = "<group>"; };
+		0C88B3CD213B59A600D4DAFD /* constellation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = constellation.hpp; sourceTree = "<group>"; };
 		0CA06BAD1FDC62B2004F564A /* libpngwriter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpngwriter.a; path = Civ2/include/libpngwriter.a; sourceTree = "<group>"; };
 		0CA100A51F3A8476004836E0 /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
 		0CCDE8731FAD6187005CDAD6 /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = ../../../../../../Library/Frameworks/SDL2_mixer.framework; sourceTree = "<group>"; };
@@ -105,6 +109,8 @@
 			isa = PBXGroup;
 			children = (
 				0CEF02A820A143C200FE2106 /* dispersal.cpp */,
+				0C88B3CC213B59A600D4DAFD /* constellation.cpp */,
+				0C88B3CD213B59A600D4DAFD /* constellation.hpp */,
 				0CEF02A920A143C200FE2106 /* dispersal.hpp */,
 				0C0D8B9A2089830700754F85 /* recipes.cpp */,
 				0C0D8B9B2089830700754F85 /* recipes.hpp */,
@@ -178,6 +184,7 @@
 				0C0F9A551F45437C0049AD91 /* dancez.hpp in Headers */,
 				0C157BE11F59B187005FAAF0 /* med_algo.hpp in Headers */,
 				0CCDE8791FB29921005CDAD6 /* music.hpp in Headers */,
+				0C88B3CF213B59A600D4DAFD /* constellation.hpp in Headers */,
 				0C546A491FDD903D00503378 /* image_gen.hpp in Headers */,
 				0C5BEAE11FC21D38003D61B1 /* story.hpp in Headers */,
 				0CEF02AB20A143C200FE2106 /* dispersal.hpp in Headers */,
@@ -245,6 +252,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C542A4C1F562ACA00CC1D8C /* Item.cpp in Sources */,
+				0C88B3CE213B59A600D4DAFD /* constellation.cpp in Sources */,
 				0C157BE01F59B187005FAAF0 /* med_algo.cpp in Sources */,
 				0CEF02AA20A143C200FE2106 /* dispersal.cpp in Sources */,
 				0CE85D282083BDB200C0FC49 /* building.cpp in Sources */,
