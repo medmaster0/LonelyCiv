@@ -28,6 +28,12 @@ public:
     
     vector<vector<int>> circles; //list of circles to draw { (x0,y0,r0), (x1,y1,r1), ...}
     
+    //Handle branched  paths, (will be dotted later)
+    vector<vector<int>> brach_vertices_coords; //list of coords of the vertices of the branched
+    vector<int> branch_vertices_types; //lis of tiles types of the branched vertices
+    vector<SDL_Color> branch_vertices_colors; //list of colors of the vertices
+    vector<vector<int>> branch_edges_coords; //list of lines (edges) connecting the vertices ( (x1,y1,x2,y2), (x1,y1,x2,y2)  )
+    
     void draw_constellation(SDL_Renderer* gRenderer, SDL_Texture** misc_tiles, SDL_Color back_ground_col); //draws a blank screen and the constellation
 };
 

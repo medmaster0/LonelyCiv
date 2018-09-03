@@ -98,22 +98,10 @@ Constellation:: Constellation(int SCREEN_WIDTH, int SCREEN_HEIGHT){
     vertices_types.push_back( star_tiles[rand()%star_tiles.size()] ); //pick a random star type for it
     //set color
     if(vertices_types.back() == 41){
-        vertices_colors.push_back({255,255,255});
+        vertices_colors.push_back({static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)});
     }else{
         vertices_colors.push_back({255,255,255});
     }
-    
-    //DEBUG
-//    //if(doIntersect(x1, y1, 0, 0, SCREEN_WIDTH/4, SCREEN_HEIGHT/4, 3*SCREEN_WIDTH/4, 3*SCREEN_HEIGHT/4)){
-//    if( doIntersect(50, 50, 60, 50, 55, 90, 55, 60) == true ){
-//        printf("liine intersect\n");
-//    }else{
-//        printf("liine no intersecty\n");
-//    }
-//    printf("%d,%d,\n",SCREEN_WIDTH,SCREEN_HEIGHT);
-//    printf("%d,%d\n",x1,y1);
-    
-    
     
     //Now, cycle through creating more points (stars), but also connecting/checking them...
     for(int j = 0 ; j < 6; j++){
@@ -134,7 +122,6 @@ Constellation:: Constellation(int SCREEN_WIDTH, int SCREEN_HEIGHT){
             }
             
             if(foundIntersection == true){continue;} //redo the loop if we found an intersection...
-            printf("we break;");
             break;//if we made it here, means, no intersections
         }
 
@@ -143,7 +130,7 @@ Constellation:: Constellation(int SCREEN_WIDTH, int SCREEN_HEIGHT){
         vertices_types.push_back( star_tiles[rand()%star_tiles.size()] ); //pick a random star type for it
         //set color
         if(vertices_types.back() == 41){
-            vertices_colors.push_back({255,255,255});
+            vertices_colors.push_back({static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand() %255),static_cast<Uint8>(rand() %255)});
         }else{
             vertices_colors.push_back({255,255,255});
         }
@@ -162,7 +149,6 @@ Constellation:: Constellation(int SCREEN_WIDTH, int SCREEN_HEIGHT){
         y1 = y2;
         printf("%d ", j);
 
-        
         //Done adding a new star
     }
     
@@ -248,6 +234,8 @@ void Constellation::draw_constellation(SDL_Renderer* gRenderer, SDL_Texture** mi
     for(int i = 0 ; i < vertices_coords.size(); i++ ){
         
         //Draw Star Symbol
+        printf("%d,%d,%d\n",vertices_colors[i].r,vertices_colors[i].g,vertices_colors[i].b);
+        SDL_SetTextureColorMod( misc_tiles[vertices_types[i]], vertices_colors[i].r,vertices_colors[i].g,vertices_colors[i].b); //modulate color, update to match the new one
         SDL_Rect renderQuad = {vertices_coords[i][0] - 8, vertices_coords[i][1] - 8, 16, 16 };
         SDL_Rect* clip = NULL;
         SDL_RenderCopy(gRenderer, misc_tiles[vertices_types[i]], clip, &renderQuad); //Render to screen
