@@ -76,7 +76,11 @@ using namespace std;
 // 349 - FIRE_2
 // 350 - FIRE_3
 // 351 - FIRE_4
-
+// 352 - TELESCOPE
+// 353 - LAID NET
+// 354 - SPRUNG NET
+// 355 = MEAT
+// 356 - BONE
 
 //static variable constructor
 //This overloaded constructor sets the static class variables

@@ -126,6 +126,9 @@ bool consoleDisplayOn = true;
 vector<string> consoleHistory; //the entire list of messages written to console (can scroll through them)
 int consoleScrollPosition = 0; //where in the history we are displaying
 void addToConsoleLog(string msg); //declare a function for writing to Console
+//------------------
+bool constellationDisplayOn = false;
+
 
 //UI SETTINGS
 double PLAYER_CREATURE_SPEED = 7.0;
@@ -666,6 +669,40 @@ void loadTiles(){
     item_tiles_s_balcony[351] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t4_seco.png");
     item_tiles_t_balcony[351] = loadTexture("Civ2/Civ2/tiles/fire_animate/fuego_t4_tert.png");
     
+    item_tiles_p[352] = loadTexture("Civ2/Civ2/tiles/telescopePrim.png");
+    item_tiles_s[352] = loadTexture("Civ2/Civ2/tiles/telescopeSeco.png");
+    item_tiles_t[352] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[352] = loadTexture("Civ2/Civ2/tiles/telescopePrim.png");
+    item_tiles_s_balcony[352] = loadTexture("Civ2/Civ2/tiles/telescopeSeco.png");
+    item_tiles_t_balcony[352] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[353] = loadTexture("Civ2/Civ2/tiles/laidNetPrim.png");
+    item_tiles_s[353] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[353] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[353] = loadTexture("Civ2/Civ2/tiles/laidNetPrim.png");
+    item_tiles_s_balcony[353] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[353] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[354] = loadTexture("Civ2/Civ2/tiles/sprungNetPrim.png");
+    item_tiles_s[354] = loadTexture("Civ2/Civ2/tiles/sprungNetSeco.png");
+    item_tiles_t[354] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[354] = loadTexture("Civ2/Civ2/tiles/sprungNetPrim.png");
+    item_tiles_s_balcony[354] = loadTexture("Civ2/Civ2/tiles/sprungNetSeco.png");
+    item_tiles_t_balcony[354] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[355] = loadTexture("Civ2/Civ2/tiles/meatPrim.png");
+    item_tiles_s[355] = loadTexture("Civ2/Civ2/tiles/meatSeco.png");
+    item_tiles_t[355] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[355] = loadTexture("Civ2/Civ2/tiles/meatPrim.png");
+    item_tiles_s_balcony[355] = loadTexture("Civ2/Civ2/tiles/meatSeco.png");
+    item_tiles_t_balcony[355] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[356] = loadTexture("Civ2/Civ2/tiles/bonePrim.png");
+    item_tiles_s[356] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[356] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[356] = loadTexture("Civ2/Civ2/tiles/bonePrim.png");
+    item_tiles_s_balcony[356] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[356] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
@@ -716,7 +753,11 @@ void loadTiles(){
     misc_tiles[40] = loadTexture("Civ2/Civ2/tiles/astrological/star_v2.png");
     misc_tiles[41] = loadTexture("Civ2/Civ2/tiles/astrological/star_v3.png");
     misc_tiles[42] = loadTexture("Civ2/Civ2/tiles/astrological/star_v4.png");
-    
+    misc_tiles[43] = loadTexture("Civ2/Civ2/tiles/astrological/chiron.png");
+    misc_tiles[44] = loadTexture("Civ2/Civ2/tiles/astrological/ceres.png");
+    misc_tiles[45] = loadTexture("Civ2/Civ2/tiles/astrological/vesta.png");
+    misc_tiles[46] = loadTexture("Civ2/Civ2/tiles/astrological/juno.png");
+    misc_tiles[47] = loadTexture("Civ2/Civ2/tiles/astrological/pallas.png");
     
 }
 
@@ -1067,7 +1108,7 @@ void init_environment(){
     for(int g = 0 ; g<225; g++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
-        temp_tile = 328; //328 for flowers
+        temp_tile = 300; //328 for flowers
         //    Both Random Colors
         //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
         //    Pink / Green
@@ -1085,7 +1126,7 @@ void init_environment(){
     for(int g = 0 ; g<1420; g++){
         tempx = rand()%(map_width);
         tempy = rand()%(map_height);
-        temp_tile = 300; //328 for flowers, 300 for cans
+        temp_tile = 328; //328 for flowers, 300 for cans
         //    Both Random Colors
         //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
         //    Pink / Green
@@ -1105,7 +1146,7 @@ void init_environment(){
 //    for(int g = 0 ; g<420; g++){
 //        tempx = rand()%(map_width);
 //        tempy = rand()%(map_height);
-//        temp_tile = 346; //328 for flowers
+//        temp_tile = 356; //328 for flowers
 //        //    Both Random Colors
 //        //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
 //        //    Pink / Green
@@ -1113,7 +1154,7 @@ void init_environment(){
 //        //    Random Color / Greens
 //        //Item temp_item = Item(tempx, tempy , temp_tile, {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, generate_green()); //temporary item (scenery)
 //        //    Both Random WOLRDZ COLORZ
-//        Item temp_item = Item(tempx, tempy , temp_tile, world_colors[rand()%world_colors.size()], world_colors[rand()%world_colors.size()]); //temporary item (scenery)
+//        Item temp_item = Item(tempx, tempy , temp_tile, world_colors[rand()%world_colors.size()], {255,255,255,255} ); //temporary item (scenery)
 //        //temp_item.tertColor = generate_golden(); //since item is perfume, apply gold to it's third color
 //        map_items[ (tempz*map_area) + (tempy*map_width)+tempx].push_back(temp_item);
 //    }
@@ -3605,20 +3646,54 @@ void sword_fish_thread(Sprite* spr1){
     while(spr1->inThread == true){
     }
     
-    //STAGE 3: WIELD FISHING ROD
-    //We are going to swap the creatures main wielded item (staff)
-    //(if applicable)
     
-    //possibly need to temporarily store the wileded items
-    Staff* hold_staff = nullptr;
-    if(spr1->staff != nullptr){
-        hold_staff = spr1->staff; //hold on to the creature's current staff
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    //STAGE 3: SWITCH ITEM TO FISHING ROD (IF APPLICABLE)
+    //Variables for holding info on currently wielded staff
+    SDL_Color staff_prim_col, staff_seco_col, staff_tert_col;
+    int staff_type;
+    bool made_staff; //indicate whether we made a brand new staff or not
+    if(spr1->staff!=nullptr){ //if creature has staff
+        staff_prim_col = spr1->staff->primColor;
+        staff_seco_col = spr1->staff->secoColor;
+        staff_tert_col = spr1->staff->tertColor;
+        staff_type = spr1->staff->type;
+        //*change* the old staff to a new envelope - new type, new color
+        spr1->staff->primColor = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+        spr1->staff->secoColor = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+        spr1->staff->tertColor = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+        spr1->staff->type = 343;
+        made_staff = false;
+    }else{ //otherwise, create a new item, and give creature it
+        Staff* temp_staff = new Staff( 0, 0, 343);
+        spr1->staff = temp_staff;
+        made_staff = true;
     }
-    
-    //Now create a new temporary rod and swap with the staff
-    Staff* temp_rod = new Staff(0,0,343);
-    spr1->staff = temp_rod;
     spr1->center_items();
+    
+    
+    
+    
     
     //STAGE 4: WAIT FOR FISH TO BITE
     int countdown = 3+rand()%7; //determine a random amount of time it will take for fish to bite
@@ -3728,9 +3803,18 @@ void sword_fish_thread(Sprite* spr1){
     }
     
     //STAGE 9: RETURN TO GROUND
-    //Return staff and delete rod
-    spr1->staff = hold_staff;
-    delete temp_rod;
+    //Return staff and (possibly) delete rod
+    if(made_staff == true){ //if we had to make a new staff..
+        //free up memory
+        delete spr1->staff;
+        spr1->staff = nullptr;
+    }else{ //if we didn't have to create a new staff
+        //just change the existing item back to old
+        spr1->staff->primColor = staff_prim_col;
+        spr1->staff->secoColor = staff_seco_col;
+        spr1->staff->tertColor = staff_tert_col;
+        spr1->staff->type = staff_type;
+    }
     
     //"Walking" back to earth
     free_path(*spr1); //clear old path
@@ -4193,9 +4277,9 @@ void task_creatures_thread(){
                 choice = rand()%6;
                 //choice = rand()%2 * 2;
                 //choice = 5+rand()%2;
-                //choice = 6;
-                vector<int> choices = {5,6,7,8,13};
-                choice = choices[ rand()%choices.size()  ];
+                choice = 6;
+                //vector<int> choices = {5,6,7,8,13};
+                //choice = choices[ rand()%choices.size()  ];
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
@@ -5011,6 +5095,11 @@ int main( int argc, char* args[] ){
                         break;
                     }
                         
+                    case SDLK_x:{
+                        constellationDisplayOn = !constellationDisplayOn;
+                        break;
+                    }
+                        
                     case SDLK_g:{
                         is_player_wandering = !is_player_wandering;
                         break;
@@ -5390,7 +5479,6 @@ int main( int argc, char* args[] ){
         draw_environment(draw_sprite);
         //Draw all the sprites
         //#
-        constellation_test.draw_constellation(gRenderer, misc_tiles, back_col);
         
         //Draw Display windows
         if(inventoryDisplayOn){
@@ -5408,6 +5496,9 @@ int main( int argc, char* args[] ){
         }
         if(consoleDisplayOn){
             displayConsole(gRenderer,consoleHistory);
+        }
+        if(constellationDisplayOn){
+            constellation_test.draw_constellation(gRenderer, misc_tiles, back_col);
         }
 
         SDL_RenderPresent( gRenderer ); //Update screen
