@@ -109,9 +109,9 @@
 			isa = PBXGroup;
 			children = (
 				0CEF02A820A143C200FE2106 /* dispersal.cpp */,
+				0CEF02A920A143C200FE2106 /* dispersal.hpp */,
 				0C88B3CC213B59A600D4DAFD /* constellation.cpp */,
 				0C88B3CD213B59A600D4DAFD /* constellation.hpp */,
-				0CEF02A920A143C200FE2106 /* dispersal.hpp */,
 				0C0D8B9A2089830700754F85 /* recipes.cpp */,
 				0C0D8B9B2089830700754F85 /* recipes.hpp */,
 				0CE85D262083BDB200C0FC49 /* building.cpp */,

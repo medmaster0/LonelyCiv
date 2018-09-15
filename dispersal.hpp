@@ -35,7 +35,7 @@ public:
     SDL_Color secoColor; //The colors of the cloud
     bool hasCreature; //A flag indicating a creature is on cloud
     //generate a cloud and record it's extreme points for cloud rectangle
-    void cloud_place_shadow(vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x, int y, int z, SDL_Color p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color s_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, int item_type = 333);
+    void cloud_place_shadow(vector<vector<Item>>* map_clouds, bool* block_map, int map_width, int map_height, int x, int y, int z, SDL_Color p_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color s_col_in = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, int item_type = 333);
     //void move_cloud(); //moves the cloud by shifting everything in the cloud's perimeter, one item at a time... (very long process)
     vector<int> walkableCoord(vector<vector<Item>>* map_clouds, int map_width, int map_height); //Returns the coordinates that actually has a cloud tile within the box
     

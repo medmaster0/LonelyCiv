@@ -38,6 +38,9 @@ void build_floor_NxN(vector<vector<Item>>* map_scenery, bool* block_map, int map
 void build_floor_radius(vector<vector<Item>>* map_scenery, bool* block_map, int map_width, int map_height, int x, int y, int z, int r, SDL_Color p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color s_col = {0,0,0,255}); //Builds an circular floor of radius radius out of floortile tiles
 void build_floor_path(vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x1, int y1, int x2, int y2, SDL_Color p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color s_col = {0,0,0,255}); //finds and builds a pathway between the two points - won't build over existing floor tiles
 
+//Streetlights...
+void build_streetlight(vector<vector<Item>>* map_scenery,vector<vector<Item>>* map_clouds, bool* block_map, int map_width, int map_height,int x, int y, int z = 0,SDL_Color p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255) } ); //builds a streetlight
+
 //Towers...
 void build_tower_NxN(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x, int y, int n, int num_floors, SDL_Color brick_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color brick_col2 = {0,0,0,255}, SDL_Color floor_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color floor_col2 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255},SDL_Color ladder_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}); //Builds an NxN enclosed box on the map out of standrad bricks, adds a door to one of the walls
 
@@ -110,7 +113,6 @@ public:
 //second floor
 //
 //EXAMPLES OF POSITION LOCATIONS
-
 
 //misc
 bool is_square_clear(bool* block_map, int map_width, int map_height, int x, int y, int z, int n); //checks the block map to make sure nothing is blocking the current location

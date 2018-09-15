@@ -81,6 +81,11 @@ using namespace std;
 // 354 - SPRUNG NET
 // 355 = MEAT
 // 356 - BONE
+// 357 - STREETLIGHT - BASE
+// 358 - STREETLIGHT - POLE
+// 359 - STREETLIGHT - TOP CENTER
+// 360 - STREETLIGHT - TOP LEFT
+// 361 - STREETLIGHT - TOP RIGHT
 
 //static variable constructor
 //This overloaded constructor sets the static class variables

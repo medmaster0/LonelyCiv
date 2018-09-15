@@ -57,7 +57,7 @@ int draw_map_z = 0; //which floor, we're drawing
 int draw_map_width, draw_map_height;
 Sprite* draw_sprite = nullptr; //the sprite that we center drawing on...
 //Balcony View Stuff
-bool isBalconyView = false; //flag for whether 2D-side view is activated
+bool isBalconyView = true; //flag for whether 2D-side view is activated
 
 //ItemTile Stuff
 SDL_Texture** item_tiles_p; //primo item tiles
@@ -703,6 +703,42 @@ void loadTiles(){
     item_tiles_p_balcony[356] = loadTexture("Civ2/Civ2/tiles/bonePrim.png");
     item_tiles_s_balcony[356] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t_balcony[356] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[357] = loadTexture("Civ2/Civ2/tiles/streetlight/streetlight_topview_base.png");
+    item_tiles_s[357] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[357] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[357] = loadTexture("Civ2/Civ2/tiles/streetlight/streetlight_sideview_base.png");
+    item_tiles_s_balcony[357] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[357] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[358] = loadTexture("Civ2/Civ2/tiles/streetlight/streetlight_topview_pole.png");
+    item_tiles_s[358] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[358] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[358] = loadTexture("Civ2/Civ2/tiles/streetlight/streetlight_sideview_pole.png");
+    item_tiles_s_balcony[358] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[358] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[359] = loadTexture("Civ2/Civ2/tiles/streetlight/streetlight_topview_topcenter.png");
+    item_tiles_s[359] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[359] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[359] = loadTexture("Civ2/Civ2/tiles/streetlight/streetlight_sideview_topcenter.png");
+    item_tiles_s_balcony[359] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[359] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[360] = loadTexture("Civ2/Civ2/tiles/streetlight/streetlight_topview_topleft.png");
+    item_tiles_s[360] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[360] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[360] = loadTexture("Civ2/Civ2/tiles/streetlight/streetlight_sideview_topleft.png");
+    item_tiles_s_balcony[360] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[360] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[361] = loadTexture("Civ2/Civ2/tiles/streetlight/streetlight_topview_topright.png");
+    item_tiles_s[361] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t[361] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[361] = loadTexture("Civ2/Civ2/tiles/streetlight/streetlight_sideview_topright.png");
+    item_tiles_s_balcony[361] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[361] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
     
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
@@ -3324,12 +3360,27 @@ void home_hoard_thread(Sprite* spr1){
     }
     
     //STAGE 4: WALK HOME
-    //We can use the walk home utility thread
+    spr1->path = A_Star_Z(block_map, &map_scenery_top, map_width, map_height, spr1->x, spr1->y, spr1->z, spr1->owned_tower->ladder_x, spr1->owned_tower->ladder_y, 0);
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        printf("search failed, no path to home\n");
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    //Now we can start walking to mailbox
+    //Now start the thread that will actually walk the path to target
     spr1->inThread = true;
-    std::thread walkHomeObj(walk_home_thread, spr1);
+    std::thread walkHomeObj(walk_path_thread, spr1);
     walkHomeObj.detach();
     while(spr1->inThread == true){
     }
+    //rechaed home
+    
+    
+    
     
     //STAGE 5: PUT ITEM IN TOWER INVENTORY
     Item temp_item = spr1->inventory.back();
@@ -3646,28 +3697,6 @@ void sword_fish_thread(Sprite* spr1){
     while(spr1->inThread == true){
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
     //STAGE 3: SWITCH ITEM TO FISHING ROD (IF APPLICABLE)
     //Variables for holding info on currently wielded staff
     SDL_Color staff_prim_col, staff_seco_col, staff_tert_col;
@@ -3690,10 +3719,6 @@ void sword_fish_thread(Sprite* spr1){
         made_staff = true;
     }
     spr1->center_items();
-    
-    
-    
-    
     
     //STAGE 4: WAIT FOR FISH TO BITE
     int countdown = 3+rand()%7; //determine a random amount of time it will take for fish to bite
@@ -4277,9 +4302,9 @@ void task_creatures_thread(){
                 choice = rand()%6;
                 //choice = rand()%2 * 2;
                 //choice = 5+rand()%2;
-                choice = 6;
-                //vector<int> choices = {5,6,7,8,13};
-                //choice = choices[ rand()%choices.size()  ];
+                //choice = 6;
+                vector<int> choices = {5,6,7,8,13};
+                choice = choices[ rand()%choices.size()  ];
                 switch(choice){
                     case 0: {
                         //This thread makes the creature gather
@@ -4792,10 +4817,16 @@ int main( int argc, char* args[] ){
     
     //Also, center on cre1 by default...
     draw_sprite = cre1;
+    draw_map_z = draw_sprite->z + draw_map_height/2; //FOR BALCONY VIEW
     
     //Write Console Welcome Message
     addToConsoleLog("Welcome to the neighborhood...");
     
+    
+    //DEBUG STREETLIGHT TEST
+    build_streetlight(&map_scenery_top, &map_clouds, block_map, map_width, map_height, cre1->x - 2, cre1->y - 7);
+    build_streetlight(&map_scenery_top, &map_clouds, block_map, map_width, map_height, cre1->x + 2, cre1->y - 7);
+    build_streetlight(&map_scenery_top, &map_clouds, block_map, map_width, map_height, cre1->x + 6, cre1->y - 7);
     
     //STORY TEST
     for(int p = 0; p < 200; p++){
@@ -4865,6 +4896,8 @@ int main( int argc, char* args[] ){
     //CONSTELLATION DEBUG
     Constellation constellation_test = Constellation(SCREEN_WIDTH, SCREEN_HEIGHT);
 
+    //START THREADS!!!!
+    
     //This thread updates the background color
     std::thread backObj(background_color_thread);
     backObj.detach();

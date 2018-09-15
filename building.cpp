@@ -254,9 +254,84 @@ void build_floor_path(vector<vector<Item>>* map_scenery_bottom, bool* block_map,
         
         //Create a floortile tile at each step
         Item temp_floor = Item(temp_step[0], temp_step[1], FLOOR_TILE_INDEX, floor_p_col, floor_s_col );
-        map_scenery_bottom->at((temp_step[1]*map_width)+temp_step[0]).push_back(temp_floor);
+        map_scenery_bottom->at( (temp_step[1]*map_width)+temp_step[0] ).push_back(temp_floor);
     }
 }
+
+//Streetlights...
+//builds a streetlight
+//the streetlight, itself, can only be black
+//p_col is the color of the LIGHT it casts
+void build_streetlight(vector<vector<Item>>* map_scenery_bottom,vector<vector<Item>>* map_clouds, bool* block_map, int map_width, int map_height,int x, int y, int z,SDL_Color p_col){
+    
+    // 357 - STREETLIGHT - BASE
+    // 358 - STREETLIGHT - POLE
+    // 359 - STREETLIGHT - TOP CENTER
+    // 360 - STREETLIGHT - TOP LEFT
+    // 361 - STREETLIGHT - TOP RIGHT
+    
+    //First, create base item
+    Item temp_item = Item(x, y, 357, {0,0,0}, {0,0,0} );
+    temp_item.z = z;
+    map_scenery_bottom->at( (z*map_width*map_height) + (y*map_width) + x ).push_back(temp_item);
+    block_map[(z*map_width*map_height) + (y*map_width) + x] = true;
+    
+    //Second, create pole item
+    temp_item = Item(x, y, 358, {0,0,0}, {0,0,0} );
+    temp_item.z = z+1;
+    map_scenery_bottom->at( ( (z+1) *map_width*map_height) + (y*map_width) + x ).push_back(temp_item);
+    block_map[( (z+1) *map_width*map_height) + (y*map_width) + x] = true;
+    
+    //Third, create another pole item
+    temp_item = Item(x, y, 358, {0,0,0}, {0,0,0} );
+    map_scenery_bottom->at( ( (z+2) *map_width*map_height) + (y*map_width) + x ).push_back(temp_item);
+    block_map[( (z+2) *map_width*map_height) + (y*map_width) + x ] = true;
+    temp_item.z = z+2;
+    
+    //FOURTH, create another the pole top center
+    temp_item = Item(x, y, 359, {0,0,0}, {0,0,0} );
+    map_scenery_bottom->at( ( (z+3) *map_width*map_height) + (y*map_width) + x ).push_back(temp_item);
+    block_map[( (z+3) *map_width*map_height) + (y*map_width) + x] = true;
+    temp_item.z = z+3;
+    
+    //Fifth, create another the pole top center
+    temp_item = Item(x-1, y, 360, {0,0,0}, {0,0,0} );
+    map_scenery_bottom->at( ( (z+3) *map_width*map_height) + (y*map_width) + x - 1 ).push_back(temp_item);
+    block_map[( (z+3) *map_width*map_height) + (y*map_width) + x - 1] = true;
+    temp_item.z = z+3;
+    
+    //sixth, create another the pole top center
+    temp_item = Item(x+1, y, 361, {0,0,0}, {0,0,0} );
+    map_scenery_bottom->at( ( (z+3) *map_width*map_height) + (y*map_width) + x + 1 ).push_back(temp_item);
+    block_map[( (z+3) *map_width*map_height) + (y*map_width) + x + 1] = true;
+    temp_item.z = z+3;
+    
+    //NOw.... ALSO CREATE A CLOUD SHINE!!!
+    //create a bunch of blank/transparent items underneath
+    int cur_z = 2;
+    while(cur_z >= 0){ //As long as we have more cloud/shadow to draw
+        //Create item 334's (blank item)
+        int alpha_value = 150 - ((z - cur_z) * 15 ); //calculate the alpha value (more transparent as you move away/go down from cloud)
+        if(alpha_value<0)alpha_value = 0; //bounds check
+        SDL_Color shadow_col_p = {p_col.r, p_col.g, p_col.b, 255 };
+        shadow_col_p.a = alpha_value;
+        SDL_Color shadow_col_s = {0,0,0,0};
+        //LEFT SHADOW SHINE
+        Item temp_shadow = Item(x-1, y, 334, shadow_col_p, shadow_col_s); //place a single cloud at x,y
+        temp_shadow.z = cur_z;
+        map_clouds->at( (temp_shadow.z*map_width*map_height) + (temp_shadow.y*map_width) + temp_shadow.x - 1).push_back(temp_shadow); // add it to global map
+        //RIGHT SHADOW SHINE
+        temp_shadow = Item(x+1, y, 334, shadow_col_p, shadow_col_s); //place a single cloud at x,y
+        temp_shadow.z = cur_z;
+        map_clouds->at( (temp_shadow.z*map_width*map_height) + (temp_shadow.y*map_width) + temp_shadow.x + 1).push_back(temp_shadow); // add it to global map
+        
+        cur_z = cur_z - 1;
+    }//End shadow
+    
+    
+    
+}
+
 
 //Builds an NxN enclosed box on the map out of standrad bricks, adds a door to one of the walls
 void build_tower_NxN(vector<vector<Item>>* map_scenery_top, vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int build_x, int build_y, int n, int num_floors, SDL_Color brick_col1 , SDL_Color brick_col2, SDL_Color floor_col1, SDL_Color floor_col2, SDL_Color door_col1,SDL_Color ladder_col1){
