@@ -326,9 +326,140 @@ void build_streetlight(vector<vector<Item>>* map_scenery_bottom,vector<vector<It
         map_clouds->at( (temp_shadow.z*map_width*map_height) + (temp_shadow.y*map_width) + temp_shadow.x + 1).push_back(temp_shadow); // add it to global map
         
         cur_z = cur_z - 1;
-    }//End shadow
+    }//End cloudshine
     
     
+    
+}
+
+//Soup Cauldrons...
+//Cauldron is a 2x2x2 cube of items
+//Build a cauldron at (x,y,z)
+//This is the point of the back, left, bottom point
+void build_cauldron(vector<vector<Item>>* map_scenery_bottom, bool* block_map,int map_width, int map_height,int x, int y, int z){
+    
+    // 362 - CAULDRON - FRONT TOP LEFT
+    // 363 - CAULDRON - FRONT TOP RIGHT
+    // 364 - CAULDRON - FRONT BOTTOM LEFT
+    // 365 - CAULDRON - FRONT BOTTOM RIGHT
+    // 366 - CAULDRON - BACK TOP LEFT
+    // 367 - CAULDRON - BACK TOP RIGHT
+    // 368 - CAULDRON - BACK BOTTOM LEFT
+    // 369 - CAULDRON - BACK BOTTOM RIGHT
+    
+    SDL_Color p_col = {0,0,0};
+    SDL_Color s_col = {52,64,64};
+    
+    //First, create FRONT TOP LEFT ITEM
+    Item temp_item = Item(x,y+1,362,p_col, s_col );
+    temp_item.z = z+1;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    block_map[(temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x] = true;
+    
+    //FRONT TOP RIGHT
+    temp_item = Item(x+1,y+1,363,p_col, s_col );
+    temp_item.z = z+1;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    block_map[(temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x] = true;
+    
+    //FRONT BOTTOM LEFT
+    temp_item = Item(x,y+1,364,p_col, s_col );
+    temp_item.z = z;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    block_map[(temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x] = true;
+    
+    //FRONT BOTTOM RIGHT
+    temp_item = Item(x+1,y+1,365,p_col, s_col );
+    temp_item.z = z;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    block_map[(temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x] = true;
+    
+    //BACK TOP LEFT
+    temp_item = Item(x,y,366,p_col, s_col );
+    temp_item.z = z+1;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    block_map[(temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x] = true;
+
+    //BACK TOP RIGHT
+    temp_item = Item(x+1,y,367,p_col, s_col );
+    temp_item.z = z+1;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    block_map[(temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x] = true;
+    
+    //BACK BOTTOM LEFT
+    temp_item = Item(x,y,368,p_col, s_col );
+    temp_item.z = z;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    block_map[(temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x] = true;
+    
+    //BACK BOTTOM RIGHT
+    temp_item = Item(x+1,y,369,p_col, s_col );
+    temp_item.z = z;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    block_map[(temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x] = true;
+    
+}
+
+//Adds a 2x2x2 grid of soup items
+//(x,y,z) is the point of the back, left, bottom point
+void fill_cauldron(vector<vector<Item>>* map_scenery_bottom, int map_width, int map_height,int x, int y, int z, SDL_Color p_col, SDL_Color s_col, SDL_Color t_col){
+    
+    // 370 - SOUP - FRONT TOP LEFT
+    // 371 - SOUP - FRONT TOP RIGHT
+    // 372 - SOUP - FRONT BOTTOM LEFT
+    // 373 - SOUP - FRONT BOTTOM RIGHT
+    // 374 - SOUP - BACK TOP LEFT
+    // 375 - SOUP - BACK TOP RIGHT
+    // 376 - SOUP - BACK BOTTOM LEFT
+    // 377 - SOUP - BACK BOTTOM RIGHT
+    
+    //First, create FRONT TOP LEFT ITEM
+    Item temp_item = Item(x,y+1,370,p_col, s_col );
+    temp_item.tertColor = t_col;
+    temp_item.z = z+1;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    
+    //FRONT TOP RIGHT
+    temp_item = Item(x+1,y+1,371,p_col, s_col );
+    temp_item.tertColor = t_col;
+    temp_item.z = z+1;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    
+    //FRONT BOTTOM LEFT
+    temp_item = Item(x,y+1,372,p_col, s_col );
+    temp_item.tertColor = t_col;
+    temp_item.z = z;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    
+    //FRONT BOTTOM RIGHT
+    temp_item = Item(x+1,y+1,373,p_col, s_col );
+    temp_item.tertColor = t_col;
+    temp_item.z = z;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    
+    //BACK TOP LEFT
+    temp_item = Item(x,y,374,p_col, s_col );
+    temp_item.tertColor = t_col;
+    temp_item.z = z+1;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    
+    //BACK TOP RIGHT
+    temp_item = Item(x+1,y,375,p_col, s_col );
+    temp_item.tertColor = t_col;
+    temp_item.z = z+1;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    
+    //BACK BOTTOM LEFT
+    temp_item = Item(x,y,376,p_col, s_col );
+    temp_item.tertColor = t_col;
+    temp_item.z = z;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
+    
+    //BACK BOTTOM RIGHT
+    temp_item = Item(x+1,y,377,p_col, s_col );
+    temp_item.tertColor = t_col;
+    temp_item.z = z;
+    map_scenery_bottom->at( (temp_item.z*map_height*map_width) + (temp_item.y*map_width) + temp_item.x   ).push_back(temp_item);
     
 }
 

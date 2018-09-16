@@ -41,6 +41,10 @@ void build_floor_path(vector<vector<Item>>* map_scenery_bottom, bool* block_map,
 //Streetlights...
 void build_streetlight(vector<vector<Item>>* map_scenery,vector<vector<Item>>* map_clouds, bool* block_map, int map_width, int map_height,int x, int y, int z = 0,SDL_Color p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255), static_cast<Uint8>(rand()%255) } ); //builds a streetlight
 
+//Soup Cauldrons...
+void build_cauldron(vector<vector<Item>>* map_scenery, bool* block_map,int map_width, int map_height,int x, int y, int z = 0);
+void fill_cauldron(vector<vector<Item>>* map_scenery, int map_width, int map_height,int x, int y, int z = 0, SDL_Color p_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color s_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color t_col = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255});
+
 //Towers...
 void build_tower_NxN(vector<vector<Item>>* map_scenery_top,vector<vector<Item>>* map_scenery_bottom, bool* block_map, int map_width, int map_height, int x, int y, int n, int num_floors, SDL_Color brick_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color brick_col2 = {0,0,0,255}, SDL_Color floor_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color floor_col2 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}, SDL_Color door_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255},SDL_Color ladder_col1 = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}); //Builds an NxN enclosed box on the map out of standrad bricks, adds a door to one of the walls
 

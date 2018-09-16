@@ -739,7 +739,118 @@ void loadTiles(){
     item_tiles_s_balcony[361] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     item_tiles_t_balcony[361] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[362] = loadTexture("Civ2/Civ2/tiles/soup/bottomleft_topview_cauldronPrim.png");
+    item_tiles_s[362] = loadTexture("Civ2/Civ2/tiles/soup/bottomleft_topview_cauldronSeco.png");
+    item_tiles_t[362] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[362] = loadTexture("Civ2/Civ2/tiles/soup/front_topleft_sideview_cauldronPrim.png");
+    item_tiles_s_balcony[362] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[362] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
     
+    item_tiles_p[363] = loadTexture("Civ2/Civ2/tiles/soup/bottomright_topview_cauldronPrim.png");
+    item_tiles_s[363] = loadTexture("Civ2/Civ2/tiles/soup/bottomright_topview_cauldronSeco.png");
+    item_tiles_t[363] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[363] = loadTexture("Civ2/Civ2/tiles/soup/front_topright_sideview_cauldronPrim.png");
+    item_tiles_s_balcony[363] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[363] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+
+    item_tiles_p[364] = loadTexture("Civ2/Civ2/tiles/soup/bottomleft_topview_cauldronPrim.png");
+    item_tiles_s[364] = loadTexture("Civ2/Civ2/tiles/soup/bottomleft_topview_cauldronSeco.png");
+    item_tiles_t[364] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[364] = loadTexture("Civ2/Civ2/tiles/soup/front_bottomleft_sideview_cauldronPrim.png");
+    item_tiles_s_balcony[364] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[364] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+
+    item_tiles_p[365] = loadTexture("Civ2/Civ2/tiles/soup/bottomright_topview_cauldronPrim.png");
+    item_tiles_s[365] = loadTexture("Civ2/Civ2/tiles/soup/bottomright_topview_cauldronSeco.png");
+    item_tiles_t[365] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[365] = loadTexture("Civ2/Civ2/tiles/soup/front_bottomright_sideview_cauldronPrim.png");
+    item_tiles_s_balcony[365] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[365] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+
+    item_tiles_p[366] = loadTexture("Civ2/Civ2/tiles/soup/topleft_topview_cauldronPrim.png");
+    item_tiles_s[366] = loadTexture("Civ2/Civ2/tiles/soup/topleft_topview_cauldronSeco.png");
+    item_tiles_t[366] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[366] = loadTexture("Civ2/Civ2/tiles/soup/back_topleft_sideview_cauldronPrim.png");
+    item_tiles_s_balcony[366] = loadTexture("Civ2/Civ2/tiles/soup/back_topleft_sideview_cauldronSeco.png");
+    item_tiles_t_balcony[366] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+
+    item_tiles_p[367] = loadTexture("Civ2/Civ2/tiles/soup/topright_topview_cauldronPrim.png");
+    item_tiles_s[367] = loadTexture("Civ2/Civ2/tiles/soup/topright_topview_cauldronSeco.png");
+    item_tiles_t[367] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[367] = loadTexture("Civ2/Civ2/tiles/soup/back_topright_sideview_cauldronPrim.png");
+    item_tiles_s_balcony[367] = loadTexture("Civ2/Civ2/tiles/soup/back_topright_sideview_cauldronSeco.png");
+    item_tiles_t_balcony[367] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+ 
+    item_tiles_p[368] = loadTexture("Civ2/Civ2/tiles/soup/topleft_topview_cauldronPrim.png");
+    item_tiles_s[368] = loadTexture("Civ2/Civ2/tiles/soup/topleft_topview_cauldronSeco.png");
+    item_tiles_t[368] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[368] = loadTexture("Civ2/Civ2/tiles/soup/back_bottomleft_sideview_cauldronPrim.png");
+    item_tiles_s_balcony[368] = loadTexture("Civ2/Civ2/tiles/soup/back_bottomleft_sideview_cauldronSeco.png");
+    item_tiles_t_balcony[368] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+
+    item_tiles_p[369] = loadTexture("Civ2/Civ2/tiles/soup/topright_topview_cauldronPrim.png");
+    item_tiles_s[369] = loadTexture("Civ2/Civ2/tiles/soup/topright_topview_cauldronSeco.png");
+    item_tiles_t[369] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_p_balcony[369] = loadTexture("Civ2/Civ2/tiles/soup/back_bottomright_sideview_cauldronPrim.png");
+    item_tiles_s_balcony[369] = loadTexture("Civ2/Civ2/tiles/soup/back_bottomright_sideview_cauldronSeco.png");
+    item_tiles_t_balcony[369] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+
+    item_tiles_p[370] = loadTexture("Civ2/Civ2/tiles/soup/bottomleft_topview_soupPrim.png");
+    item_tiles_s[370] = loadTexture("Civ2/Civ2/tiles/soup/bottomleft_topview_soupSeco.png");
+    item_tiles_t[370] = loadTexture("Civ2/Civ2/tiles/soup/bottomleft_topview_soupTert.png");
+    item_tiles_p_balcony[370] = loadTexture("Civ2/Civ2/tiles/blank.png");
+    item_tiles_s_balcony[370] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[370] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[371] = loadTexture("Civ2/Civ2/tiles/soup/bottomright_topview_soupPrim.png");
+    item_tiles_s[371] = loadTexture("Civ2/Civ2/tiles/soup/bottomright_topview_soupSeco.png");
+    item_tiles_t[371] = loadTexture("Civ2/Civ2/tiles/soup/bottomright_topview_soupTert.png");
+    item_tiles_p_balcony[371] = loadTexture("Civ2/Civ2/tiles/blank.png");
+    item_tiles_s_balcony[371] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[371] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[372] = loadTexture("Civ2/Civ2/tiles/soup/bottomleft_topview_soupPrim.png");
+    item_tiles_s[372] = loadTexture("Civ2/Civ2/tiles/soup/bottomleft_topview_soupSeco.png");
+    item_tiles_t[372] = loadTexture("Civ2/Civ2/tiles/soup/bottomleft_topview_soupTert.png");
+    item_tiles_p_balcony[372] = loadTexture("Civ2/Civ2/tiles/blank.png");
+    item_tiles_s_balcony[372] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[372] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[373] = loadTexture("Civ2/Civ2/tiles/soup/bottomright_topview_soupPrim.png");
+    item_tiles_s[373] = loadTexture("Civ2/Civ2/tiles/soup/bottomright_topview_soupSeco.png");
+    item_tiles_t[373] = loadTexture("Civ2/Civ2/tiles/soup/bottomright_topview_soupTert.png");
+    item_tiles_p_balcony[373] = loadTexture("Civ2/Civ2/tiles/blank.png");
+    item_tiles_s_balcony[373] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    item_tiles_t_balcony[373] = (SDL_Texture *)0x9999; //this is an escape code to indicate no color
+    
+    item_tiles_p[374] = loadTexture("Civ2/Civ2/tiles/soup/topleft_topview_soupPrim.png");
+    item_tiles_s[374] = loadTexture("Civ2/Civ2/tiles/soup/topleft_topview_soupSeco.png");
+    item_tiles_t[374] = loadTexture("Civ2/Civ2/tiles/soup/topleft_topview_soupTert.png");
+    item_tiles_p_balcony[374] = loadTexture("Civ2/Civ2/tiles/soup/back_topleft_sideview_soupPrim.png");
+    item_tiles_s_balcony[374] = loadTexture("Civ2/Civ2/tiles/soup/back_topleft_sideview_soupSeco.png");
+    item_tiles_t_balcony[374] = loadTexture("Civ2/Civ2/tiles/soup/back_topleft_sideview_soupTert.png");
+    
+    item_tiles_p[375] = loadTexture("Civ2/Civ2/tiles/soup/topright_topview_soupPrim.png");
+    item_tiles_s[375] = loadTexture("Civ2/Civ2/tiles/soup/topright_topview_soupSeco.png");
+    item_tiles_t[375] = loadTexture("Civ2/Civ2/tiles/soup/topright_topview_soupTert.png");
+    item_tiles_p_balcony[375] = loadTexture("Civ2/Civ2/tiles/soup/back_topright_sideview_soupPrim.png");
+    item_tiles_s_balcony[375] = loadTexture("Civ2/Civ2/tiles/soup/back_topright_sideview_soupSeco.png");
+    item_tiles_t_balcony[375] = loadTexture("Civ2/Civ2/tiles/soup/back_topright_sideview_soupTert.png");
+    
+    item_tiles_p[376] = loadTexture("Civ2/Civ2/tiles/soup/topleft_topview_soupPrim.png");
+    item_tiles_s[376] = loadTexture("Civ2/Civ2/tiles/soup/topleft_topview_soupSeco.png");
+    item_tiles_t[376] = loadTexture("Civ2/Civ2/tiles/soup/topleft_topview_soupTert.png");
+    item_tiles_p_balcony[376] = loadTexture("Civ2/Civ2/tiles/soup/back_bottomleft_sideview_soupPrim.png");
+    item_tiles_s_balcony[376] = loadTexture("Civ2/Civ2/tiles/soup/back_bottomleft_sideview_soupSeco.png");
+    item_tiles_t_balcony[376] = loadTexture("Civ2/Civ2/tiles/soup/back_bottomleft_sideview_soupTert.png");
+    
+    item_tiles_p[377] = loadTexture("Civ2/Civ2/tiles/soup/topright_topview_soupPrim.png");
+    item_tiles_s[377] = loadTexture("Civ2/Civ2/tiles/soup/topright_topview_soupSeco.png");
+    item_tiles_t[377] = loadTexture("Civ2/Civ2/tiles/soup/topright_topview_soupTert.png");
+    item_tiles_p_balcony[377] = loadTexture("Civ2/Civ2/tiles/soup/back_bottomright_sideview_soupPrim.png");
+    item_tiles_s_balcony[377] = loadTexture("Civ2/Civ2/tiles/soup/back_bottomright_sideview_soupSeco.png");
+    item_tiles_t_balcony[377] = loadTexture("Civ2/Civ2/tiles/soup/back_bottomright_sideview_soupTert.png");
+
     //MISC TILES
     misc_tiles[0] = loadTexture("Civ2/Civ2/tiles/zodiac/aries.png");
     misc_tiles[1] = loadTexture("Civ2/Civ2/tiles/zodiac/taurus.png");
@@ -4824,9 +4935,17 @@ int main( int argc, char* args[] ){
     
     
     //DEBUG STREETLIGHT TEST
-    build_streetlight(&map_scenery_top, &map_clouds, block_map, map_width, map_height, cre1->x - 2, cre1->y - 7);
-    build_streetlight(&map_scenery_top, &map_clouds, block_map, map_width, map_height, cre1->x + 2, cre1->y - 7);
-    build_streetlight(&map_scenery_top, &map_clouds, block_map, map_width, map_height, cre1->x + 6, cre1->y - 7);
+    SDL_Color light_color = {static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255};
+    build_streetlight(&map_scenery_top, &map_clouds, block_map, map_width, map_height, cre1->x - 2, cre1->y - 7,0, light_color);
+    build_streetlight(&map_scenery_top, &map_clouds, block_map, map_width, map_height, cre1->x + 2, cre1->y - 7,0, light_color);
+    build_streetlight(&map_scenery_top, &map_clouds, block_map, map_width, map_height, cre1->x + 6, cre1->y - 7,0, light_color);
+    
+    //DEBUG CAULDRON TEST
+    build_cauldron(&map_scenery_bottom, block_map, map_width, map_height, cre1->x + 9, cre1->y - 7);
+    
+    build_cauldron(&map_scenery_bottom, block_map, map_width, map_height, cre1->x + 12, cre1->y - 7);
+    fill_cauldron(&map_scenery_bottom, map_width, map_height, cre1->x + 12, cre1->y - 7);
+    
     
     //STORY TEST
     for(int p = 0; p < 200; p++){

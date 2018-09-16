@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Civ2/med_algo.cpp"
-            timestampString = "556314030.825101"
+            timestampString = "558764199.9557461"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "867"
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "building.cpp"
-            timestampString = "558691041.234193"
+            timestampString = "558767980.982146"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1039"
-            endingLineNumber = "1039"
+            startingLineNumber = "1170"
+            endingLineNumber = "1170"
             landmarkName = "build_neighborhood(vector&lt;vector&lt;Item&gt;&gt;* map_scenery_top,vector&lt;vector&lt;Item&gt;&gt;* map_scenery_bottom, bool* block_map, int map_width, int map_height, SDL_Color brick_p_col_in, SDL_Color brick_s_col_in, SDL_Color floor_p_col_in, SDL_Color floor_s_col_in, SDL_Color door_col1, SDL_Color ladder_col_p )"
             landmarkType = "9">
          </BreakpointContent>
