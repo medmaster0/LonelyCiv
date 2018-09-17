@@ -84,6 +84,10 @@ void Sprite::changePrimColor(SDL_Color new_col){
 //changes the secondary color of the spirte
 void Sprite::changeSecoColor(SDL_Color new_col){
     SDL_SetTextureColorMod( secoTexture, new_col.r, new_col.g, new_col.b); //modulate color, update to match the new one
+    //update the stored rgb color values
+    r = new_col.r;
+    g = new_col.g;
+    b = new_col.b;
     return;
 }
 //Draws the sprite to the screen at a specific MAP COORDS

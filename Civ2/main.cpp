@@ -1293,7 +1293,7 @@ void init_environment(){
 //    for(int g = 0 ; g<420; g++){
 //        tempx = rand()%(map_width);
 //        tempy = rand()%(map_height);
-//        temp_tile = 356; //328 for flowers
+//        temp_tile = 354; //328 for flowers
 //        //    Both Random Colors
 //        //Item temp_item = Item(tempx, tempy , temp_tile); //temporary item (scenery)
 //        //    Pink / Green
@@ -2514,6 +2514,11 @@ void free_path(Item item1){
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 //THREADS - ACTIONS ////////////////////////////////////////////////////////////////////////////////////
 //
 // Creatures won't be scheduled a new task uless the two flags: inThread and isNeededByThread are equal to false
@@ -3360,7 +3365,7 @@ void walk_home_thread(Sprite* spr1){
 //roam Thread
 //Keep picking a random location and walk to there
 void roam_thread(Sprite* spr1){
-    //printf("entering roam_thread\n");
+    printf("entering roam_thread\n");
     
     //Firstly, indicate to the sprites that we need them...
     //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
@@ -3409,6 +3414,84 @@ void roam_thread(Sprite* spr1){
     spr1->inThread = false;
     spr1->isNeededByThread = false;
     return;
+    
+}
+
+//ANIMAL TRAPPED THREAD
+//Search by item for laid trap
+//Walk into it
+//Create sprung trap
+//teleport elsewhere and change color (as if entirely new creature has spawned)
+//Exit thread
+void animal_trap_thread(Sprite* spr1){
+    
+    //Firstly, indicate to the sprites that we need them...
+    //the isNeededByThread Flag is used to indicate to the task_creatures_thread not to schedule it anything new (we'll handle that)
+    //mainly used for OTHER creatures, outside thread...
+    spr1->isNeededByThread = true;
+    
+    //STAGE 1: SEARCH BY ITEM # - 353 LAID NET
+    free_path(*spr1); //clear path on sprite for starters
+    if(spr1->path.empty()){ //if path is empty
+        spr1->path = itemTypeSearch_Z(spr1, 353); //try to find a  laid net
+    }
+    //Check if the search failed (error code (9999,9999)
+    if(spr1->path[0][0] == 9999){
+        spr1->path.pop_back();
+        //Just exit and try something else
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    //Now start the thread that will actually walk the path to target
+    spr1->inThread = true;
+    std::thread walkPathObj(walk_path_thread, spr1);
+    walkPathObj.detach();
+    while(spr1->inThread == true){
+    }
+    //got to trap
+    
+    //STAGE 2: Delete the trap
+    bool wasTrap = false; //flag to check if there was actually a trap still there
+    for(int i = 0 ; i < map_items[(spr1->z*map_width*map_height) + (spr1->y*map_width) + spr1->x].size(); i++){ //cycle through all tile items
+        if(map_items[(spr1->z*map_width*map_height) + (spr1->y*map_width) + spr1->x][i].type == 353){ //check if the item in a laid net
+            map_items[(spr1->z*map_width*map_height) + (spr1->y*map_width) + spr1->x].erase(map_items[(spr1->z*map_width*map_height) + (spr1->y*map_width) + spr1->x].begin() + i); //erase the item
+            wasTrap = true; //set flag
+            break; //break so we don't break more than one
+        }
+    }
+    //if we didn't find a trap, just exit.
+    if(wasTrap == false){
+        spr1->inThread = false;
+        spr1->isNeededByThread = false;
+        return; //search failed, try again....
+    }
+    //otherwise... we can continue and make a spring net
+    
+    //STAGE 3: Create spring net
+    Item sprung_net = Item(spr1->x, spr1->y, 354,  {255,255,199}, {static_cast<Uint8>(spr1->r), static_cast<Uint8>(spr1->g), static_cast<Uint8>(spr1->b)});
+    sprung_net.z = spr1->z;
+    map_items.at( (spr1->z*map_width*map_height) + (spr1->y*map_width) + spr1->x ).push_back(sprung_net);
+    
+    //STAGE 4; Change color of animal and teleport to random place
+    spr1->changeSecoColor({static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),static_cast<Uint8>(rand()%255),255}); 
+    while(true){
+        int x = rand()%map_width;
+        int y = rand()%map_height;
+        if(block_map[y*map_width + x] == false){
+            spr1->x = x;
+            spr1->y = y;
+            spr1->z = 0;
+            break;
+        }
+    }
+    
+    //STAGE 5: Now exit
+    spr1->inThread = false;
+    spr1->isNeededByThread = false;
+    return; //search failed, try again....
+    
+    //Remember to use isItemInList function from Item Class
     
 }
 
@@ -3489,9 +3572,6 @@ void home_hoard_thread(Sprite* spr1){
     while(spr1->inThread == true){
     }
     //rechaed home
-    
-    
-    
     
     //STAGE 5: PUT ITEM IN TOWER INVENTORY
     Item temp_item = spr1->inventory.back();
@@ -4356,6 +4436,7 @@ void dance_flower_thread(Sprite* spr1){
 //This function starts threads and sets inThread flag = true
 //**Individual spawned threas are responsible for inThread flag = false again
 void task_animals_thread(){
+    
     short choice = 0; //decide which thread to run
     
     while(true){
@@ -4373,10 +4454,26 @@ void task_animals_thread(){
                 map_animals[i].thread_timer = time(NULL);
                 map_animals[i].inThread = true;
                 
+                vector<int> choices = {0,1};
+                choice = choices[ rand()%choices.size()  ];
+                
                 //Now actually spawn the thread we want to spawn
-                map_animals[i].task_status = "roam";
-                std::thread roamObj(roam_thread, &map_animals[i]);
-                roamObj.detach();
+                switch(choice){
+                    case 0: {
+                        map_animals[i].task_status = "roam";
+                        std::thread roamObj(roam_thread, &map_animals[i]);
+                        roamObj.detach();
+                        break;
+                    }
+                    case 1: {
+                        map_animals[i].task_status = "get trapped";
+                        std::thread animalTrapObj(animal_trap_thread, &map_animals[i]);
+                        animalTrapObj.detach();
+                        break;
+                    }
+                        
+                }
+
                 
             }
             
@@ -4947,14 +5044,14 @@ int main( int argc, char* args[] ){
     fill_cauldron(&map_scenery_bottom, map_width, map_height, cre1->x + 12, cre1->y - 7);
     
     
-    //STORY TEST
-    for(int p = 0; p < 200; p++){
-        cout << genHerokuName() << "\n";
-        cout << genOldName() << "\n";
-        //cout << genThreadName() << "\n";
-        //cout << genTwineName() << "\n";
-        //cout << genMeatName() << "\n";
-    }
+//    //STORY TEST
+//    for(int p = 0; p < 200; p++){
+//        cout << genHerokuName() << "\n";
+//        cout << genOldName() << "\n";
+//        //cout << genThreadName() << "\n";
+//        //cout << genTwineName() << "\n";
+//        //cout << genMeatName() << "\n";
+//    }
     
     //RECIPES
     //Generate some new recipe types
@@ -5028,8 +5125,8 @@ int main( int argc, char* args[] ){
     std::thread taskObj(task_creatures_thread);
     taskObj.detach();
     //This thread schedules new threads for halted animals!
-//    std::thread taskAnimalObj(task_animals_thread);
-//    taskAnimalObj.detach();
+    std::thread taskAnimalObj(task_animals_thread);
+    taskAnimalObj.detach();
     //This thread wanders the player character around the map
     std::thread playerWanderObj(wander_player_thread, cre1);
     playerWanderObj.detach();
@@ -5270,6 +5367,14 @@ int main( int argc, char* args[] ){
                             creature_inventory_index = 0;
                         }
                         break;
+                        
+                    case SDLK_SLASH:{
+                        //lay a trap down at the craetures feet
+                        Item temp_net = Item(cre1->x, cre1->y, 353, {255,255,199}, {0,0,0} );
+                        temp_net.z = 0;
+                        map_items.at( (cre1->z*map_width*map_height) + (cre1->y*map_width) + cre1->x ).push_back(temp_net);
+                        break;
+                    }
                         
                     case SDLK_t:{
                         statusDisplayOn = !statusDisplayOn;
